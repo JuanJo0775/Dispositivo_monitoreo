@@ -8,6 +8,7 @@
     "android": "expo start --android",
     "test": "jest",
     "test:watch": "jest --watch",
+    "build": "expo export --platform android",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --check .",
