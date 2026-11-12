@@ -4887,10 +4887,80 @@ function runGitleaks(argv, cwd) {
 }
 
 // tools/src/hook/pre-commit.ts
-import { spawnSync as spawnSync5 } from "node:child_process";
+import { spawnSync as spawnSync6 } from "node:child_process";
 import { existsSync as existsSync6 } from "node:fs";
 import os3 from "node:os";
 import path22 from "node:path";
+
+// tools/src/hook/patterns.ts
+import { spawnSync as spawnSync5 } from "node:child_process";
+var JS = ["js", "jsx", "ts", "tsx", "mjs", "cjs", "mts", "cts", "vue", "svelte", "astro"];
+var PY = ["py"];
+var PATTERNS3 = [
+  { langs: JS, re: /\.(inner|outer)HTML\s*=(?!=)|\binsertAdjacentHTML\s*\(|\bdocument\.write(ln)?\s*\(/, why: "HTML built from text: set textContent, or escape what comes from outside" },
+  { langs: JS, re: /\bdangerouslySet(InnerHTML)\b|\bv-html\s*=|\{@html\b/, why: "raw HTML in a template: sanitize it first or render it as text" },
+  { langs: [...JS, ...PY, "php", "rb"], re: /(^|[^\w.$])eval\s*\(|\bnew\s+Function\s*\(/, why: "eval runs text as code: parse the data instead" },
+  { langs: JS, re: /\bexec(Sync)?\s*\(\s*(`[^`]*\$\{|[^,)]*\+)/, why: "a shell command built from text: use execFile or spawn with a list of arguments" },
+  { langs: JS, re: /\bshell\s*:\s*true\b/, why: "shell: true lets text from outside become commands: pass a list of arguments" },
+  { langs: JS, re: /\brejectUnauthorized\s*:\s*false\b|NODE_TLS_REJECT_UNAUTHORIZED\s*=\s*['"]?0/, why: "TLS certificate checks turned off" },
+  { langs: PY, re: /\b(c?pickle|marshal|dill|shelve)\.(loads?|open)\s*\(/, why: "unpickling runs code: never on data from outside; use JSON" },
+  { langs: PY, re: /\byaml\.(load|load_all|unsafe_load)\s*\((?![^)]*SafeLoader)/, why: "yaml.load can build any object: use yaml.safe_load" },
+  { langs: PY, re: /\btorch\.load\s*\((?![^)]*weights_only\s*=\s*True)/, why: "torch.load unpickles: pass weights_only=True" },
+  { langs: PY, re: /\bshell\s*=\s*True\b|\bos\.(system|popen)\s*\(/, why: "a command run through the shell: use subprocess with a list and no shell" },
+  { langs: PY, re: /\bverify\s*=\s*False\b/, why: "TLS certificate checks turned off" },
+  { langs: [...PY, ...JS, "php", "rb", "go", "java", "kt", "cs"], re: /\b(execute|executemany|query|raw|exec_query|find_by_sql)\s*\(\s*(f["']|`[^`]*\$\{|["'][^"']*["']\s*(\+|%(?!s?["']))|["'][^"']*["']\s*\.\s*format\s*\()/i, why: "SQL built from text: pass the values as query parameters" },
+  { langs: ["go"], re: /\bInsecureSkipVerify\s*:\s*true\b/, why: "TLS certificate checks turned off" },
+  { langs: ["php"], re: /\bunserialize\s*\(/, why: "unserialize on data from outside can run code: use json_decode" },
+  { langs: ["rb"], re: /\bMarshal\.load\s*\(|\bYAML\.load\s*\(/, why: "deserializing data from outside can run code: use JSON or YAML.safe_load" },
+  { langs: ["java", "kt"], re: /\bnew\s+ObjectInputStream\s*\(/, why: "Java deserialization of data from outside can run code: use a data format such as JSON" }
+];
+var SKIP3 = [/(^|\/)(tests?|__tests__|spec|specs|fixtures?|testdata|e2e|vendor|node_modules|dist|build)\//i, /\.(test|spec)\.[^/]+$/i, /(^|\/)test_[^/]*\.py$/i, /\.min\.[^/]+$/i];
+var MAX_LINE = 2e3;
+var MAX_SHOWN = 8;
+function ext(file) {
+  const m = /\.([^./]+)$/.exec(file);
+  return m ? m[1].toLowerCase() : "";
+}
+function scanAdded(lines) {
+  const out2 = [];
+  for (const a of lines) {
+    if (a.text.length > MAX_LINE || SKIP3.some((s) => s.test(a.file))) continue;
+    const e = ext(a.file);
+    const hit = PATTERNS3.find((p) => p.langs.includes(e) && p.re.test(a.text));
+    if (hit) out2.push({ ...a, why: hit.why });
+  }
+  return out2;
+}
+function addedLines2(root) {
+  const r = spawnSync5("git", ["-c", "core.fsmonitor=false", "-c", "core.quotepath=off", "diff", "--cached", "-U0", "--no-color", "--no-ext-diff", "--no-textconv", "--diff-filter=ACMR"], { cwd: root, encoding: "utf8", windowsHide: true, timeout: 3e4, maxBuffer: 64 * 1024 * 1024 });
+  if (r.status !== 0) return [];
+  const out2 = [];
+  let file = "";
+  let line = 0;
+  for (const raw of r.stdout.split("\n")) {
+    if (raw.startsWith("+++ ")) {
+      file = raw.startsWith("+++ b/") ? raw.slice(6) : "";
+      continue;
+    }
+    const hunk = /^@@ -\S+ \+(\d+)/.exec(raw);
+    if (hunk) {
+      line = Number(hunk[1]);
+      continue;
+    }
+    if (raw.startsWith("+") && file) out2.push({ file, line: line++, text: raw.slice(1).replace(/\r$/, "") });
+  }
+  return out2;
+}
+function scanStaged(root) {
+  return scanAdded(addedLines2(root));
+}
+function warnings(found) {
+  const lines = found.slice(0, MAX_SHOWN).map((f) => `harness: warning: ${f.file}:${f.line} ${f.why}`);
+  if (found.length > MAX_SHOWN) lines.push(`harness: warning: and ${found.length - MAX_SHOWN} more risky lines in the staged changes`);
+  return lines;
+}
+
+// tools/src/hook/pre-commit.ts
 var HOOK_ANALYSIS_MS = 1e4;
 var HOOK_GIT_MS = 3e4;
 function report(v) {
@@ -4901,6 +4971,13 @@ function report(v) {
   if (v.decision === "ask") return { code: 0, lines: [`harness: warning: ${v.reason}`] };
   return { code: 0, lines: [] };
 }
+function riskyWarnings(root) {
+  try {
+    return warnings(scanStaged(root));
+  } catch {
+    return ["harness: warning: the risky-pattern check could not run"];
+  }
+}
 var MANIFEST2 = ".harness/manifest.json";
 function configRoot(top) {
   if (existsSync6(path22.join(top, MANIFEST2))) return top;
@@ -4909,12 +4986,14 @@ function configRoot(top) {
 }
 function preCommit(cwd, opts) {
   try {
-    const top = spawnSync5("git", ["rev-parse", "--show-toplevel"], { cwd, encoding: "utf8", windowsHide: true });
+    const top = spawnSync6("git", ["rev-parse", "--show-toplevel"], { cwd, encoding: "utf8", windowsHide: true });
     if (top.status !== 0) return { code: 1, lines: ["harness: not inside a git repository, so the commit cannot be checked"] };
     const root = top.stdout.trim();
     const verdict5 = judge({ tool: "shell", shell: "posix", command: "git commit", cwd: root, root }, loadGuardConfig(configRoot(root)).config, new Budget(Date.now() + HOOK_ANALYSIS_MS, HOOK_GIT_MS), opts.home ?? os3.homedir());
     const out2 = report(verdict5);
-    if (out2.code === 1 || !opts.gitleaks) return out2;
+    if (out2.code === 1) return out2;
+    out2.lines.push(...riskyWarnings(root));
+    if (!opts.gitleaks) return out2;
     const leaks = runGitleaks(opts.gitleaks, root);
     if (leaks.found) return { code: 1, lines: [...out2.lines, "harness: gitleaks found a secret in the staged changes; remove it, or add it to .gitleaksignore if it is a false positive"] };
     if (leaks.note) return { code: 0, lines: [...out2.lines, `harness: warning: ${leaks.note}`] };
@@ -4934,7 +5013,7 @@ function hookCommand(flags, io) {
 }
 
 // tools/src/commands/doctor.ts
-import { spawnSync as spawnSync6 } from "node:child_process";
+import { spawnSync as spawnSync7 } from "node:child_process";
 
 // tools/src/context/map.ts
 import path23 from "node:path";
@@ -5030,7 +5109,7 @@ function nodeTooOld(version) {
   return major < MIN_NODE[0] || major === MIN_NODE[0] && minor < MIN_NODE[1];
 }
 function opencodeVersion() {
-  const r = spawnSync6("opencode", ["--version"], { encoding: "utf8", timeout: 5e3, windowsHide: true, stdio: ["ignore", "pipe", "ignore"] });
+  const r = spawnSync7("opencode", ["--version"], { encoding: "utf8", timeout: 5e3, windowsHide: true, stdio: ["ignore", "pipe", "ignore"] });
   if (r.status !== 0) return null;
   return /(\d+\.\d+\.\d+)/.exec(r.stdout)?.[1] ?? null;
 }
@@ -5209,7 +5288,7 @@ import { existsSync as existsSync8, readFileSync as readFileSync9 } from "node:f
 import path27 from "node:path";
 
 // tools/src/verify/run.ts
-import { spawn, spawnSync as spawnSync7 } from "node:child_process";
+import { spawn, spawnSync as spawnSync8 } from "node:child_process";
 import { existsSync as existsSync7, statSync as statSync7 } from "node:fs";
 import os4 from "node:os";
 import path26 from "node:path";
@@ -5223,8 +5302,8 @@ function onWindowsPath(prog, env) {
   const dirs2 = hasDir ? [""] : (env.PATH ?? env.Path ?? "").split(";").filter(Boolean);
   for (const d of dirs2) {
     const base = d ? path26.join(d, prog) : prog;
-    for (const ext of path26.extname(prog) ? ["", ...exts] : exts) {
-      const f = base + ext;
+    for (const ext2 of path26.extname(prog) ? ["", ...exts] : exts) {
+      const f = base + ext2;
       try {
         if (existsSync7(f) && statSync7(f).isFile()) return f;
       } catch {
@@ -5236,7 +5315,7 @@ function onWindowsPath(prog, env) {
 var cmdQuote = (a) => `"${a.replace(/"/g, '""')}"`;
 function killTree(pid) {
   try {
-    if (process.platform === "win32") spawnSync7("taskkill", ["/T", "/F", "/PID", String(pid)], { windowsHide: true, stdio: "ignore" });
+    if (process.platform === "win32") spawnSync8("taskkill", ["/T", "/F", "/PID", String(pid)], { windowsHide: true, stdio: "ignore" });
     else process.kill(-pid, "SIGKILL");
   } catch {
   }
@@ -5451,7 +5530,7 @@ Commands:
   init [--agent a,b] [--with m,n] [--without m,n] [--new] [--dry-run]
                                        Install the harness core and modules, or update them (alias: update)
   guard [--agent claude-code|opencode] Judge one agent action read as JSON on stdin (allow, ask or deny)
-  hook pre-commit                      Check the staged changes for secrets (what the git hook runs)
+  hook pre-commit                      Check the staged changes for secrets and risky patterns (what the git hook runs)
   doctor [--brief]                     Check the installed harness (--brief: print only problems)
   remove [--dry-run]                   Remove what init installed; keep what you changed
   verify [--full]                      Run format, lint and types (--full: also test and build)

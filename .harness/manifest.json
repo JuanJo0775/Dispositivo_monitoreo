@@ -29,7 +29,7 @@
   "files": [
     {
       "path": ".harness/bin/harness.mjs",
-      "sha256": "sha256:b28cf39a3dcff298703a4347407e77ec2d2f0d4457526659f404a1c447fab10e"
+      "sha256": "sha256:d8913e05749909bde2fcbe7e6cc48cc7679c548df022597f5a2a6bbb022c265d"
     },
     {
       "path": ".claude/skills/harness-start/SKILL.md",
