@@ -6,4 +6,5 @@ cubre.
 
 | Número | Título | Estado | Área |
 | --- | --- | --- | --- |
-| [0001](0001-arquitectura-por-capas.md) | Arquitectura por capas con puertos y bastón simulado | proposed | diseno |
+| [0001](0001-arquitectura-por-capas.md) | Arquitectura por capas con puertos y bastón simulado | accepted | diseno |
+| [0002](0002-cifrado-ble-y-protocolo.md) | Cifrado de carga útil en BLE y perfil GATT congelado | proposed | conexion-ble |
