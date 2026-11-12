@@ -166,7 +166,7 @@ export function decodeFrame(bytes: Uint8Array): DecodedFrame {
     );
   }
 
-  return { opcode: opcode as Opcode, version, body };
+  return { opcode, version, body };
 }
 
 /** Dice si un byte corresponde a un opcode del contrato. */

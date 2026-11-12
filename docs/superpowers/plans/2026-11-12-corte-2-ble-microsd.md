@@ -119,7 +119,7 @@ tests/                           espejo de src/ y app/
 
 **Interfaces:**
 - Produces:
-  - `RECORD_HEADERS` (las 27 columnas del contrato, en orden)
+  - `RECORD_HEADERS` (las 26 columnas del contrato, en orden)
   - `encodeRecord(record: StickRecord): string`
   - `decodeRecord(line: string): StickRecord`
   - `interface StickRecord { idRegistro; deviceId; fecha; horaUtc; lat; lon; altM; velKmh; sats;
