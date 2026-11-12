@@ -66,6 +66,11 @@ src/
       validation.ts
     session/                      Bloque de configuración de sesión.
       types.ts
+    protocol/                     Contrato BLE v0.1. (corte 2)
+      ble-profile.ts              UUIDs congelados y características.
+      frame.ts                    Tramas, CRC-16 y opcodes.
+      record-codec.ts             Códec del registro (línea CSV).
+      encryption.ts               Sobre XChaCha20-Poly1305.
     calibration/                  Calibración individual. (corte 4)
 
   application/                    Casos de uso, uno por intención.
@@ -88,10 +93,15 @@ src/
       get-settings.ts
       set-trial-mode.ts
     sync/                         (corte 2)
+      sync-from-stick.ts
+      import-csv.ts
+      ingest-synced-records.ts
 
   ports/                          Interfaces de salida.
     stick-gateway.ts
+    ble-transport.ts              Puerto de transporte BLE. (corte 2)
     clock.ts
+    random-bytes.ts               Bytes aleatorios para el cifrado. (corte 2)
     stores/
       capture-store.ts
       measurement-store.ts
@@ -100,11 +110,15 @@ src/
       session-store.ts
       diagnosis-store.ts
       settings-store.ts
+      sync-state-store.ts          (corte 2)
 
   infrastructure/                 Adaptadores concretos.
     ble/
       simulated-stick-gateway.ts
-      ble-stick-gateway.ts        (corte 2)
+      simulated-stick-device.ts    Bastón fiel al contrato. (corte 2)
+      fake-ble-transport.ts       (corte 2)
+      ble-plx-transport.ts        BLE real (react-native-ble-plx). (corte 2)
+      ble-stick-gateway.ts        Gateway sobre el transporte. (corte 2)
     db/
       sql-database.ts             Contrato mínimo que consumen los almacenes.
       migrations.ts
