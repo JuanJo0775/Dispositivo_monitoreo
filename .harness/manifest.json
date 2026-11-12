@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "harnessVersion": "0.1.0",
+  "agents": [
+    "claude-code",
+    "opencode"
+  ],
+  "modules": [
+    "adr",
+    "context",
+    "cto-review",
+    "docs",
+    "greenfield",
+    "playbooks",
+    "roles"
+  ],
+  "testedWith": {
+    "claude-code": "2.1.318",
+    "opencode": "2.2.5"
+  },
+  "gitignore": [
+    ".harness/profile.json",
+    ".harness/verify.json",
+    ".harness/task.md",
+    ".harness/proposals/",
+    ".harness/handoffs/",
+    ".harness/review.diff"
+  ],
+  "files": [
+    {
+      "path": ".harness/bin/harness.mjs",
+      "sha256": "sha256:b28cf39a3dcff298703a4347407e77ec2d2f0d4457526659f404a1c447fab10e"
+    },
+    {
+      "path": ".claude/skills/harness-start/SKILL.md",
+      "sha256": "sha256:f00cc44f1fcec9cc2dd2e71f1112f006cb55d51fc942129a8fbe9cf204ab3fce"
+    },
+    {
+      "path": ".claude/skills/harness-start/task-template.md",
+      "sha256": "sha256:ab6d76ca56a767f7513dd4dd42ae6d0848d147e09374c07ef1eb7a4e3518e946"
+    },
+    {
+      "path": ".claude/skills/harness-verify/SKILL.md",
+      "sha256": "sha256:9cbcfde504dbeff664a4593a184472fcfda77bcbba219e28d15ffa2a8b58ed81"
+    },
+    {
+      "path": ".harness/guides/adr/GUIDE.md",
+      "sha256": "sha256:b3322f766279e189a232a7c627bd0eaeaf7d7cf7042dc12b509ed88faab78eb1"
+    },
+    {
+      "path": ".harness/guides/adr/adr-template.md",
+      "sha256": "sha256:2620946b7c1297cf6f85767ecd515e21af1312190f14242fcf54d2d4c465a2b9"
+    },
+    {
+      "path": ".harness/guides/context/GUIDE.md",
+      "sha256": "sha256:51cd369706ce250044af4beed044dc92d699784ffba079ef44a6c03e6187e58f"
+    },
+    {
+      "path": ".harness/guides/context/glossary-template.md",
+      "sha256": "sha256:d564e0bed8d111f45f093b3fda7ec932956dbfce6c5139ffb4a1d4d6bdd39c21"
+    },
+    {
+      "path": ".harness/guides/context/map-template.md",
+      "sha256": "sha256:eb9c076c2fbca2779f484a747437e41ef689372c1b12927c1e669e4c3fe59b74"
+    },
+    {
+      "path": ".harness/guides/context/soul-template.md",
+      "sha256": "sha256:561c6a35f9de80f1b18e9746825d514083b0d6d3fc0c1b92fc5c1ed666efe0f5"
+    },
+    {
+      "path": ".harness/guides/cto-review/GUIDE.md",
+      "sha256": "sha256:d8538f3cdd2f927e9a1c8b1ad9f2310f1102fad5e8b6db97deaa7a239b3ed3b9"
+    },
+    {
+      "path": ".harness/guides/cto-review/lens-architecture.md",
+      "sha256": "sha256:9c8e8eb3a0f9bd9d415f44267802979f773c23cf0cbfa8ede84bef5cc2b5d260"
+    },
+    {
+      "path": ".harness/guides/cto-review/lens-documentation.md",
+      "sha256": "sha256:95749a66705845faa6e2026dbaa92ef78cc2751e7014b27f1a0029cbe1f37b80"
+    },
+    {
+      "path": ".harness/guides/cto-review/lens-security.md",
+      "sha256": "sha256:c80cd43f62de19a0ea656a5e8cad4374f00e58cda3d10094323ea52dadfaa556"
+    },
+    {
+      "path": ".harness/guides/docs/GUIDE.md",
+      "sha256": "sha256:8a14e453e8eb1cce15f2e896881a9b0cfeee59d7ea87247bd4f1d9517e7cafb6"
+    },
+    {
+      "path": ".harness/guides/greenfield/GUIDE.md",
+      "sha256": "sha256:2178e75f9fff135938a95e286d5efdae6a04dc8f55ccb639053911612e6aa4ae"
+    },
+    {
+      "path": ".harness/guides/playbooks/GUIDE.md",
+      "sha256": "sha256:8507b4d9e6d2aa269387cb14ab0206c22eb1393f823f58a11d750747bf816125"
+    },
+    {
+      "path": ".harness/guides/playbooks/bug.md",
+      "sha256": "sha256:10de3726708dd27bf13ff2fad730d6f0a7c32d4d2f8237f6b12f9b0c81bab72a"
+    },
+    {
+      "path": ".harness/guides/playbooks/dependency.md",
+      "sha256": "sha256:a13640903a77acebc98a8e3071af15d0768d55f6d39b45da00bb73691f138d96"
+    },
+    {
+      "path": ".harness/guides/playbooks/feature.md",
+      "sha256": "sha256:6706735fe6463cf37146aac973bc51c86a5d0904e207e5780fc0139e4f23a803"
+    },
+    {
+      "path": ".harness/guides/playbooks/incident.md",
+      "sha256": "sha256:99be0000a1ec553fce3031962f07e0b129f10f02b3088c555f149ca3f3aa03d5"
+    },
+    {
+      "path": ".harness/guides/playbooks/migration.md",
+      "sha256": "sha256:5c061da8c5dd645e5bc8ee545e6822b61d43a7d0f96a1c92972f164a8d299a77"
+    },
+    {
+      "path": ".harness/guides/playbooks/performance.md",
+      "sha256": "sha256:77ad3ae87e2bbedb1283379b4a97d516ddbd2a12ccd34f934f926dc4e0a2cf7e"
+    },
+    {
+      "path": ".harness/guides/playbooks/refactor.md",
+      "sha256": "sha256:aaf7983fd05a414bca6511b319b15ec8934309a7310c2d15d5d0cd20f25cd9cd"
+    },
+    {
+      "path": ".harness/guides/playbooks/release.md",
+      "sha256": "sha256:8ec667433b0444e802357ef4c0bc3fa75a3ad71ce358d0689a6186da21bd2da5"
+    },
+    {
+      "path": ".harness/guides/roles/GUIDE.md",
+      "sha256": "sha256:8110a29633c42af3e7343df282990565f8029654192d5d52034ce35ee5aedec4"
+    },
+    {
+      "path": ".harness/guides/index.md",
+      "sha256": "sha256:dd3797d1853791c83939fb1797b47de06d8dc16c148a63168125bb5aa2fa5463"
+    },
+    {
+      "path": ".claude/agents/harness-critic.md",
+      "sha256": "sha256:ffec1dd73f962464ecc02cefeaecdabe693d5d2a1c67caa3ef26d94fc2bfd12d"
+    },
+    {
+      "path": ".opencode/agents/harness-critic.md",
+      "sha256": "sha256:79e6bdfd669593a779aba123495c816d58a281baad5275c6e4a1a93b68dafc94"
+    },
+    {
+      "path": ".claude/agents/harness-researcher.md",
+      "sha256": "sha256:82c79c17c83868f93544b6be5242fffacd48a113b07b35cad96d49c23327b1aa"
+    },
+    {
+      "path": ".opencode/agents/harness-researcher.md",
+      "sha256": "sha256:577240c1981bc9a59e5e5bdc5293c670214cda7453a98e705037ce3d8b8a99b5"
+    },
+    {
+      "path": ".claude/agents/harness-reviewer.md",
+      "sha256": "sha256:19047013c18e498a8ee22e97eb9d7d18c8d70ddbfc8fc7c71e11e25bdc0519df"
+    },
+    {
+      "path": ".opencode/agents/harness-reviewer.md",
+      "sha256": "sha256:11b1490a134b134bacf3d9f81cc38b2ef410354f6ff76b07149c546f93191081"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "sha256:4b9d90ed96e6483f3f913ae636a6bd99866619a93d4fca17f9eb7c270f6f1a68"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "sha256:336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49"
+    },
+    {
+      "path": ".opencode/plugins/harness.js",
+      "sha256": "sha256:5393c05003fe8f1c76353039341370f3efcd358494f7826c639cf627479fb72d"
+    }
+  ],
+  "hook": {
+    "path": ".git/hooks/pre-commit",
+    "sha256": "sha256:068a6d9bfa12ac3a579ce2d511293f00b158491d8642f4a5aab183c66e971e6c"
+  }
+}

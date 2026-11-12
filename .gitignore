@@ -1,0 +1,8 @@
+# >>> harness (managed by harness init)
+.harness/profile.json
+.harness/verify.json
+.harness/task.md
+.harness/proposals/
+.harness/handoffs/
+.harness/review.diff
+# <<< harness

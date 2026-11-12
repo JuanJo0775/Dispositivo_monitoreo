@@ -1,0 +1,71 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|Monitor|Read|Write|Edit|NotebookEdit|Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              "-e",
+              "const e=process.env,a=process.argv,r=require('child_process').spawnSync(a[0],[require('path').resolve(e.CLAUDE_PROJECT_DIR||'.',a[1]),...a.slice(2)],{stdio:[0,1,'ignore'],timeout:+e.HARNESS_GUARD_TIMEOUT||15e3}),s=r.status;s===0||s===2||console.error('harness: the guard failed ('+(r.error?r.error.code:'exit '+s)+'); blocked. Run: harness doctor');process.exit(s===0?0:2)",
+              ".harness/bin/harness.mjs",
+              "guard",
+              "--agent",
+              "claude-code"
+            ],
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              ".harness/bin/harness.mjs",
+              "doctor",
+              "--brief"
+            ],
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              ".harness/bin/harness.mjs",
+              "resume"
+            ],
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": [
+              ".harness/bin/harness.mjs",
+              "stop",
+              "--agent",
+              "claude-code"
+            ],
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
