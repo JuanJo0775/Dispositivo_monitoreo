@@ -7,6 +7,15 @@
 .harness/review.diff
 # <<< harness
 
+# Arnés de ingeniería y sus agentes: son herramientas locales de desarrollo,
+# no forman parte de la app. El repositorio publica solo el producto.
+.harness/
+.claude/
+.opencode/
+opencode.json
+AGENTS.md
+CLAUDE.md
+
 # dependencies
 node_modules/
 
