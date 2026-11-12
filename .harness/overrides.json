@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "commands": {
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "format": "npm run format",
+    "typecheck": "npm run typecheck",
+    "build": "npx expo export --platform android"
+  }
+}

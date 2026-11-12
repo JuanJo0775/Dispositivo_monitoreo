@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+.expo
+.harness
+.claude
+.opencode
+android
+ios
+docs
+package-lock.json
+.prettierrc
+.prettierignore
+AGENTS.md
+CLAUDE.md

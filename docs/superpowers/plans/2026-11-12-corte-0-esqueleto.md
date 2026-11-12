@@ -6,9 +6,23 @@
 
 **Architecture:** Capas con dependencias hacia adentro (`domain` → `application` → `ports` → `infrastructure`/`ui`). El bastón se consume por un puerto `StickGateway` con implementación simulada. SQLite es la única fuente de verdad; toda escritura es transaccional y la confirmación al bastón ocurre solo después del commit.
 
-**Tech Stack:** React Native + Expo (SDK estable al crear el proyecto), TypeScript estricto, expo-router, expo-sqlite, expo-file-system, expo-sharing, Zustand, Zod, Vitest, jest-expo + React Native Testing Library.
+**Tech Stack:** React Native + Expo SDK 58, TypeScript estricto, expo-router, expo-sqlite, expo-file-system, expo-sharing, Zustand, Zod, Jest + jest-expo + React Native Testing Library.
 
 **Spec:** `docs/superpowers/specs/2026-11-12-app-movil-arquitectura-design.md`
+
+## Ajustes de ejecución (2026-11-12)
+
+Decisiones tomadas al arrancar, para que el plan y el repositorio no se separen:
+
+- **Un solo runner de pruebas: Jest con `jest-expo`.** Se descartó Vitest porque la prueba de
+  componentes exige el preset de React Native y mantener dos runners duplica configuración. Todo
+  `npm test` corre con Jest.
+- **Los tests espejan `src/`.** Nada de tests sueltos en la raíz de `tests/`.
+- **La raíz solo tiene configuración** (`package.json`, `app.json`, `tsconfig.json`,
+  `eslint.config.js`, `jest.config.js`, `.prettierrc`); el código vive en `app/` y `src/`.
+- **Expo SDK 58**, React 19.3, React Native 0.88, TypeScript 6. El stack exacto queda en
+  `package.json` y el lockfile.
+- La prueba de humo quedó en `tests/domain/types.test.ts` porque `APP_NAME` es del dominio.
 
 ## Global Constraints
 
@@ -36,7 +50,7 @@
 ## File Structure
 
 ```
-app.json, package.json, tsconfig.json, .eslintrc.cjs, .prettierrc, vitest.config.ts
+package.json, app.json, tsconfig.json, eslint.config.js, jest.config.js, .prettierrc
 app/_layout.tsx, app/index.tsx, app/connect.tsx, app/measure.tsx, app/history.tsx
 src/domain/types.ts            entidades y tipos del dominio
 src/domain/validation.ts       rangos, banderas, reglas de validez
@@ -52,6 +66,7 @@ src/infrastructure/ble/simulated-stick-gateway.ts
 src/infrastructure/files/csv-share.ts
 src/ui/stick-provider.tsx
 src/ui/history-list.tsx
+tests/domain/types.test.ts
 tests/domain/validation.test.ts
 tests/application/ingest-capture.test.ts
 tests/application/export-csv.test.ts
