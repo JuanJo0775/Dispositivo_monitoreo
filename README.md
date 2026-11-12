@@ -7,7 +7,7 @@ camino crítico.
 - Requisitos y ciencia: Notion «Dispositivo de monitoreo del suelo» y
   `docs/requirements/objetivo-1-umbrales-ecuaciones-motor.md`.
 - Diseño técnico: `docs/superpowers/specs/2026-11-12-app-movil-arquitectura-design.md`.
-- Plan en curso: `docs/superpowers/plans/2026-11-12-corte-0-esqueleto.md`.
+- Plan del corte 0 (cerrado): `docs/superpowers/plans/2026-11-12-corte-0-esqueleto.md`.
 
 ## Estructura del repositorio
 
@@ -49,6 +49,7 @@ dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports
 | `npm install`                          | Instala dependencias.                                         |
 | `npm start`                            | Metro + Expo.                                                 |
 | `npm run android`                      | Abre la app en el dispositivo o emulador.                     |
+| `npm run build`                        | Exporta el bundle de Android (sin instalar).                  |
 | `npm test`                             | Pruebas con Jest y jest-expo.                                 |
 | `npm run typecheck`                    | TypeScript estricto, sin emitir.                              |
 | `npm run lint`                         | ESLint.                                                       |
@@ -69,8 +70,8 @@ dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports
 
 | Corte | Alcance                                      | Estado    |
 | ----- | -------------------------------------------- | --------- |
-| 0     | Esqueleto: simulador, SQLite, historial, CSV | en curso  |
-| 1     | Recorrido de campo mínimo con diagnóstico    | pendiente |
+| 0     | Esqueleto: simulador, SQLite, historial, CSV | listo     |
+| 1     | Recorrido de campo mínimo con diagnóstico    | siguiente |
 | 2     | BLE real y sincronización por microSD        | pendiente |
 | 3     | Mapa con teselas offline y guía de muestreo  | pendiente |
 | 4     | v1.0: calibración individual, PDF, análisis  | pendiente |

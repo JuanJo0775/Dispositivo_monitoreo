@@ -37,6 +37,8 @@ app/                              Rutas de expo-router. Una pantalla por archivo
 src/
   shared/                         Sin dependencias externas.
     app-info.ts
+    format.ts                     Números, unidades y hora local.
+    versions.ts                   Versión de calibración y de umbrales activos.
 
   domain/                         Puro, testeable sin emulador.
     capture/                      Captura cruda del bastón.
@@ -54,6 +56,7 @@ src/
       list-measurements.ts
     export/
       export-csv.ts
+      csv-file-name.ts            Nombre del archivo, en UTC.
     diagnosis/                    (corte 1)
     sync/                         (corte 2)
 
@@ -70,15 +73,23 @@ src/
       simulated-stick-gateway.ts
       ble-stick-gateway.ts        (corte 2)
     db/
+      sql-database.ts             Contrato mínimo que consumen los almacenes.
       migrations.ts               (corte 0)
       sqlite-stores.ts            (corte 0)
+      database.ts                 Apertura, WAL y migraciones.
     files/
       csv-share.ts                (corte 0)
     maps/                         (corte 3)
 
-  ui/                             Componentes, hooks y tiendas.
+  ui/                             Componentes, hooks, proveedores y tiendas.
     components/
+      history-list.tsx
+      primary-button.tsx
     hooks/
+      use-stick-status.ts         Suscripción al bastón sin renders en cascada.
+    providers/
+      app-context.ts
+      app-provider.tsx            Punto de composición: abre la base y cablea puertos.
     stores/
 
 assets/                           Íconos, splash, umbrales y teselas.
@@ -86,6 +97,7 @@ tests/                            Espejo exacto de src/ y app/.
   domain/capture/
   application/capture/
   infrastructure/ble/
+  integration/                    Flujos de punta a punta: simulador → base → CSV.
   ui/
   helpers/                        Factories compartidas (captures, measurements).
 
