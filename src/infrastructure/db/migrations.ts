@@ -93,6 +93,72 @@ export const MIGRATIONS: readonly Migration[] = [
         ON plots (farm_id);
     `,
   },
+  {
+    version: 2,
+    sql: `
+      ALTER TABLE plots ADD COLUMN cartographic_unit TEXT;
+      ALTER TABLE plots ADD COLUMN planting_density_ha REAL;
+      ALTER TABLE measurements ADD COLUMN session_id TEXT REFERENCES sessions(id);
+      ALTER TABLE measurements ADD COLUMN thresholds_version TEXT;
+      ALTER TABLE measurements ADD COLUMN calibration_version TEXT;
+
+      CREATE TABLE sessions (
+        id TEXT PRIMARY KEY,
+        plot_id TEXT NOT NULL REFERENCES plots(id),
+        config_id INTEGER NOT NULL,
+        crop_primary TEXT NOT NULL,
+        crop_secondary TEXT,
+        depth_cm INTEGER NOT NULL,
+        cartographic_unit TEXT NOT NULL,
+        last_fertilization_date TEXT,
+        thresholds_version TEXT NOT NULL,
+        firmware_version TEXT,
+        sent_at TEXT NOT NULL,
+        accepted_at TEXT,
+        status TEXT NOT NULL
+      );
+
+      CREATE TABLE threshold_sets (
+        version TEXT PRIMARY KEY,
+        payload_json TEXT NOT NULL,
+        checksum TEXT NOT NULL,
+        source TEXT NOT NULL,
+        activated_at TEXT NOT NULL
+      );
+
+      CREATE TABLE diagnoses (
+        id TEXT PRIMARY KEY,
+        measurement_id TEXT NOT NULL REFERENCES measurements(id),
+        engine_version TEXT NOT NULL,
+        thresholds_version TEXT NOT NULL,
+        calibration_version TEXT NOT NULL,
+        firmware_version TEXT,
+        context_snapshot_json TEXT NOT NULL,
+        classes_json TEXT NOT NULL,
+        limiting_factors_json TEXT NOT NULL,
+        alerts_json TEXT NOT NULL,
+        evidence_json TEXT NOT NULL,
+        uncertainty_json TEXT NOT NULL,
+        explanation TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+
+      CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+
+      CREATE INDEX IF NOT EXISTS idx_diagnoses_measurement
+        ON diagnoses (measurement_id);
+
+      CREATE INDEX IF NOT EXISTS idx_sessions_plot
+        ON sessions (plot_id, sent_at DESC);
+    `,
+  },
+  {
+    version: 3,
+    sql: `
+      ALTER TABLE diagnoses ADD COLUMN variables_json TEXT NOT NULL DEFAULT '[]';
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_config_id ON sessions (config_id);
+    `,
+  },
 ];
 
 /** Migraciones que faltan aplicar, dada la última versión registrada. */

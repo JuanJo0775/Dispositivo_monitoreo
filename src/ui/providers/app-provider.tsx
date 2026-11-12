@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import type { ThresholdSet } from '@/domain/diagnosis/threshold-set';
 import { SimulatedStickGateway } from '@/infrastructure/ble/simulated-stick-gateway';
 import { adaptSqlDatabase, createSqliteStores, openDatabase } from '@/infrastructure/db/database';
 import type { SqlDatabase } from '@/infrastructure/db/sql-database';
+import { importThresholdSet } from '@/infrastructure/thresholds/import-threshold-set';
+import { loadThresholdSet } from '@/infrastructure/thresholds/load-threshold-set';
+import { ACTIVE_THRESHOLDS_VERSION } from '@/shared/versions';
 
 import { AppContext, type AppServices } from './app-context';
 
 /**
  * Punto de composición de la app.
  *
- * Abre SQLite, aplica migraciones y crea el gateway del bastón. Ninguna capa
- * de dominio conoce estas implementaciones: acá se conectan los puertos.
+ * Abre SQLite, aplica migraciones, importa el set de umbrales y crea el gateway del bastón.
+ * Ninguna capa de dominio conoce estas implementaciones: acá se conectan los puertos.
  */
 export function AppProvider({ children }: { children: ReactNode }) {
   const [services, setServices] = useState<AppServices | null>(null);
@@ -26,9 +30,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const db = await openDatabase();
         const sql: SqlDatabase = adaptSqlDatabase(db);
         const stores = createSqliteStores(sql);
+        const thresholds: ThresholdSet = await loadThresholdSet(ACTIVE_THRESHOLDS_VERSION);
+        await importThresholdSet(sql, thresholds);
 
         if (!cancelled) {
-          setServices({ stores, uow: stores.uow, gateway });
+          setServices({ stores, uow: stores.uow, gateway, thresholds });
         }
       } catch (bootError) {
         if (!cancelled) {

@@ -1,4 +1,5 @@
 import type { RawCapture } from '@/domain/capture/types';
+import type { SessionConfig } from '@/domain/session/types';
 
 /** Estado observable del bastón. Se muestra siempre en la UI, no solo con color. */
 export interface StickStatus {
@@ -27,6 +28,13 @@ export interface StickGateway {
   onStatus(listener: (status: StickStatus) => void): Unsubscribe;
   /** Pulsación del gatillo simulada o comando «capturar ahora». */
   requestCapture(): Promise<void>;
+  /**
+   * Escribe al bastón el bloque de configuración de la sesión.
+   *
+   * A partir de esta escritura el bastón devuelve el `configId` en cada
+   * captura y la puede relacionar con un lote y un cultivo.
+   */
+  writeConfig(config: SessionConfig): Promise<void>;
   /**
    * Confirma al bastón que la captura quedó guardada. Solo se llama después
    * del commit en SQLite; el bastón no borra de la microSD antes de esto.

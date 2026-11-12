@@ -1,4 +1,5 @@
 import type { CapturePayload, RawCapture } from '@/domain/capture/types';
+import type { SessionConfig } from '@/domain/session/types';
 import type { StickGateway, StickStatus, Unsubscribe } from '@/ports/stick-gateway';
 
 export interface SimulatedStickGatewayOptions {
@@ -46,12 +47,14 @@ const DISCONNECTED: StickStatus = {
  *
  * Permite cerrar los cortes 0 y 1 sin hardware y sirve de fixture de
  * integración. Toda captura se marca `simulated: true` para que el motor no
- * la trate como dato de campo.
+ * la trate como dato de campo. Guarda la configuración que le escriben y la
+ * adjunta a cada captura posterior.
  */
 export class SimulatedStickGateway implements StickGateway {
   private currentStatus: StickStatus = DISCONNECTED;
   private sequence = 0;
   private confirmedSequence = 0;
+  private activeConfig: SessionConfig | null = null;
   private readonly captureListeners = new Set<(capture: RawCapture) => void>();
   private readonly statusListeners = new Set<(status: StickStatus) => void>();
   private readonly options: SimulatedStickGatewayOptions;
@@ -99,10 +102,21 @@ export class SimulatedStickGateway implements StickGateway {
 
     this.sequence += 1;
     const now = new Date().toISOString();
+    const config = this.activeConfig;
+    const overrides = this.options.capture ?? {};
     const capture: RawCapture = {
       deviceId: this.currentStatus.deviceId ?? 'simulated-stick',
       sequence: this.sequence,
-      payload: { ...BASE_PAYLOAD, ...this.options.capture },
+      payload: {
+        ...BASE_PAYLOAD,
+        ...overrides,
+        cropCode: overrides.cropCode ?? config?.cropPrimary ?? BASE_PAYLOAD.cropCode,
+        plotCode: overrides.plotCode ?? config?.plotId ?? BASE_PAYLOAD.plotCode,
+        lastFertilizationDate:
+          overrides.lastFertilizationDate ??
+          config?.lastFertilizationDate ??
+          BASE_PAYLOAD.lastFertilizationDate,
+      },
       capturedAtUtc: now,
       receivedAtUtc: now,
       origin: 'stick',
@@ -114,11 +128,19 @@ export class SimulatedStickGateway implements StickGateway {
         timeValid: true,
         simulated: true,
       },
-      configId: 0,
-      plotId: null,
+      configId: config?.configId ?? 0,
+      plotId: config?.plotId ?? null,
     };
 
     this.captureListeners.forEach((listener) => listener(capture));
+  }
+
+  /**
+   * Guarda la configuración activa: a partir de aquí cada captura trae su
+   * `config_id` y el lote y el cultivo declarados en la sesión.
+   */
+  async writeConfig(config: SessionConfig): Promise<void> {
+    this.activeConfig = config;
   }
 
   async confirm(sequence: number): Promise<void> {
