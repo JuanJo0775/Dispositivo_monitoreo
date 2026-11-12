@@ -7,6 +7,7 @@ const allSql = MIGRATIONS.map((migration) => migration.sql).join('\n');
 const version1 = MIGRATIONS.find((migration) => migration.version === 1)?.sql ?? '';
 const version2 = MIGRATIONS.find((migration) => migration.version === 2)?.sql ?? '';
 const version3 = MIGRATIONS.find((migration) => migration.version === 3)?.sql ?? '';
+const version4 = MIGRATIONS.find((migration) => migration.version === 4)?.sql ?? '';
 
 describe('migraciones', () => {
   it('empieza en la versión 1 y es consecutiva', () => {
@@ -45,7 +46,7 @@ describe('migraciones', () => {
 
   describe('versión 2', () => {
     it('publica las versiones en orden consecutive', () => {
-      expect(MIGRATIONS.map((migration) => migration.version)).toEqual([1, 2, 3]);
+      expect(MIGRATIONS.map((migration) => migration.version)).toEqual([1, 2, 3, 4]);
     });
 
     it('crea las tablas de sesiones, umbrales, diagnósticos y ajustes', () => {
@@ -102,6 +103,22 @@ describe('migraciones', () => {
       expect(version2).not.toContain('idx_sessions_config_id');
       expect(version1).not.toContain('variables_json');
       expect(version1).not.toContain('idx_sessions_config_id');
+    });
+  });
+
+  describe('versión 4', () => {
+    it('crea la tabla del estado de sincronización', () => {
+      expect(version4).toContain('CREATE TABLE sync_state');
+      expect(version4).toContain('device_id TEXT PRIMARY KEY');
+      expect(version4).toContain('last_confirmed_sequence INTEGER NOT NULL DEFAULT 0');
+      expect(version4).toContain('status TEXT NOT NULL');
+      expect(version4).toContain('updated_at TEXT NOT NULL');
+    });
+
+    it('no modifica las versiones ya publicadas', () => {
+      expect(version3).not.toContain('sync_state');
+      expect(version2).not.toContain('sync_state');
+      expect(version1).not.toContain('sync_state');
     });
   });
 
@@ -171,6 +188,29 @@ describe('migraciones', () => {
 
       expect(unico).toBeDefined();
       expect(unico?.unique).toBe(1);
+    });
+
+    it('crea la tabla del estado de sincronización', async () => {
+      const tables = await db.getAllAsync<{ name: string }>(
+        "SELECT name FROM sqlite_master WHERE type = 'table'",
+      );
+
+      expect(tables.map((row) => row.name)).toContain('sync_state');
+    });
+
+    it('guarda el estado de sincronización por bastón', async () => {
+      await db.runAsync(
+        'INSERT INTO sync_state (device_id, last_confirmed_sequence, status, updated_at) VALUES (?, ?, ?, ?)',
+        ['stick-01', 7, 'syncing', '2026-11-12T12:00:00Z'],
+      );
+
+      const row = await db.getFirstAsync<{ last_confirmed_sequence: number; status: string }>(
+        'SELECT last_confirmed_sequence, status FROM sync_state WHERE device_id = ?',
+        ['stick-01'],
+      );
+
+      expect(row?.last_confirmed_sequence).toBe(7);
+      expect(row?.status).toBe('syncing');
     });
   });
 });

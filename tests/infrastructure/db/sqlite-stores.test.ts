@@ -612,3 +612,82 @@ describe('almacenes SQLite de ajustes', () => {
     });
   });
 });
+
+describe('almacenes SQLite de estado de sincronización', () => {
+  let db: TestSqlDatabase;
+
+  beforeEach(async () => {
+    db = makeTestSqlDatabase();
+    await applyMigrations(db);
+  });
+
+  afterEach(() => {
+    db.close();
+  });
+
+  it('guarda el estado de un dispositivo y lo lee', async () => {
+    const stores = createSqliteStores(db);
+
+    await stores.syncState.save({
+      deviceId: 'stick-01',
+      lastConfirmedSequence: 42,
+      status: 'idle',
+      updatedAt: '2026-11-12T17:06:00Z',
+    });
+
+    const guardado = await stores.syncState.get('stick-01');
+
+    expect(guardado?.lastConfirmedSequence).toBe(42);
+    expect(guardado?.status).toBe('idle');
+    expect(guardado?.updatedAt).toBe('2026-11-12T17:06:00Z');
+  });
+
+  it('devuelve null cuando el dispositivo no tiene estado', async () => {
+    const stores = createSqliteStores(db);
+
+    expect(await stores.syncState.get('stick-01')).toBeNull();
+  });
+
+  it('deja el último estado cuando se guarda dos veces el mismo dispositivo', async () => {
+    const stores = createSqliteStores(db);
+
+    await stores.syncState.save({
+      deviceId: 'stick-01',
+      lastConfirmedSequence: 10,
+      status: 'syncing',
+      updatedAt: '2026-11-12T17:00:00Z',
+    });
+    await stores.syncState.save({
+      deviceId: 'stick-01',
+      lastConfirmedSequence: 25,
+      status: 'idle',
+      updatedAt: '2026-11-12T17:06:00Z',
+    });
+
+    const guardado = await stores.syncState.get('stick-01');
+
+    expect(guardado?.lastConfirmedSequence).toBe(25);
+    expect(guardado?.status).toBe('idle');
+  });
+
+  it('lista el estado de cada dispositivo', async () => {
+    const stores = createSqliteStores(db);
+
+    await stores.syncState.save({
+      deviceId: 'stick-01',
+      lastConfirmedSequence: 3,
+      status: 'idle',
+      updatedAt: '2026-11-12T17:00:00Z',
+    });
+    await stores.syncState.save({
+      deviceId: 'stick-02',
+      lastConfirmedSequence: 7,
+      status: 'error',
+      updatedAt: '2026-11-12T17:05:00Z',
+    });
+
+    const estados = await stores.syncState.list();
+
+    expect(estados.map((estado) => estado.deviceId).sort()).toEqual(['stick-01', 'stick-02']);
+  });
+});

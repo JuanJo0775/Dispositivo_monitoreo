@@ -159,6 +159,17 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE UNIQUE INDEX IF NOT EXISTS idx_sessions_config_id ON sessions (config_id);
     `,
   },
+  {
+    version: 4,
+    sql: `
+      CREATE TABLE sync_state (
+        device_id TEXT PRIMARY KEY,
+        last_confirmed_sequence INTEGER NOT NULL DEFAULT 0,
+        status TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    `,
+  },
 ];
 
 /** Migraciones que faltan aplicar, dada la última versión registrada. */

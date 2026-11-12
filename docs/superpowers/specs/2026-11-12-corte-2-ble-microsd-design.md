@@ -193,8 +193,11 @@ error → idle (acción manual)
    deduplicación por `device_id + id_registro`.
 6. Si un id repetido llega con contenido distinto, **se conserva el primero y se avisa**
    (RF-APP-040).
-7. La app escribe **Sync · confirmación** con el último id recibido y guardado.
-8. La app persiste `sync_state` con ese id. El bastón no borra nada hasta recibir la confirmación.
+7. La app **persiste** `sync_state` con ese id y **después** escribe **Sync · confirmación** con el
+   mismo id. Persistir antes de confirmar es lo seguro: si la confirmación falla, la próxima
+   sincronización vuelve a pedir esos registros y la deduplicación los descarta; al revés, el
+   bastón ya los habría borrado.
+8. El bastón no borra nada hasta recibir la confirmación.
 9. El progreso se cuenta por **registros confirmados**, no por paquetes (RF-APP-041).
 
 ### 6.1 Modelo de datos (migración 4)

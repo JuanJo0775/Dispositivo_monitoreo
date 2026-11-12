@@ -25,6 +25,7 @@ import type { FarmStore } from '@/ports/stores/farm-store';
 import type { MeasurementFilter, MeasurementStore } from '@/ports/stores/measurement-store';
 import type { Session, SessionStore, SessionStatus } from '@/ports/stores/session-store';
 import type { SettingsStore } from '@/ports/stores/settings-store';
+import type { SyncState, SyncStateStore } from '@/ports/stores/sync-state-store';
 import type { StoreTransaction, UnitOfWork } from '@/ports/stores/unit-of-work';
 
 import type { SqlBindValue, SqlDatabase } from './sql-database';
@@ -122,6 +123,13 @@ interface SettingRow {
   value: string;
 }
 
+interface SyncStateRow {
+  device_id: string;
+  last_confirmed_sequence: number;
+  status: string;
+  updated_at: string;
+}
+
 /** Vocabularios cerrados: un valor desconocido no se inventa, se descarta. */
 const APTITUDE_CLASS = new Map<string, AptitudeClass>([
   ['S1', 'S1'],
@@ -134,6 +142,13 @@ const SESSION_STATUS = new Map<string, SessionStatus>([
   ['sent', 'sent'],
   ['accepted', 'accepted'],
   ['expired', 'expired'],
+]);
+
+/** Estado de la sincronización: un valor desconocido no se inventa. */
+const SYNC_STATUS = new Map<string, SyncState['status']>([
+  ['idle', 'idle'],
+  ['syncing', 'syncing'],
+  ['error', 'error'],
 ]);
 
 const DRAINAGE = new Map<string, Drainage>([
@@ -346,6 +361,15 @@ function toSession(row: SessionRow): Session {
   };
 }
 
+function toSyncState(row: SyncStateRow): SyncState {
+  return {
+    deviceId: row.device_id,
+    lastConfirmedSequence: row.last_confirmed_sequence,
+    status: SYNC_STATUS.get(row.status) ?? 'idle',
+    updatedAt: row.updated_at,
+  };
+}
+
 function toVariableResults(value: string): VariableResult[] {
   const items = parseList(value) as VariableResult[];
 
@@ -551,12 +575,15 @@ const SESSION_COLUMNS =
 const DIAGNOSIS_COLUMNS =
   'id, measurement_id, engine_version, thresholds_version, calibration_version, firmware_version, context_snapshot_json, classes_json, limiting_factors_json, alerts_json, evidence_json, uncertainty_json, variables_json, explanation, created_at';
 
-/** Almacenes respaldados por SQLite: fincas, lotes, sesiones, diagnósticos y ajustes. */
+const SYNC_STATE_COLUMNS = 'device_id, last_confirmed_sequence, status, updated_at';
+
+/** Almacenes respaldados por SQLite: fincas, lotes, sesiones, diagnósticos, ajustes y sincronización. */
 export interface SqliteStores extends StoreTransaction {
   readonly farms: FarmStore;
   readonly sessions: SessionStore;
   readonly diagnoses: DiagnosisStore;
   readonly settings: SettingsStore;
+  readonly syncState: SyncStateStore;
   readonly uow: UnitOfWork;
 }
 
@@ -871,6 +898,32 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
     },
   };
 
+  const syncState: SyncStateStore = {
+    async get(deviceId) {
+      const row = await db.getFirstAsync<SyncStateRow>(
+        `SELECT ${SYNC_STATE_COLUMNS} FROM sync_state WHERE device_id = ?`,
+        [deviceId],
+      );
+
+      return row === null ? null : toSyncState(row);
+    },
+
+    async save(state) {
+      await db.runAsync(
+        `INSERT OR REPLACE INTO sync_state (${SYNC_STATE_COLUMNS}) VALUES (?, ?, ?, ?)`,
+        [state.deviceId, state.lastConfirmedSequence, state.status, state.updatedAt],
+      );
+    },
+
+    async list() {
+      const rows = await db.getAllAsync<SyncStateRow>(
+        `SELECT ${SYNC_STATE_COLUMNS} FROM sync_state ORDER BY device_id`,
+      );
+
+      return rows.map(toSyncState);
+    },
+  };
+
   const uow: UnitOfWork = {
     async run<T>(work: (stores: StoreTransaction) => Promise<T>): Promise<T> {
       let result: T | undefined;
@@ -889,5 +942,5 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
     },
   };
 
-  return { captures, measurements, farms, sessions, diagnoses, settings, uow };
+  return { captures, measurements, farms, sessions, diagnoses, settings, syncState, uow };
 }
