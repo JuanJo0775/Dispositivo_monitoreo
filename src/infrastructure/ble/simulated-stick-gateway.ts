@@ -1,6 +1,11 @@
 import type { CapturePayload, RawCapture } from '@/domain/capture/types';
+import { flagsFromBits, type StickRecord } from '@/domain/protocol/record-codec';
 import type { SessionConfig } from '@/domain/session/types';
 import type { StickGateway, StickStatus, Unsubscribe } from '@/ports/stick-gateway';
+import {
+  SimulatedStickDevice,
+  type StickSensors,
+} from '@/infrastructure/ble/simulated-stick-device';
 
 export interface SimulatedStickGatewayOptions {
   /** Identificador del bastón simulado. Se usa si `connect` no lo recibe. */
@@ -9,30 +14,9 @@ export interface SimulatedStickGatewayOptions {
   capture?: Partial<CapturePayload>;
   /** Fuerza un fallo de conexión, como un bastón apagado. */
   failOnConnect?: boolean;
+  /** Bastón simulado sobre el que se construye el gateway. */
+  device?: SimulatedStickDevice;
 }
-
-const BASE_PAYLOAD: CapturePayload = {
-  latitude: 4.5339,
-  longitude: -75.6811,
-  altitudeM: 1550,
-  speedKmh: 0.4,
-  satellites: 9,
-  hdop: 0.9,
-  fixAgeS: 1.2,
-  depthCm: 20,
-  cropCode: 'cafe',
-  plotCode: null,
-  lastFertilizationDate: null,
-  humidityPct: 38,
-  temperatureC: 21.5,
-  ph: 5.4,
-  ecUsCm: 120,
-  nMgKg: 12,
-  pMgKg: 18,
-  kMgKg: 95,
-  batteryPct: 82,
-  firmwareVersion: '0.1.0',
-};
 
 const DISCONNECTED: StickStatus = {
   connected: false,
@@ -45,22 +29,43 @@ const DISCONNECTED: StickStatus = {
 /**
  * Bastón simulado que implementa el mismo puerto que el BLE real.
  *
- * Permite cerrar los cortes 0 y 1 sin hardware y sirve de fixture de
- * integración. Toda captura se marca `simulated: true` para que el motor no
- * la trate como dato de campo. Guarda la configuración que le escriben y la
- * adjunta a cada captura posterior.
+ * Se construye sobre `SimulatedStickDevice`, el bastón que habla el contrato:
+ * microSD, configuración en memoria no volátil, CRC, MTU y cortes de
+ * conexión. Así la app usa hoy el mismo camino de código que usará con el
+ * bastón real. Toda captura se marca `simulated: true` para que el motor no
+ * la trate como dato de campo.
  */
 export class SimulatedStickGateway implements StickGateway {
+  private readonly device: SimulatedStickDevice;
+  private readonly options: SimulatedStickGatewayOptions;
   private currentStatus: StickStatus = DISCONNECTED;
-  private sequence = 0;
-  private confirmedSequence = 0;
-  private activeConfig: SessionConfig | null = null;
+  private connected = false;
   private readonly captureListeners = new Set<(capture: RawCapture) => void>();
   private readonly statusListeners = new Set<(status: StickStatus) => void>();
-  private readonly options: SimulatedStickGatewayOptions;
 
   constructor(options: SimulatedStickGatewayOptions = {}) {
     this.options = options;
+    this.device =
+      options.device ??
+      new SimulatedStickDevice({
+        deviceId: options.deviceId ?? 'simulated-stick',
+        sensors: sensorsFrom(options.capture),
+      });
+
+    const battery = options.capture?.batteryPct;
+    if (typeof battery === 'number') {
+      this.device.setBatteryPct(battery);
+    }
+
+    const firmware = options.capture?.firmwareVersion;
+    if (typeof firmware === 'string') {
+      this.device.setFirmwareVersion(firmware);
+    }
+  }
+
+  /** Bastón simulado sobre el que está construido el gateway. */
+  simulatedDevice(): SimulatedStickDevice {
+    return this.device;
   }
 
   async connect(deviceId: string): Promise<void> {
@@ -68,16 +73,20 @@ export class SimulatedStickGateway implements StickGateway {
       throw new Error('El bastón simulado no disponible');
     }
 
+    this.connected = true;
+
+    const status = this.device.status();
     this.updateStatus({
       connected: true,
-      deviceId: deviceId || this.options.deviceId || 'simulated-stick',
-      batteryPct: BASE_PAYLOAD.batteryPct,
-      firmwareVersion: BASE_PAYLOAD.firmwareVersion,
+      deviceId: deviceId || this.device.deviceId,
+      batteryPct: status.batteryPct,
+      firmwareVersion: status.firmwareVersion,
       protocolVersion: '0.1',
     });
   }
 
   async disconnect(): Promise<void> {
+    this.connected = false;
     this.updateStatus(DISCONNECTED);
   }
 
@@ -96,64 +105,122 @@ export class SimulatedStickGateway implements StickGateway {
   }
 
   async requestCapture(): Promise<void> {
-    if (!this.currentStatus.connected) {
+    if (!this.connected) {
       throw new Error('El bastón no conectado');
     }
 
-    this.sequence += 1;
-    const now = new Date().toISOString();
-    const config = this.activeConfig;
-    const overrides = this.options.capture ?? {};
-    const capture: RawCapture = {
-      deviceId: this.currentStatus.deviceId ?? 'simulated-stick',
-      sequence: this.sequence,
-      payload: {
-        ...BASE_PAYLOAD,
-        ...overrides,
-        cropCode: overrides.cropCode ?? config?.cropPrimary ?? BASE_PAYLOAD.cropCode,
-        plotCode: overrides.plotCode ?? config?.plotId ?? BASE_PAYLOAD.plotCode,
-        lastFertilizationDate:
-          overrides.lastFertilizationDate ??
-          config?.lastFertilizationDate ??
-          BASE_PAYLOAD.lastFertilizationDate,
-      },
-      capturedAtUtc: now,
-      receivedAtUtc: now,
-      origin: 'stick',
-      flags: {
-        positionValid: true,
-        recentFix: true,
-        probeOk: true,
-        ecOverThreshold: false,
-        timeValid: true,
-        simulated: true,
-      },
-      configId: config?.configId ?? 0,
-      plotId: config?.plotId ?? null,
-    };
+    const record = this.device.captureNow();
+    const capture = toRawCapture(record, this.device.deviceId, this.options.capture);
 
     this.captureListeners.forEach((listener) => listener(capture));
   }
 
   /**
-   * Guarda la configuración activa: a partir de aquí cada captura trae su
-   * `config_id` y el lote y el cultivo declarados en la sesión.
+   * Escribe al bastón el bloque de configuración de la sesión.
+   *
+   * A partir de esta escritura el bastón devuelve el `configId` en cada
+   * captura y la puede relacionar con un lote y un cultivo. Si el bastón
+   * rechaza la configuración, la escritura falla con el motivo del rechazo.
    */
   async writeConfig(config: SessionConfig): Promise<void> {
-    this.activeConfig = config;
+    const status = this.device.writeSessionConfig(config);
+
+    if (!status.aceptada) {
+      throw new Error(
+        `El bastón no aceptó la configuración: ${status.motivo ?? 'motivo desconocido'}.`,
+      );
+    }
   }
 
   async confirm(sequence: number): Promise<void> {
-    this.confirmedSequence = Math.max(this.confirmedSequence, sequence);
+    this.device.confirm(sequence);
   }
 
   /** Última secuencia confirmada; el BLE real la persiste en `sync_state`. */
   lastConfirmedSequence(): number {
-    return this.confirmedSequence;
+    return this.device.lastConfirmedSequence();
   }
 
   private updateStatus(next: StickStatus): void {
     this.currentStatus = next;
     this.statusListeners.forEach((listener) => listener(next));
   }
+}
+
+/**
+ * Convierte un registro de la microSD en la captura que maneja la app.
+ *
+ * El registro es la fuente: la app nunca inventa un dato que el bastón no
+ * reportó. Los `overrides` solo sirven para las pruebas del simulador.
+ */
+export function toRawCapture(
+  record: StickRecord,
+  deviceId: string,
+  overrides: Partial<CapturePayload> = {},
+): RawCapture {
+  const payload: CapturePayload = {
+    latitude: record.lat,
+    longitude: record.lon,
+    altitudeM: record.altM,
+    speedKmh: record.velKmh,
+    satellites: record.sats,
+    hdop: record.hdop,
+    fixAgeS: record.edadFixS,
+    depthCm: record.profCm,
+    cropCode: overrides.cropCode ?? record.cultivo ?? 'cafe',
+    plotCode: overrides.plotCode ?? record.loteId ?? null,
+    lastFertilizationDate: overrides.lastFertilizationDate ?? record.fertFecha ?? null,
+    humidityPct: record.humedadPct,
+    temperatureC: record.tempC,
+    ph: record.ph,
+    ecUsCm: record.ceUsCm,
+    nMgKg: record.nMgKg,
+    pMgKg: record.pMgKg,
+    kMgKg: record.kMgKg,
+    batteryPct: record.batPct,
+    firmwareVersion: record.fwVer,
+  };
+
+  return {
+    deviceId: record.deviceId ?? deviceId,
+    sequence: record.idRegistro ?? 0,
+    payload,
+    capturedAtUtc: `${record.fecha ?? '1970-01-01'}T${record.horaUtc ?? '00:00:00'}Z`,
+    receivedAtUtc: new Date().toISOString(),
+    origin: 'stick',
+    flags: flagsFromBits(record.banderas ?? 0),
+    configId: record.configId ?? 0,
+    plotId: record.loteId ?? null,
+  };
+}
+
+/** Traduce los overrides del payload a las lecturas del bastón. */
+function sensorsFrom(overrides: Partial<CapturePayload> | undefined): Partial<StickSensors> {
+  if (overrides === undefined) {
+    return {};
+  }
+
+  const sensors: Partial<StickSensors> = {};
+
+  const copy = (value: number | null | undefined, key: keyof StickSensors): void => {
+    if (typeof value === 'number') {
+      Object.assign(sensors, { [key]: value });
+    }
+  };
+
+  copy(overrides.latitude, 'latitude');
+  copy(overrides.longitude, 'longitude');
+  copy(overrides.altitudeM, 'altitudeM');
+  copy(overrides.speedKmh, 'speedKmh');
+  copy(overrides.fixAgeS, 'fixAgeS');
+  copy(overrides.depthCm, 'depthCm');
+  copy(overrides.humidityPct, 'humidityPct');
+  copy(overrides.temperatureC, 'temperatureC');
+  copy(overrides.ph, 'ph');
+  copy(overrides.ecUsCm, 'ecUsCm');
+  copy(overrides.nMgKg, 'nMgKg');
+  copy(overrides.pMgKg, 'pMgKg');
+  copy(overrides.kMgKg, 'kMgKg');
+
+  return sensors;
 }

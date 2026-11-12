@@ -28,13 +28,7 @@ export interface BleCharacteristic {
 
 /** Estado de la conexión, para mostrarlo en la interfaz. */
 export type BleConnectionState =
-  | 'idle'
-  | 'scanning'
-  | 'connecting'
-  | 'discovering'
-  | 'ready'
-  | 'disconnected'
-  | 'error';
+  'idle' | 'scanning' | 'connecting' | 'discovering' | 'ready' | 'disconnected' | 'error';
 
 /** Eventos del transporte. */
 export interface BleTransportEvents {
