@@ -8,7 +8,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 
 | Area | Code | ADR | Requirements |
 | --- | --- | --- | --- |
-| conexion-ble | src/infrastructure/ble/, src/ports/stick-gateway.ts | ADR-APP-012, ADR-APP-017 | RF-APP-001 a RF-APP-006, RF-APP-064; Notion `collection://77d39c4a-833b-82e4-8810-870de4b8d062` |
+| conexion-ble | src/infrastructure/ble/, src/ports/stick-gateway.ts, src/ports/ble-transport.ts, src/domain/protocol/ | ADR-APP-012, ADR-APP-017 | RF-APP-001 a RF-APP-006, RF-APP-064; Notion `collection://77d39c4a-833b-82e4-8810-870de4b8d062` |
 | medicion | src/domain/capture/, src/application/capture/ | ADR-APP-005, ADR-APP-012 | RF-APP-007 a RF-APP-012; contrato ESP32-App |
 | contexto-lote | src/domain/farm/, src/application/farm/, src/domain/session/, src/application/session/ | ADR-APP-015 | RF-APP-013 a RF-APP-020, RF-APP-048 a RF-APP-051, RF-APP-064 |
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
