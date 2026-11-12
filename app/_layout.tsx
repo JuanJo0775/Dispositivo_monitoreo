@@ -1,10 +1,12 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { AppProvider } from '@/ui/providers/app-provider';
+
 export default function RootLayout() {
   return (
-    <>
-      <StatusBar style="dark" />
+    <AppProvider>
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: '#1B4332' },
@@ -14,7 +16,10 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: 'Monitoreo de suelo' }} />
+        <Stack.Screen name="connect" options={{ title: 'Conectar' }} />
+        <Stack.Screen name="measure" options={{ title: 'Medir' }} />
+        <Stack.Screen name="history" options={{ title: 'Historial' }} />
       </Stack>
-    </>
+    </AppProvider>
   );
 }

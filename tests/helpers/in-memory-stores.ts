@@ -24,7 +24,7 @@ export interface InMemoryStores extends StoreTransaction {
 export function makeInMemoryStores(options: InMemoryStoresOptions = {}): InMemoryStores {
   let captureRows: RawCapture[] = [];
   let measurementRows: Measurement[] = [];
-  const commitCallbacks: Array<() => void> = [];
+  const commitCallbacks: (() => void)[] = [];
 
   const captures: CaptureStore = {
     async insertRaw(capture) {

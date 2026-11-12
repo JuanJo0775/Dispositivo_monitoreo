@@ -11,12 +11,12 @@ type NumericPayloadField = {
  * `max: null` significa sin techo publicado (solo se exige que no sea negativo).
  * El nombre del campo define el código del motivo: `humidity_out_of_range`.
  */
-const RANGES: ReadonlyArray<{
+const RANGES: readonly {
   field: NumericPayloadField;
   code: string;
   min: number;
   max: number | null;
-}> = [
+}[] = [
   { field: 'humidityPct', code: 'humidity', min: 0, max: 100 },
   { field: 'temperatureC', code: 'temperature', min: -10, max: 60 },
   { field: 'ph', code: 'ph', min: 0, max: 14 },
