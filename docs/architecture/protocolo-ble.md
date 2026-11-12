@@ -73,9 +73,26 @@ bytes 25..  texto cifrado + etiqueta AEAD (16 bytes al final)
 ### Vectores de prueba
 
 Estos valores los produce la suite del dominio (`tests/domain/protocol/encryption.test.ts`) y
-sirven para verificar que el firmware implementa lo mismo:
+sirven para verificar que el firmware implementa lo mismo.
 
-<!-- VECTORES -->
+Con PIN `000000` y sal `07070707070707070707070707070707` (16 bytes):
+
+| Dato | Valor (hexadecimal) |
+| --- | --- |
+| Clave derivada (32 bytes) | `346981fefb0842956ca059b53355c2081736702569cbe2dae93b4459f059df23` |
+| Nonce (24 bytes) | `030303030303030303030303030303030303030303030303` |
+| Cuerpo en claro | `636f6e6669675f69643d313b63756c7469766f3d636166653b6c6f74655f69643d6c6f74652d313b70726f665f636d3d3230` |
+| Texto cifrado + etiqueta (66 bytes) | `19db5042761d54a1ad9bf46880fc441a57a7b732e3f7eeeba9bae726c69227db4f66cd01a58611589c46a57d242ca4da3ead69d208216430bf1b3eeb4d67a401f151` |
+
+El cuerpo en claro del ejemplo es la configuración de sesión
+`config_id=1;cultivo=cafe;lote_id=lote-1;prof_cm=20`. Con esos valores, el sobre completo es:
+
+```
+01 | 030303030303030303030303030303030303030303030303 | 19db5042…401f151
+```
+
+La etiqueta Poly1305 son los últimos 16 bytes del texto cifrado. Si el firmware descifra y el
+cuerpo no coincide, la implementación no es equivalente.
 
 ## 5. Registro de captura
 
