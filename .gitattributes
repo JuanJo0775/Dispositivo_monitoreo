@@ -1,0 +1,19 @@
+# Normalización de fin de línea: el repositorio guarda LF y las copias de trabajo
+# también, para que los diffs no cambien entre máquinas y sistemas.
+* text=auto eol=lf
+
+# Los archivos por lotes de Windows necesitan CRLF para ejecutarse.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Los binarios no se tocan.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.apk binary
+*.aab binary
+*.hbc binary

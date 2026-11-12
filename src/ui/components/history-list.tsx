@@ -7,14 +7,18 @@ export interface HistoryListProps {
   measurements: readonly Measurement[];
   onSelect: (measurement: Measurement) => void;
   emptyMessage?: string;
+  /** Identificadores de las mediciones marcadas como ensayo. */
+  trialMeasurementIds?: readonly string[];
 }
 
 function MeasurementRow({
   measurement,
   onSelect,
+  trial,
 }: {
   measurement: Measurement;
   onSelect: (measurement: Measurement) => void;
+  trial: boolean;
 }) {
   const status = measurement.valid ? 'válida' : 'revisar';
 
@@ -27,7 +31,12 @@ function MeasurementRow({
     >
       <View style={styles.rowHeader}>
         <Text style={styles.date}>{formatDateTimeLocal(measurement.capturedAtUtc)}</Text>
-        <Text style={measurement.valid ? styles.statusValid : styles.statusWarning}>{status}</Text>
+        <View style={styles.badges}>
+          {trial ? <Text style={styles.trial}>ensayo</Text> : null}
+          <Text style={measurement.valid ? styles.statusValid : styles.statusWarning}>
+            {status}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.values}>
@@ -55,13 +64,20 @@ export function HistoryList({
   measurements,
   onSelect,
   emptyMessage = 'Todavía no hay mediciones guardadas.',
+  trialMeasurementIds = [],
 }: HistoryListProps) {
   return (
     <FlatList
       data={measurements}
       keyExtractor={(measurement) => measurement.id}
       contentContainerStyle={measurements.length === 0 ? styles.emptyContainer : styles.list}
-      renderItem={({ item }) => <MeasurementRow measurement={item} onSelect={onSelect} />}
+      renderItem={({ item }) => (
+        <MeasurementRow
+          measurement={item}
+          onSelect={onSelect}
+          trial={trialMeasurementIds.includes(item.id)}
+        />
+      )}
       ListEmptyComponent={<Text style={styles.empty}>{emptyMessage}</Text>}
     />
   );
@@ -99,6 +115,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8,
+  },
+  badges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  trial: {
+    fontSize: 13,
+    color: '#3F3F3F',
+    fontWeight: '600',
+    borderWidth: 1,
+    borderColor: '#C9D3C4',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
   },
   date: {
     fontSize: 15,

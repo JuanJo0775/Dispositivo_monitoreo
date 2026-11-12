@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 
 import { listMeasurements } from '@/application/capture/list-measurements';
 import { buildCsvFileName } from '@/application/export/csv-file-name';
@@ -12,8 +12,12 @@ import { HistoryList } from '@/ui/components/history-list';
 import { PrimaryButton } from '@/ui/components/primary-button';
 import { useApp } from '@/ui/providers/app-context';
 
+/** Motivo con el que la app marca una captura de ensayo. */
+const TRIAL_REASON = 'simulated_data';
+
 export default function HistoryScreen() {
   const { stores } = useApp();
+  const router = useRouter();
   const [measurements, setMeasurements] = useState<readonly Measurement[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +67,10 @@ export default function HistoryScreen() {
     }
   }
 
+  const trialMeasurementIds = measurements
+    .filter((measurement) => measurement.invalidReasons.includes(TRIAL_REASON))
+    .map((measurement) => measurement.id);
+
   return (
     <View style={styles.container}>
       <Text style={styles.count}>
@@ -78,12 +86,25 @@ export default function HistoryScreen() {
           disabled={measurements.length === 0}
           onPress={handleExport}
         />
+        <PrimaryButton
+          label="Ajustes"
+          variant="secondary"
+          onPress={() => {
+            router.push('/settings');
+          }}
+        />
       </View>
 
       {message !== null ? <Text style={styles.message}>{message}</Text> : null}
       {error !== null ? <Text style={styles.error}>{error}</Text> : null}
 
-      <HistoryList measurements={measurements} onSelect={() => {}} />
+      <HistoryList
+        measurements={measurements}
+        onSelect={(measurement) => {
+          router.push({ pathname: '/diagnosis', params: { measurementId: measurement.id } });
+        }}
+        trialMeasurementIds={trialMeasurementIds}
+      />
     </View>
   );
 }
@@ -101,6 +122,7 @@ const styles = StyleSheet.create({
   actions: {
     paddingHorizontal: 16,
     paddingTop: 12,
+    gap: 12,
   },
   message: {
     paddingHorizontal: 16,
