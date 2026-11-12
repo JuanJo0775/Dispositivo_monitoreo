@@ -77,11 +77,14 @@ código fuente vive aquí:
 | `eslint.config.js`, `jest.config.js`, `.prettierrc`, `.prettierignore` | Configuración de las herramientas de calidad.                   |
 | `.gitignore`, `.gitattributes`                                         | Qué se versiona y cómo se normalizan los fines de línea.        |
 | `README.md`                                                            | Esta guía.                                                      |
-| `AGENTS.md`, `CLAUDE.md`                                               | Instrucciones para los agentes; las administra el arnés.        |
-| `.harness/`, `.claude/`, `.opencode/`, `opencode.json`                 | Arnés de ingeniería y sus agentes; los administra el arnés.     |
 
 Lo que no se versiona: `node_modules/`, `.expo/`, `dist/`, `coverage/`, archivos `.env` y
 `secrets/`. Ver `.gitignore`.
+
+El arnés de ingeniería (`.harness/`, `.claude/`, `.opencode/`, `AGENTS.md`, `CLAUDE.md`) es
+**infraestructura aparte**: se instala en cada máquina como paso de setup y no forma parte del
+proyecto, así que no se publica. Para trabajar con él, instálalo en el repositorio antes de
+empezar.
 
 ## Convenciones
 
