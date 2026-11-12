@@ -14,14 +14,16 @@ camino crítico.
 ```
 app/                     Rutas de expo-router. Una pantalla por archivo, sin lógica de negocio.
 src/
-  domain/                TypeScript puro: entidades, validación, unidades, motor de diagnóstico.
-  application/           Casos de uso que orquestan puertos.
-  ports/                 Interfaces de salida (StickGateway, almacenes, reloj).
-  infrastructure/        Adaptadores: ble/, db/, files/, maps/, clock/.
-  ui/                    Componentes, hooks y tiendas de UI.
+  shared/                Utilidades sin dependencias (metadatos de la app).
+  domain/                TypeScript puro: capture/, measurement/, diagnosis/, farm/, calibration/.
+  application/           Casos de uso por área: capture/, export/, diagnosis/, sync/.
+  ports/                 Interfaces de salida: stick-gateway.ts y stores/.
+  infrastructure/        Adaptadores: ble/, db/, files/, maps/.
+  ui/                    components/, hooks/, stores/.
 assets/                  Íconos, splash y, más adelante, umbrales y teselas.
 tests/                   Espejo de src/: domain/, application/, infrastructure/, ui/, helpers/.
 docs/
+  architecture/          Estructura y reglas de dependencia.
   context/               soul, glossary, map (contexto para agentes y personas).
   adr/                   Decisiones de implementación del repositorio.
   requirements/          Ciencia de origen copiada al repo.
@@ -29,9 +31,10 @@ docs/
 .harness/                Arnés de ingeniería (no editar a mano).
 ```
 
-Regla de dependencias: `app/` y `src/ui/` dependen de `src/application/`; `src/application/` de
-`src/domain/` y de `src/ports/`; `src/infrastructure/` implementa `src/ports/`. `src/domain/` no
-importa nada de React Native, SQLite ni BLE.
+El detalle, las reglas de dependencia y dónde va cada cosa nueva están en
+[`docs/architecture/estructura.md`](docs/architecture/estructura.md). Resumen: `app/` y `src/ui/`
+dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports/`;
+`src/infrastructure/` implementa `src/ports/`. `src/domain/` no importa React Native, SQLite ni BLE.
 
 ## Requisitos
 

@@ -1,6 +1,6 @@
-import { isPositionValid, validateCapture } from '@/domain/validation';
+import { isPositionValid, validateCapture } from '@/domain/capture/validation';
 
-import { makeCapture } from '../helpers/captures';
+import { makeCapture } from '../../helpers/captures';
 
 describe('validateCapture', () => {
   it('acepta una captura completa y en rango', () => {

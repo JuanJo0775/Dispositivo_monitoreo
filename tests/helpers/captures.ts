@@ -1,4 +1,4 @@
-import type { CaptureFlags, CapturePayload, RawCapture } from '@/domain/types';
+import type { CaptureFlags, CapturePayload, RawCapture } from '@/domain/capture/types';
 
 export const DEFAULT_PAYLOAD: CapturePayload = {
   latitude: 4.5339,
