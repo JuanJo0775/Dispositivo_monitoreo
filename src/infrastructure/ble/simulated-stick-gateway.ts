@@ -1,4 +1,4 @@
-import type { CapturePayload, RawCapture } from '@/domain/types';
+import type { CapturePayload, RawCapture } from '@/domain/capture/types';
 import type { StickGateway, StickStatus, Unsubscribe } from '@/ports/stick-gateway';
 
 export interface SimulatedStickGatewayOptions {

@@ -1,4 +1,4 @@
-import type { RawCapture } from '@/domain/types';
+import type { RawCapture } from '@/domain/capture/types';
 
 /** Estado observable del bastón. Se muestra siempre en la UI, no solo con color. */
 export interface StickStatus {

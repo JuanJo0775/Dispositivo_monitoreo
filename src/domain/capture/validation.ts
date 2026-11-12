@@ -1,4 +1,4 @@
-import type { CaptureFlags, CapturePayload, RawCapture, ValidationResult } from './types';
+import type { CaptureFlags, CapturePayload, CaptureValidationResult, RawCapture } from './types';
 
 /** Campos numéricos del payload, para no comparar cadenas por error. */
 type NumericPayloadField = {
@@ -45,7 +45,7 @@ const REPORTED_WHEN_MISSING = new Set<string>([
  * cálculos, no borrarla. Los valores nulos no invalidan; se reportan como
  * `<variable>_missing` para que la UI muestre «sin dato» en vez de cero.
  */
-export function validateCapture(capture: RawCapture): ValidationResult {
+export function validateCapture(capture: RawCapture): CaptureValidationResult {
   const reasons: string[] = [];
   const { payload, flags } = capture;
 

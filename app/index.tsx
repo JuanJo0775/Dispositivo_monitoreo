@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { APP_NAME } from '@/domain/types';
+import { APP_NAME } from '@/shared/app-info';
 
 export default function HomeScreen() {
   return (

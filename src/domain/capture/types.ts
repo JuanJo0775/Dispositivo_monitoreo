@@ -1,12 +1,3 @@
-/**
- * Identidad visible de la aplicación.
- *
- * El nombre se usa en la cabecera de las pantallas y en los metadatos de
- * exportación. No confundir con `app.json` (`expo.name`), que es el nombre
- * que Android muestra bajo el ícono.
- */
-export const APP_NAME = 'Monitoreo de suelo';
-
 /** De dónde salió una captura. */
 export type CaptureOrigin = 'stick' | 'manual' | 'import';
 
@@ -96,24 +87,8 @@ export interface RawCapture {
   readonly plotId: string | null;
 }
 
-/** Medición derivada de una captura: lo que el agricultor ve en el historial. */
-export interface Measurement {
-  readonly id: string;
-  readonly captureId: string;
-  readonly plotId: string | null;
-  readonly payload: CapturePayload;
-  readonly capturedAtUtc: string;
-  readonly valid: boolean;
-  readonly invalidReasons: readonly string[];
-  readonly notes: string | null;
-  readonly photoPath: string | null;
-  /** Borrado lógico; una medición descartada no se borra ni se recalcula. */
-  readonly discardedAt: string | null;
-  readonly createdAt: string;
-}
-
 /** Resultado de validar una captura contra los rangos del contrato. */
-export interface ValidationResult {
+export interface CaptureValidationResult {
   readonly valid: boolean;
   readonly reasons: readonly string[];
 }
