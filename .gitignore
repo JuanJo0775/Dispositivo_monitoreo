@@ -36,7 +36,24 @@ yarn-debug.*
 yarn-error.*
 
 # local env files
-.env*.local
+.env
+.env.*
+!.env.example
+
+# secrets
+secrets/
+*.keystore
+
+# logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# editors
+.idea/
+.vscode/
+.claude/settings.local.json
 
 # typescript
 *.tsbuildinfo
