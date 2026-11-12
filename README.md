@@ -100,8 +100,8 @@ empezar.
 | Corte | Alcance                                      | Estado    |
 | ----- | -------------------------------------------- | --------- |
 | 0     | Esqueleto: simulador, SQLite, historial, CSV | listo     |
-| 1     | Recorrido de campo mínimo con diagnóstico    | en curso  |
-| 2     | BLE real y sincronización por microSD        | pendiente |
+| 1     | Recorrido de campo mínimo con diagnóstico    | listo     |
+| 2     | BLE real y sincronización por microSD        | en curso  |
 | 3     | Mapa con teselas offline y guía de muestreo  | pendiente |
 | 4     | v1.0: calibración individual, PDF, análisis  | pendiente |
 | 5     | v2.0: dosis y exportación geoespacial        | pendiente |
