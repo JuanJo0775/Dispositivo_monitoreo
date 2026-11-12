@@ -6,13 +6,16 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
+    "build": "expo export --platform android",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "expo export --platform android",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --check .",
-    "format:write": "prettier --write ."
+    "format:write": "prettier --write .",
+    "verify": "node .harness/bin/harness.mjs verify",
+    "check": "npm run format && npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {
     "expo": "~58.0.24",

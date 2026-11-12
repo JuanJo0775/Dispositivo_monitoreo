@@ -33,12 +33,21 @@ app/                              Rutas de expo-router. Una pantalla por archivo
   connect.tsx                     (corte 0)
   measure.tsx                     (corte 0)
   history.tsx                     (corte 0)
+  farms.tsx                       Fincas y lotes. (corte 1)
+  farm-form.tsx                   Alta y edición de finca. (corte 1)
+  plot-form.tsx                   Alta y edición de lote. (corte 1)
+  session.tsx                     Configuración de sesión. (corte 1)
+  diagnosis.tsx                   Resultado del diagnóstico. (corte 1)
+  settings.tsx                    Ajustes mínimos. (corte 1)
+  privacy.tsx                     Aviso de privacidad. (corte 1)
+
+assets/thresholds/                Sets de umbrales versionados (datos, no código).
 
 src/
   shared/                         Sin dependencias externas.
     app-info.ts
     format.ts                     Números, unidades y hora local.
-    versions.ts                   Versión de calibración y de umbrales activos.
+    versions.ts                   Versión de calibración, de umbrales y del motor.
 
   domain/                         Puro, testeable sin emulador.
     capture/                      Captura cruda del bastón.
@@ -46,8 +55,17 @@ src/
       validation.ts
     measurement/                  Medición derivada.
       types.ts
-    diagnosis/                    Motor de decisión. (corte 1)
-    farm/                         Fincas, lotes y contexto. (corte 1)
+    diagnosis/                    Motor de decisión.
+      types.ts                    Contrato del motor.
+      threshold-set.ts            Tipos y esquema Zod del set de umbrales.
+      suitability.ts              Funciones de aptitud y clases.
+      estimates.ts                Ecuaciones y conversiones de unidades.
+      diagnose.ts                 Motor, fases 1 a 7.
+    farm/                         Fincas, lotes y contexto.
+      types.ts
+      validation.ts
+    session/                      Bloque de configuración de sesión.
+      types.ts
     calibration/                  Calibración individual. (corte 4)
 
   application/                    Casos de uso, uno por intención.
@@ -57,16 +75,31 @@ src/
     export/
       export-csv.ts
       csv-file-name.ts            Nombre del archivo, en UTC.
-    diagnosis/                    (corte 1)
+    farm/
+      save-farm.ts
+      save-plot.ts
+      list-farms.ts
+    session/
+      start-session.ts
+    diagnosis/
+      diagnose-measurement.ts
+      recompute-diagnosis.ts
+    settings/
+      get-settings.ts
+      set-trial-mode.ts
     sync/                         (corte 2)
 
   ports/                          Interfaces de salida.
     stick-gateway.ts
+    clock.ts
     stores/
       capture-store.ts
       measurement-store.ts
       unit-of-work.ts
-    clock.ts                      (corte 1)
+      farm-store.ts
+      session-store.ts
+      diagnosis-store.ts
+      settings-store.ts
 
   infrastructure/                 Adaptadores concretos.
     ble/
@@ -74,17 +107,23 @@ src/
       ble-stick-gateway.ts        (corte 2)
     db/
       sql-database.ts             Contrato mínimo que consumen los almacenes.
-      migrations.ts               (corte 0)
-      sqlite-stores.ts            (corte 0)
+      migrations.ts
+      sqlite-stores.ts
       database.ts                 Apertura, WAL y migraciones.
+    thresholds/
+      load-threshold-set.ts       Carga desde los assets y validación con Zod.
+      import-threshold-set.ts     Importación a la tabla `threshold_sets`.
     files/
-      csv-share.ts                (corte 0)
+      csv-share.ts
     maps/                         (corte 3)
 
   ui/                             Componentes, hooks, proveedores y tiendas.
     components/
       history-list.tsx
       primary-button.tsx
+      diagnosis-card.tsx           Resultado de un diagnóstico.
+      field.tsx                    Campo de formulario con etiqueta.
+      plot-picker.tsx              Selector de lote.
     hooks/
       use-stick-status.ts         Suscripción al bastón sin renders en cascada.
     providers/
@@ -92,14 +131,25 @@ src/
       app-provider.tsx            Punto de composición: abre la base y cablea puertos.
     stores/
 
-assets/                           Íconos, splash, umbrales y teselas.
+assets/                           Íconos, splash y teselas.
+  thresholds/                     Sets de umbrales versionados.
+
 tests/                            Espejo exacto de src/ y app/.
   domain/capture/
+  domain/diagnosis/
+  domain/farm/
   application/capture/
+  application/export/
+  application/farm/
+  application/session/
+  application/diagnosis/
+  application/settings/
   infrastructure/ble/
+  infrastructure/db/
+  infrastructure/thresholds/
   integration/                    Flujos de punta a punta: simulador → base → CSV.
   ui/
-  helpers/                        Factories compartidas (captures, measurements).
+  helpers/                        Factories compartidas (captures, measurements, almacenes).
 
 docs/
   architecture/estructura.md      Este documento.

@@ -1,19 +1,71 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import type { Measurement } from '@/domain/measurement/types';
+import { diagnoseMeasurement } from '@/application/diagnosis/diagnose-measurement';
 import { ingestCapture } from '@/application/capture/ingest-capture';
+import type { RawCapture } from '@/domain/capture/types';
+import type { DiagnosisResult } from '@/domain/diagnosis/types';
+import type { Measurement } from '@/domain/measurement/types';
+import type { Session } from '@/ports/stores/session-store';
 import { useStickStatus } from '@/ui/hooks/use-stick-status';
 import { PrimaryButton } from '@/ui/components/primary-button';
+import { classesToText } from '@/ui/components/diagnosis-card';
 import { useApp } from '@/ui/providers/app-context';
 import { formatDateTimeLocal, formatMeasure } from '@/shared/format';
 
 export default function MeasureScreen() {
-  const { gateway, uow, stores } = useApp();
+  const { gateway, uow, stores, thresholds } = useApp();
   const status = useStickStatus(gateway);
   const [lastMeasurement, setLastMeasurement] = useState<Measurement | null>(null);
+  const [diagnosis, setDiagnosis] = useState<DiagnosisResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  /** Sesión con la que se capturó: la del bastón o la última del lote. */
+  const findSession = useCallback(
+    async (capture: RawCapture): Promise<Session | null> => {
+      if (capture.configId > 0) {
+        return stores.sessions.findByConfigId(capture.configId);
+      }
+
+      if (capture.plotId !== null) {
+        const sessions = await stores.sessions.listByPlot(capture.plotId);
+
+        return sessions[0] ?? null;
+      }
+
+      return null;
+    },
+    [stores],
+  );
+
+  /** Diagnóstico de la medición recién guardada; sin sesión no hay diagnóstico. */
+  const diagnoseCapture = useCallback(
+    async (
+      capture: RawCapture,
+      measurement: Measurement | null,
+    ): Promise<DiagnosisResult | null> => {
+      if (measurement === null) {
+        return null;
+      }
+
+      const session = await findSession(capture);
+
+      return diagnoseMeasurement(
+        { measurement, session },
+        {
+          diagnoses: stores.diagnoses,
+          measurements: stores.measurements,
+          sessions: stores.sessions,
+          farms: stores.farms,
+          thresholds,
+          clock: { now: () => new Date().toISOString() },
+          newId: () => `${measurement.id}:diagnostico:${Date.now()}`,
+        },
+      );
+    },
+    [findSession, stores, thresholds],
+  );
 
   useEffect(() => {
     const unsubscribeCapture = gateway.onCapture((capture) => {
@@ -33,7 +85,19 @@ export default function MeasureScreen() {
           );
 
           if (result.status === 'saved') {
-            setLastMeasurement(await stores.measurements.get(result.measurementId));
+            const measurement = await stores.measurements.get(result.measurementId);
+            setLastMeasurement(measurement);
+
+            try {
+              setDiagnosis(await diagnoseCapture(capture, measurement));
+            } catch (diagnosisError) {
+              setDiagnosis(null);
+              setError(
+                diagnosisError instanceof Error
+                  ? diagnosisError.message
+                  : 'No se pudo calcular el diagnóstico',
+              );
+            }
           }
         } catch (ingestError) {
           setError(
@@ -46,7 +110,7 @@ export default function MeasureScreen() {
     return () => {
       unsubscribeCapture();
     };
-  }, [gateway, stores, uow]);
+  }, [diagnoseCapture, gateway, stores, uow]);
 
   async function handleCapture(): Promise<void> {
     setBusy(true);
@@ -101,6 +165,23 @@ export default function MeasureScreen() {
                 ? 'Dato válido para diagnóstico.'
                 : `Revisar: ${lastMeasurement.invalidReasons.join(', ')}`}
             </Text>
+          </>
+        )}
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Diagnóstico</Text>
+        {lastMeasurement === null ? (
+          <Text style={styles.empty}>Todavía no hay una medición que diagnosticar.</Text>
+        ) : diagnosis === null ? (
+          <Text style={styles.empty}>
+            Esta medición todavía no tiene diagnóstico. Configurá una sesión de medición para que la
+            app pueda interpretarla.
+          </Text>
+        ) : (
+          <>
+            <Text style={styles.diagnosisClass}>Clase: {classesToText(diagnosis.classes)}</Text>
+            <Text style={styles.explanation}>{diagnosis.explanation}</Text>
           </>
         )}
       </View>
@@ -161,6 +242,16 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 16,
+    color: '#1F1F1F',
+  },
+  diagnosisClass: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1B4332',
+  },
+  explanation: {
+    fontSize: 15,
+    lineHeight: 22,
     color: '#1F1F1F',
   },
 });

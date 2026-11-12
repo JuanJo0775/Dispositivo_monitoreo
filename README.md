@@ -44,18 +44,44 @@ dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports
 
 ## Comandos
 
-| Comando                                | Qué hace                                                      |
-| -------------------------------------- | ------------------------------------------------------------- |
-| `npm install`                          | Instala dependencias.                                         |
-| `npm start`                            | Metro + Expo.                                                 |
-| `npm run android`                      | Abre la app en el dispositivo o emulador.                     |
-| `npm run build`                        | Exporta el bundle de Android (sin instalar).                  |
-| `npm test`                             | Pruebas con Jest y jest-expo.                                 |
-| `npm run typecheck`                    | TypeScript estricto, sin emitir.                              |
-| `npm run lint`                         | ESLint.                                                       |
-| `npm run format`                       | Verifica el formato con Prettier.                             |
-| `npm run format:write`                 | Aplica el formato.                                            |
-| `node .harness/bin/harness.mjs verify` | Formato, lint y tipos. Obligatorio antes de cerrar una tarea. |
+| Comando                | Qué hace                                           |
+| ---------------------- | -------------------------------------------------- |
+| `npm install`          | Instala dependencias.                              |
+| `npm start`            | Metro + Expo.                                      |
+| `npm run android`      | Abre la app en el dispositivo o emulador.          |
+| `npm run build`        | Exporta el bundle de Android (sin instalar).       |
+| `npm run clean`        | Borra la carpeta `dist/` de la última exportación. |
+| `npm test`             | Pruebas con Jest y jest-expo.                      |
+| `npm run typecheck`    | TypeScript estricto, sin emitir.                   |
+| `npm run lint`         | ESLint.                                            |
+| `npm run format`       | Verifica el formato con Prettier.                  |
+| `npm run format:write` | Aplica el formato.                                 |
+| `npm run check`        | Formato, lint, tipos y pruebas, en ese orden.      |
+| `npm run verify`       | Verificación del arnés de ingeniería.              |
+
+## La raíz del repositorio
+
+La raíz tiene **solo configuración**. Cada archivo está donde su herramienta lo busca, y nada de
+código fuente vive aquí:
+
+| Entrada                                                                | Qué es y por qué está aquí                                      |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `app/`                                                                 | Rutas de `expo-router`: una pantalla por archivo.               |
+| `src/`                                                                 | Código de la app, organizado por capas.                         |
+| `tests/`                                                               | Espejo exacto de `src/` y `app/`.                               |
+| `assets/`                                                              | Íconos, splash y los sets de umbrales versionados.              |
+| `docs/`                                                                | Contexto, arquitectura, requisitos, ADR y planes.               |
+| `package.json`, `package-lock.json`                                    | Dependencias y scripts; npm los busca en la raíz.               |
+| `app.json`                                                             | Configuración de Expo; Expo la busca en la raíz.                |
+| `tsconfig.json`                                                        | Configuración de TypeScript; el compilador la busca en la raíz. |
+| `eslint.config.js`, `jest.config.js`, `.prettierrc`, `.prettierignore` | Configuración de las herramientas de calidad.                   |
+| `.gitignore`, `.gitattributes`                                         | Qué se versiona y cómo se normalizan los fines de línea.        |
+| `README.md`                                                            | Esta guía.                                                      |
+| `AGENTS.md`, `CLAUDE.md`                                               | Instrucciones para los agentes; las administra el arnés.        |
+| `.harness/`, `.claude/`, `.opencode/`, `opencode.json`                 | Arnés de ingeniería y sus agentes; los administra el arnés.     |
+
+Lo que no se versiona: `node_modules/`, `.expo/`, `dist/`, `coverage/`, archivos `.env` y
+`secrets/`. Ver `.gitignore`.
 
 ## Convenciones
 
@@ -71,8 +97,14 @@ dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports
 | Corte | Alcance                                      | Estado    |
 | ----- | -------------------------------------------- | --------- |
 | 0     | Esqueleto: simulador, SQLite, historial, CSV | listo     |
-| 1     | Recorrido de campo mínimo con diagnóstico    | siguiente |
+| 1     | Recorrido de campo mínimo con diagnóstico    | en curso  |
 | 2     | BLE real y sincronización por microSD        | pendiente |
 | 3     | Mapa con teselas offline y guía de muestreo  | pendiente |
 | 4     | v1.0: calibración individual, PDF, análisis  | pendiente |
 | 5     | v2.0: dosis y exportación geoespacial        | pendiente |
+
+En el corte 1 la app ya diagnostica de verdad: los umbrales vienen de las tablas publicadas en
+`docs/requirements/objetivo-1-umbrales-ecuaciones-motor.md` y están en
+`assets/thresholds/2026.11-v1.json`, el motor es TypeScript puro en `src/domain/diagnosis/` y cada
+diagnóstico guarda su versión de umbrales, calibración, motor y firmware, con la evidencia de qué
+supuestos usó y qué datos la ciencia no publica.
