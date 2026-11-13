@@ -224,6 +224,9 @@ export class BleStickGateway implements StickGateway, StickSync {
 
   private lastSyncDeviceId: string | null = null;
 
+  /** Sal del emparejamiento: se fija al construir o al emparejar con PIN. */
+  private pairingSalt: Uint8Array | undefined;
+
   constructor(transport: BleTransport, options: BleStickGatewayOptions = {}) {
     this.transport = transport;
     this.options = {
@@ -239,6 +242,7 @@ export class BleStickGateway implements StickGateway, StickSync {
     this.clock = options.clock ?? (() => new Date().toISOString());
     this.delay = options.delay ?? sleep;
     this.random = options.random ?? defaultRandomBytes();
+    this.pairingSalt = options.salt;
 
     if (options.pin !== undefined && options.salt !== undefined) {
       this.pair(options.pin, options.salt);
@@ -336,10 +340,22 @@ export class BleStickGateway implements StickGateway, StickSync {
    * Empareja el bastón: deriva la clave de la carga útil con el PIN y la sal.
    *
    * La clave nunca se inventa: sale de `deriveKey` con el PIN de seis dígitos
-   * y la sal que se intercambió al emparejar.
+   * y la sal que se intercambió al emparejar. Si se llama sin sal, se usa la
+   * que quedó fijada al construir el gateway; sin ninguna de las dos no hay
+   * forma segura de derivar la clave y se avisa.
    */
-  pair(pin: string, salt: Uint8Array): void {
-    const key = deriveKey(pin, salt);
+  pair(pin: string, salt?: Uint8Array): void {
+    const sal = salt ?? this.pairingSalt;
+
+    if (sal === undefined) {
+      throw new Error(
+        'Falta la sal de emparejamiento: el intercambio de sal con el bastón todavía no está implementado.',
+      );
+    }
+
+    this.pairingSalt = sal;
+
+    const key = deriveKey(pin, sal);
     this.encryptor = createEncryptor(key, this.random);
   }
 
@@ -1177,14 +1193,14 @@ function defaultRandomBytes(): RandomBytes {
         }
       ).crypto;
 
-      if (cryptoApi?.getRandomValues !== undefined) {
-        cryptoApi.getRandomValues(bytes);
-        return bytes;
+      if (cryptoApi?.getRandomValues === undefined) {
+        throw new Error(
+          'No hay un generador de bytes aleatorios seguro: en el teléfono, pásale a la app ' +
+            'la fuente de expo-crypto; fuera de él, inyecta uno en las pruebas.',
+        );
       }
 
-      for (let index = 0; index < length; index += 1) {
-        bytes[index] = Math.floor(Math.random() * 256);
-      }
+      cryptoApi.getRandomValues(bytes);
 
       return bytes;
     },

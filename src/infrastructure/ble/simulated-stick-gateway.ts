@@ -94,6 +94,19 @@ export class SimulatedStickGateway implements StickGateway {
     return this.currentStatus;
   }
 
+  /**
+   * Guarda el PIN del emparejamiento.
+   *
+   * El gateway simulado habla directamente con el dispositivo simulado, así
+   * que no hay sobre cifrado que abrir; pero el PIN se valida igual para que
+   * la app no acepte uno que el bastón real rechazaría.
+   */
+  pair(pin: string): void {
+    if (!/^\d{6}$/.test(pin)) {
+      throw new Error('El PIN debe tener 6 dígitos.');
+    }
+  }
+
   onCapture(listener: (capture: RawCapture) => void): Unsubscribe {
     this.captureListeners.add(listener);
     return () => this.captureListeners.delete(listener);

@@ -199,8 +199,8 @@ export default function SessionScreen() {
       </View>
 
       <Text style={styles.note}>
-        En este corte el bastón sigue siendo simulado: la configuración se guarda en el teléfono y
-        no llega a un bastón real.
+        El bastón todavía es simulado, pero la configuración viaja cifrada por el mismo protocolo
+        que usará el prototipo: cuando exista, solo cambia el transporte.
       </Text>
     </ScrollView>
   );

@@ -78,6 +78,7 @@ function gatewayFalso(antesDeEscribir?: () => void): GatewayFalso {
     connect: async () => undefined,
     disconnect: async () => undefined,
     status: () => ESTADO_CONECTADO,
+    pair: () => undefined,
     onCapture: () => () => undefined,
     onStatus: () => () => undefined,
     requestCapture: async () => undefined,

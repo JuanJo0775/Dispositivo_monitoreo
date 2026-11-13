@@ -2,7 +2,14 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import type { ThresholdSet } from '@/domain/diagnosis/threshold-set';
-import { SimulatedStickGateway } from '@/infrastructure/ble/simulated-stick-gateway';
+import { BleStickGateway } from '@/infrastructure/ble/ble-stick-gateway';
+import { makeFakeBleTransport } from '@/infrastructure/ble/fake-ble-transport';
+import {
+  DEFAULT_SIMULATED_PIN,
+  DEFAULT_SIMULATED_SALT,
+  SimulatedStickDevice,
+} from '@/infrastructure/ble/simulated-stick-device';
+import { expoRandomBytes } from '@/infrastructure/crypto/expo-random-bytes';
 import { adaptSqlDatabase, createSqliteStores, openDatabase } from '@/infrastructure/db/database';
 import type { SqlDatabase } from '@/infrastructure/db/sql-database';
 import { importThresholdSet } from '@/infrastructure/thresholds/import-threshold-set';
@@ -14,13 +21,31 @@ import { AppContext, type AppServices } from './app-context';
 /**
  * Punto de composición de la app.
  *
- * Abre SQLite, aplica migraciones, importa el set de umbrales y crea el gateway del bastón.
- * Ninguna capa de dominio conoce estas implementaciones: acá se conectan los puertos.
+ * Abre SQLite, aplica migraciones, importa el set de umbrales y cablea el
+ * bastón. El bastón todavía es simulado, pero la app no lo sabe: habla con él
+ * por el mismo transporte BLE y el mismo protocolo que usará con el prototipo,
+ * así que el día que exista solo cambia el transporte.
+ *
+ * Ninguna capa de dominio conoce estas implementaciones: acá se conectan los
+ * puertos.
  */
 export function AppProvider({ children }: { children: ReactNode }) {
   const [services, setServices] = useState<AppServices | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const gateway = useMemo(() => new SimulatedStickGateway({ deviceId: 'simulated-stick' }), []);
+
+  const stick = useMemo(() => {
+    const device = new SimulatedStickDevice({
+      deviceId: 'simulated-stick',
+      pin: DEFAULT_SIMULATED_PIN,
+    });
+    const gateway = new BleStickGateway(makeFakeBleTransport(device), {
+      pin: DEFAULT_SIMULATED_PIN,
+      salt: DEFAULT_SIMULATED_SALT,
+      random: expoRandomBytes,
+    });
+
+    return { deviceId: device.deviceId, gateway };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +59,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         await importThresholdSet(sql, thresholds);
 
         if (!cancelled) {
-          setServices({ stores, uow: stores.uow, gateway, thresholds });
+          setServices({
+            stores,
+            uow: stores.uow,
+            gateway: stick.gateway,
+            sync: stick.gateway,
+            deviceId: stick.deviceId,
+            thresholds,
+          });
         }
       } catch (bootError) {
         if (!cancelled) {
@@ -48,7 +80,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [gateway]);
+  }, [stick]);
 
   if (error !== null) {
     return (

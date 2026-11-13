@@ -62,6 +62,14 @@ export interface StickGateway {
   connect(deviceId: string): Promise<void>;
   disconnect(): Promise<void>;
   status(): StickStatus;
+  /**
+   * Empareja con el PIN de seis dígitos del bastón.
+   *
+   * La sal del emparejamiento la fija la implementación: el simulador usa una
+   * fija y el bastón real la recibirá en el intercambio del enlace. Sin
+   * emparejar, la app no puede escribir la configuración cifrada.
+   */
+  pair(pin: string): void;
   /** Capturas en vivo (característica Notify del contrato). */
   onCapture(listener: (capture: RawCapture) => void): Unsubscribe;
   onStatus(listener: (status: StickStatus) => void): Unsubscribe;

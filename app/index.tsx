@@ -22,9 +22,16 @@ export default function HomeScreen() {
           variant="secondary"
           onPress={() => router.push('/history')}
         />
+        <PrimaryButton
+          label="Sincronizar microSD"
+          variant="secondary"
+          onPress={() => router.push('/sync')}
+        />
       </View>
 
-      <Text style={styles.note}>Corte 0: bastón simulado, sin diagnóstico todavía.</Text>
+      <Text style={styles.note}>
+        Corte 2: la app habla BLE por el protocolo del bastón y sincroniza su microSD.
+      </Text>
     </View>
   );
 }

@@ -17,6 +17,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: 'Monitoreo de suelo' }} />
         <Stack.Screen name="connect" options={{ title: 'Conectar' }} />
+        <Stack.Screen name="sync" options={{ title: 'Sincronizar' }} />
         <Stack.Screen name="measure" options={{ title: 'Medir' }} />
         <Stack.Screen name="history" options={{ title: 'Historial' }} />
         <Stack.Screen name="farms" options={{ title: 'Fincas y lotes' }} />
