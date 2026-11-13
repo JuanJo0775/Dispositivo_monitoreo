@@ -39,6 +39,10 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
+# fixture del pincho de mapa: pesa 23,5 MB y no entra al repositorio
+# (`.easignore` lo vuelve a incluir para que el build de EAS lo lleve al APK)
+assets/maps/prueba.pmtiles
+
 # debug
 npm-debug.*
 yarn-debug.*
