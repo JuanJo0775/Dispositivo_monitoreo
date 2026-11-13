@@ -37,6 +37,12 @@ export const PBKDF2_ITERATIONS = 100000;
 /** Longitud del PIN de emparejamiento. */
 export const PIN_LENGTH = 6;
 
+/** Intentos máximos para sortear un nonce que ya se usó con esta clave. */
+export const MAX_NONCE_ATTEMPTS = 8;
+
+/** Un PIN válido: exactamente seis dígitos. */
+const PIN_PATTERN = new RegExp(`^\\d{${PIN_LENGTH}}$`);
+
 function assertKey(key: Uint8Array): void {
   if (key.length !== KEY_BYTES) {
     throw new Error(`La clave debe tener ${KEY_BYTES} bytes y tiene ${key.length}.`);
@@ -44,12 +50,26 @@ function assertKey(key: Uint8Array): void {
 }
 
 /**
+ * Deja el PIN solo con sus dígitos.
+ *
+ * Un PIN pegado desde otro lado puede traer espacios o guiones; se quitan
+ * para que el usuario no tenga que pelearse con el teclado. Lo que sobre
+ * tiene que ser exactamente seis dígitos.
+ */
+function normalizePin(pin: string): string {
+  return pin.replace(/\D/g, '');
+}
+
+/**
  * Deriva la clave de la carga útil a partir del PIN y la sal.
  *
- * El PIN tiene seis dígitos. La sal es aleatoria y se genera al emparejar.
+ * El PIN tiene seis dígitos. La sal es aleatoria y se genera al emparejar
+ * (16 bytes, `SALT_BYTES`); aquí solo se usa tal cual.
  */
 export function deriveKey(pin: string, salt: Uint8Array): Uint8Array {
-  if (!/^\d+$/.test(pin) || pin.length !== PIN_LENGTH) {
+  const normalizado = normalizePin(pin);
+
+  if (!PIN_PATTERN.test(normalizado)) {
     throw new Error(`El PIN debe tener ${PIN_LENGTH} dígitos.`);
   }
 
@@ -57,7 +77,7 @@ export function deriveKey(pin: string, salt: Uint8Array): Uint8Array {
     throw new Error('La sal no puede estar vacía.');
   }
 
-  return pbkdf2(sha256, pin, salt, { c: PBKDF2_ITERATIONS, dkLen: KEY_BYTES });
+  return pbkdf2(sha256, normalizado, salt, { c: PBKDF2_ITERATIONS, dkLen: KEY_BYTES });
 }
 
 /**

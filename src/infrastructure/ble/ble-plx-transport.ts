@@ -16,7 +16,6 @@ import {
   BLE_CHARACTERISTIC_KEYS,
   BLE_SERVICE_UUID,
 } from '@/domain/protocol/ble-profile';
-import type { BleCharacteristicKey } from '@/domain/protocol/ble-profile';
 import type {
   BleCharacteristic,
   BleConnectionState,
@@ -30,11 +29,6 @@ const MISSING_NATIVE_MESSAGE =
   'No se pudo cargar el módulo nativo de BLE (react-native-ble-plx). ' +
   'La app necesita un build nativo: ejecuta `expo prebuild` y usa un dev client o un APK. ' +
   'Expo Go no incluye el módulo de Bluetooth.';
-
-/** Clave del perfil según el UUID de la característica. */
-const KEY_BY_UUID: ReadonlyMap<string, BleCharacteristicKey> = new Map(
-  BLE_CHARACTERISTIC_KEYS.map((key) => [BLE_CHARACTERISTICS[key], key] as const),
-);
 
 /** Suscripción de la biblioteca: notificaciones o vigilancia de conexión. */
 export interface BlePlxSubscription {
@@ -93,11 +87,16 @@ export interface BlePlxLibrary {
   readonly BleManager: new () => BlePlxManager;
 }
 
+/** Obliga a que el tipo sea `true`: si no, el typecheck falla. */
+type Assert<T extends true> = T;
+
 /**
  * El `BleManager` real debe encajar con la interfaz mínima de arriba. Si la
  * biblioteca cambia su API, esto deja de compilar y avisa en el typecheck.
  */
-export type BlePlxManagerIsCompatible = ReactNativeBleManager extends BlePlxManager ? true : never;
+export type BlePlxManagerIsCompatible = Assert<
+  ReactNativeBleManager extends BlePlxManager ? true : false
+>;
 
 /** Opciones del transporte. */
 export interface BlePlxTransportOptions {

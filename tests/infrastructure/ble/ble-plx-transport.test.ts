@@ -134,7 +134,7 @@ class FakeManager implements BlePlxManager {
 
   readonly scanResults: FakeScannedDevice[] = [];
   readonly devices = new Map<string, FakeDevice>();
-  readonly mtuRequests: Array<{ deviceId: string; mtu: number }> = [];
+  readonly mtuRequests: { deviceId: string; mtu: number }[] = [];
   readonly cancelled: string[] = [];
   scanFilter: string[] | null = null;
   stopScanCalls = 0;
