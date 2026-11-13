@@ -25,7 +25,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | decisiones | docs/adr/ | - | ADR-APP-001 a ADR-APP-017 en Notion `collection://dfe39c4a-833b-8315-88ec-07f76cfec317` |
 | diseno | docs/superpowers/specs/ | - | Mapa de pantallas `40439c4a833b819291dfefd7dc545b88` |
 | estructura | docs/architecture/ | - | Este repositorio: dónde vive cada capa y cada área |
-| ciencia-origen | docs/requirements/ | - | Objetivo 1 v2: umbrales, ecuaciones y motor de decisión |
+| ciencia-origen | docs/requirements/ | - | Objetivo 1 v2: umbrales, ecuaciones y motor de decisión; `muestreo-espacial-mallas-gradientes.md` |
 
 ## Reglas
 

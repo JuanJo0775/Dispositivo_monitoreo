@@ -73,3 +73,6 @@ coverage/
 # macOS
 .DS_Store
 *.pem
+
+# bocetos del compañero visual (locales)
+.superpowers/

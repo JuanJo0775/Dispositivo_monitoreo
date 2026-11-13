@@ -319,13 +319,39 @@ campo, no un extra.
 - Render: `maplibre-react-native` con paquete de teselas vectoriales `.pmtiles` por región.
 - Origen: extracto Protomaps (datos OpenStreetMap, ODbL) o un proveedor con licencia que permita
   uso offline; la atribución se muestra siempre en el mapa.
-- La app incluye un paquete mínimo de la zona de trabajo y permite descargar/importar otro con
-  límite de tamaño y borrado explícito.
+- La app incluye un paquete base de país a zoom bajo y permite importar uno detallado para la zona,
+  con límite de tamaño y borrado explícito.
 - Si no hay paquete para la zona, el mapa cae a un lienzo con los puntos en coordenadas relativas y
   lo dice; nunca deja de mostrar los puntos.
-- Capas: puntos por variable, posición actual, ruta del recorrido y polígono del lote. La unidad
-  cartográfica se dibuja como referencia, no se edita en el MVP.
-- GPS del teléfono con `expo-location`, activo solo durante el muestreo (RNF-APP-010).
+- Capas: celdas de la malla, puntos por clase y celda seleccionada. El contorno del lote llega en
+  v2.0; la unidad cartográfica se declara en el lote, no se dibuja.
+- La posición la da el GPS del bastón, registro por registro. El GPS del teléfono no se usa para
+  ubicar puntos (RNF-APP-010).
+
+### 13.1 Malla y dictamen por espacio (2026-11-12)
+
+Corrección del 2026-11-12: un punto no representa el lote y la app no dirige el muestreo. El mapa
+documenta **espacios**: una malla sobre el área medida, con un dictamen por celda.
+
+- La malla se arma con las coordenadas del bastón; no se camina ni se dibuja un perímetro.
+- Celda por defecto: **0,4 ha (1 acre)** para café, cultivo de alto valor; áreas menores usan una
+  sola celda. La malla organiza lo medido, no indica dónde medir.
+- Estados de celda: `sin_dato`, `un_punto`, `resumen` (mediana y mínimo–máximo) y `no_concluyente`.
+  La celda nunca se colorea como promedio del lote; si las clases discrepan, se muestran todas.
+- **No hay interpolación en el MVP.** La superficie interpolada (mapa de calor, RF-APP-047) queda en
+  v2.0 y exige al menos 100 puntos con estructura espacial demostrada; con 15–20 capturas no se
+  interpola.
+- Los gradientes topográficos sirven para **declarar zonas**; el gradiente calculado solo se muestra
+  cuando hay puntos suficientes y la tendencia es significativa.
+- La justificación, los tamaños de celda y las fuentes están en
+  `docs/requirements/muestreo-espacial-mallas-gradientes.md`.
+- La posición del punto sale del GPS del bastón cuando la bandera `positionValid` lo permite; no hay
+  respaldo del teléfono ni posición manual. Las mediciones sincronizadas se asignan a su lote por
+  `plotCode` o `configId` y se diagnostican con la sesión de ese `configId`.
+- RF-APP-050 (contador y marca de “muestreo completo”) queda reemplazado por este enfoque de
+  documentación; hay que actualizar el requisito en Notion.
+
+El detalle del corte 3 está en `docs/superpowers/specs/2026-11-12-corte-3-mapa-malla-design.md`.
 
 ## 14. Exportación
 
