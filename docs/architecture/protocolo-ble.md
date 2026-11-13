@@ -124,6 +124,16 @@ p_mgkg, k_mgkg, banderas, bat_pct, fw_ver
    emparejado o versión incompatible.
 5. Cada captura posterior lleva su `config_id`, cultivo, lote y profundidad.
 
+### 6.1 Emparejamiento en la app
+
+La app pide el PIN de seis dígitos en la pantalla de conexión. Con `StickGateway.pair(pin)` deriva la
+clave de la carga útil usando la sal que fija la implementación:
+
+- **Simulador:** usa la sal fija `DEFAULT_SIMULATED_SALT`, para que las pruebas sean deterministas.
+- **Bastón real:** la sal se recibe en el intercambio del enlace cifrado. Ese intercambio todavía no
+  está implementado en el firmware, así que es el primer punto a cerrar cuando exista el prototipo;
+  sin la sal correcta el bastón rechaza la configuración.
+
 ## 7. Sincronización por microSD
 
 1. La app escribe **Sync · solicitud** con el id desde el que quiere (`last_confirmed + 1`).

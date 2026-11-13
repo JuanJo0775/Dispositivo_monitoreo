@@ -15,10 +15,10 @@ camino crítico.
 app/                     Rutas de expo-router. Una pantalla por archivo, sin lógica de negocio.
 src/
   shared/                Utilidades sin dependencias (metadatos de la app).
-  domain/                TypeScript puro: capture/, measurement/, diagnosis/, farm/, calibration/.
+  domain/                TypeScript puro: capture/, measurement/, diagnosis/, farm/, protocol/.
   application/           Casos de uso por área: capture/, export/, diagnosis/, sync/.
-  ports/                 Interfaces de salida: stick-gateway.ts y stores/.
-  infrastructure/        Adaptadores: ble/, db/, files/, maps/.
+  ports/                 Interfaces de salida: stick-gateway.ts, ble-transport.ts y stores/.
+  infrastructure/        Adaptadores: ble/, crypto/, db/, files/, maps/.
   ui/                    components/, hooks/, stores/.
 assets/                  Íconos, splash y, más adelante, umbrales y teselas.
 tests/                   Espejo de src/: domain/, application/, infrastructure/, ui/, helpers/.
@@ -40,7 +40,8 @@ dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports
 
 - Node 22 o superior y npm.
 - Android SDK y un teléfono o emulador para la app.
-- El bastón es **simulado** hasta el corte 2; no se necesita hardware.
+- El bastón es **simulado** hasta que exista el prototipo; no se necesita hardware para probar el
+  BLE, la configuración de sesión ni la sincronización por microSD.
 
 ## Comandos
 
@@ -101,7 +102,7 @@ empezar.
 | ----- | -------------------------------------------- | --------- |
 | 0     | Esqueleto: simulador, SQLite, historial, CSV | listo     |
 | 1     | Recorrido de campo mínimo con diagnóstico    | listo     |
-| 2     | BLE real y sincronización por microSD        | en curso  |
+| 2     | BLE real y sincronización por microSD        | listo     |
 | 3     | Mapa con teselas offline y guía de muestreo  | pendiente |
 | 4     | v1.0: calibración individual, PDF, análisis  | pendiente |
 | 5     | v2.0: dosis y exportación geoespacial        | pendiente |

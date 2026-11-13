@@ -8,16 +8,16 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 
 | Area | Code | ADR | Requirements |
 | --- | --- | --- | --- |
-| conexion-ble | src/infrastructure/ble/, src/ports/stick-gateway.ts, src/ports/ble-transport.ts, src/domain/protocol/ | ADR-APP-012, ADR-APP-017 | RF-APP-001 a RF-APP-006, RF-APP-064; Notion `collection://77d39c4a-833b-82e4-8810-870de4b8d062` |
+| conexion-ble | src/infrastructure/ble/, src/infrastructure/crypto/, src/ports/stick-gateway.ts, src/ports/ble-transport.ts, src/ports/random-bytes.ts, src/domain/protocol/, docs/architecture/protocolo-ble.md | ADR-APP-012, ADR-APP-017 | RF-APP-001 a RF-APP-006, RF-APP-064; Notion `collection://77d39c4a-833b-82e4-8810-870de4b8d062` |
 | medicion | src/domain/capture/, src/application/capture/ | ADR-APP-005, ADR-APP-012 | RF-APP-007 a RF-APP-012; contrato ESP32-App |
 | contexto-lote | src/domain/farm/, src/application/farm/, src/domain/session/, src/application/session/ | ADR-APP-015 | RF-APP-013 a RF-APP-020, RF-APP-048 a RF-APP-051, RF-APP-064 |
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
 | historial | app/history.tsx, src/application/capture/list-measurements.ts | ADR-APP-004 | RF-APP-034 a RF-APP-038 |
-| sincronizacion-sd | - | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
+| sincronizacion-sd | src/application/sync/, src/ports/stick-sync.ts, src/ports/stores/sync-state-store.ts, app/sync.tsx, tests/integration/ble-sync-flow.test.ts | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
 | mapas | - | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
 | calibracion | - | ADR-APP-005 | RF-APP-052 a RF-APP-054 |
 | exportacion | src/application/export/, src/infrastructure/files/ | ADR-APP-014 | RF-APP-055 a RF-APP-057 |
-| estado-baston | app/connect.tsx, app/measure.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
+| estado-baston | app/connect.tsx, app/measure.tsx, src/ui/components/sync-status.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
 | ajustes | - | ADR-APP-010, ADR-APP-011, ADR-APP-016 | RF-APP-060 a RF-APP-063 |
 | accesibilidad-localizacion | app/, src/ui/ | ADR-APP-011 | RNF-APP-007, RNF-APP-016, RNF-APP-020 |
 | datos-privacidad | src/infrastructure/db/ | ADR-APP-004, ADR-APP-010 | RNF-APP-004, RNF-APP-006, RNF-APP-011, RNF-APP-012, RNF-APP-014 |

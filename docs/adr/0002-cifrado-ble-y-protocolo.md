@@ -1,6 +1,6 @@
 # 0002. Cifrado de carga útil en BLE y perfil GATT congelado
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-12
 - **Area:** conexion-ble
 

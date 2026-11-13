@@ -30,9 +30,10 @@ Una violación de esta regla se corrige moviendo código, no agregando excepcion
 app/                              Rutas de expo-router. Una pantalla por archivo.
   _layout.tsx
   index.tsx
-  connect.tsx                     (corte 0)
+  connect.tsx                     Estado del bastón y emparejamiento. (corte 2)
   measure.tsx                     (corte 0)
   history.tsx                     (corte 0)
+  sync.tsx                        Sincronización por microSD y CSV. (corte 2)
   farms.tsx                       Fincas y lotes. (corte 1)
   farm-form.tsx                   Alta y edición de finca. (corte 1)
   plot-form.tsx                   Alta y edición de lote. (corte 1)
@@ -127,6 +128,8 @@ src/
     thresholds/
       load-threshold-set.ts       Carga desde los assets y validación con Zod.
       import-threshold-set.ts     Importación a la tabla `threshold_sets`.
+    crypto/
+      expo-random-bytes.ts        Bytes aleatorios seguros del teléfono. (corte 2)
     files/
       csv-share.ts
     maps/                         (corte 3)
@@ -138,6 +141,7 @@ src/
       diagnosis-card.tsx           Resultado de un diagnóstico.
       field.tsx                    Campo de formulario con etiqueta.
       plot-picker.tsx              Selector de lote.
+      sync-status.tsx              Resumen de la sincronización, en texto. (corte 2)
     hooks/
       use-stick-status.ts         Suscripción al bastón sin renders en cascada.
     providers/

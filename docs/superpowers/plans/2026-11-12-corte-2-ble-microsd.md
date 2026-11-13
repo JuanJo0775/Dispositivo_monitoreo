@@ -1,6 +1,6 @@
 # Corte 2 — BLE real y sincronización por microSD Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Que la app hable BLE con el bastón real y sincronice los registros de la microSD con
 reanudación, sin duplicar y avisando de conflictos, aunque el prototipo físico todavía no exista.
@@ -99,14 +99,14 @@ tests/                           espejo de src/ y app/
   - `encodeFrame(opcode, body): Uint8Array`
   - `decodeFrame(bytes): { opcode, version, body }` (lanza si el CRC no cuadra)
 
-- [ ] **Step 1: Escribir las pruebas** — CRC con los vectores conocidos («123456789» → 0x29B1), ida y
+- [x] **Step 1: Escribir las pruebas** — CRC con los vectores conocidos («123456789» → 0x29B1), ida y
   vuelta de una trama, rechazo de una trama con el CRC alterado, rechazo de una versión
   desconocida.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Run: `npm test -- tests/domain/protocol`
+- [x] **Step 2: Ejecutar y verificar que falla** — Run: `npm test -- tests/domain/protocol`
   Expected: FAIL porque los archivos no existen.
-- [ ] **Step 3: Implementar** — TypeScript puro, sin dependencias.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (8 pruebas).
-- [ ] **Step 5: Commit** — `git add src/domain/protocol tests/domain/protocol` ·
+- [x] **Step 3: Implementar** — TypeScript puro, sin dependencias.
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (8 pruebas).
+- [x] **Step 5: Commit** — `git add src/domain/protocol tests/domain/protocol` ·
   `git commit -m "feat: tramas, CRC-16 y perfil BLE del contrato v0.1"`
 
 ---
@@ -127,14 +127,14 @@ tests/                           espejo de src/ y app/
     nMgKg; pMgKg; kMgKg; banderas; batPct; fwVer }` (todo `number | string | null`)
   - `flagsFromBits(bits: number): CaptureFlags` y `bitsFromFlags(flags): number`
 
-- [ ] **Step 1: Escribir las pruebas** — ida y vuelta de un registro completo; celdas vacías para
+- [x] **Step 1: Escribir las pruebas** — ida y vuelta de un registro completo; celdas vacías para
   los datos ausentes; los bits de bandera en las dos direcciones; un valor con coma decimal se
   conserva; una línea con columnas de menos se rechaza.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — los números con punto decimal (el archivo de la microSD usa punto);
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — los números con punto decimal (el archivo de la microSD usa punto);
   los vacíos nunca se rellenan.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (8 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: codec del registro en linea CSV del contrato"`
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (8 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: codec del registro en linea CSV del contrato"`
 
 ---
 
@@ -152,13 +152,13 @@ tests/                           espejo de src/ y app/
   - `decryptPayload(key, envelope): Uint8Array` (lanza si la etiqueta no cuadra)
   - `PAYLOAD_VERSION = 1`, `NONCE_BYTES = 24`, `TAG_BYTES = 16`, `KEY_BYTES = 32`
 
-- [ ] **Step 1: Escribir las pruebas** — ida y vuelta con una clave y un nonce fijos; un byte
+- [x] **Step 1: Escribir las pruebas** — ida y vuelta con una clave y un nonce fijos; un byte
   alterado se rechaza; una clave distinta se rechaza; el nonce nunca se repite dentro de una misma
   clave; la derivación da 32 bytes y cambia con la sal.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — `@noble/ciphers` (XChaCha20-Poly1305) y `@noble/hashes` (pbkdf2).
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (6 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: cifrado de carga util con XChaCha20-Poly1305"`
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — `@noble/ciphers` (XChaCha20-Poly1305) y `@noble/hashes` (pbkdf2).
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (6 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: cifrado de carga util con XChaCha20-Poly1305"`
 
 ---
 
@@ -180,14 +180,14 @@ tests/                           espejo de src/ y app/
     (CRC inválido, corte de conexión).
   - `makeFakeBleTransport(device): BleTransport`
 
-- [ ] **Step 1: Escribir las pruebas** — el dispositivo responde el estado; una captura trae el
+- [x] **Step 1: Escribir las pruebas** — el dispositivo responde el estado; una captura trae el
   `config_id` y el contexto de la configuración activa; la configuración sobrevive a «reiniciar»
   el dispositivo; el bloque de sincronización cabe en el MTU y lleva CRC válido; con CRC inválido
   inyectado la trama se rechaza; un firmware con versión mayor bloquea.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — el simulador speaks el mismo protocolo que el firmware real.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (10 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: baston simulado fiel al contrato con microSD"`
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — el simulador speaks el mismo protocolo que el firmware real.
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (10 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: baston simulado fiel al contrato con microSD"`
 
 ---
 
@@ -203,14 +203,14 @@ tests/                           espejo de src/ y app/
 - Produces: `class BlePlxTransport implements BleTransport` que traduce la API de
   `react-native-ble-plx` al puerto.
 
-- [ ] **Step 1: Escribir las pruebas** — con un doble de la biblioteca: el escaneo devuelve los
+- [x] **Step 1: Escribir las pruebas** — con un doble de la biblioteca: el escaneo devuelve los
   dispositivos del servicio propio; conectar y descubrir expone las características; escribir
   entrega los bytes exactos; la MTU negociada se devuelve.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — el módulo nativo se carga con `require` diferido dentro del
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — el módulo nativo se carga con `require` diferido dentro del
   constructor, para que las pruebas no lo carguen.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (6 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: transporte BLE real sobre react-native-ble-plx"`
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (6 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: transporte BLE real sobre react-native-ble-plx"`
 
 ---
 
@@ -227,15 +227,15 @@ tests/                           espejo de src/ y app/
   (idle, scanning, connecting, discovering, ready, configuring, capturing, syncing,
   reconnecting, error), `writeConfig` cifrado, captura en vivo y confirmación.
 
-- [ ] **Step 1: Escribir las pruebas** — conectar y descubrir deja el gateway en `ready`; una
+- [x] **Step 1: Escribir las pruebas** — conectar y descubrir deja el gateway en `ready`; una
   versión mayor de protocolo bloquea con mensaje; la configuración se escribe cifrada y el
   bastón la acepta; una configuración con CRC inválido se rechaza y se avisa; una captura en
   vivo llega al suscriptor; `confirm` llega al bastón.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — cola serial de escrituras; reconexión con espera creciente y
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — cola serial de escrituras; reconexión con espera creciente y
   límite; estado visible para la UI.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (10 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: gateway BLE con maquina de estados"`
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (10 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: gateway BLE con maquina de estados"`
 
 ---
 
@@ -254,14 +254,14 @@ tests/                           espejo de src/ y app/
   - `interface SyncSummary { received; imported; duplicates; conflicts; lastConfirmedSequence }`
   - tabla `sync_state` con `device_id`, `last_confirmed_sequence`, `status`, `updated_at`
 
-- [ ] **Step 1: Escribir las pruebas** — sincroniza los registros pendientes; reanuda desde el
+- [x] **Step 1: Escribir las pruebas** — sincroniza los registros pendientes; reanuda desde el
   último id confirmado; no duplica un id repetido; un id repetido con contenido distinto conserva
   el primero y devuelve el conflicto; confirma al bastón el último id; un bloque con CRC inválido
   se descarta y se reintenta desde el último confirmado.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — la ingesta va por el mismo camino que la captura en vivo.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (8 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: sincronizacion por microSD reanudable"`
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — la ingesta va por el mismo camino que la captura en vivo.
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (8 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: sincronizacion por microSD reanudable"`
 
 ---
 
@@ -275,13 +275,13 @@ tests/                           espejo de src/ y app/
 - Produces: `importCsvFromStick(contents: string, deps): Promise<SyncSummary>` con el mismo
   pipeline y la misma deduplicación que la sincronización BLE (RF-APP-042).
 
-- [ ] **Step 1: Escribir las pruebas** — importa un CSV de la microSD; ignora las líneas repetidas;
+- [x] **Step 1: Escribir las pruebas** — importa un CSV de la microSD; ignora las líneas repetidas;
   avisa el conflicto con mismo id y distinto contenido; una línea inválida se cuenta como error
   y no detiene la importación.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — sin dependencia del BLE.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (6 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: importacion manual de CSV de la microSD"`
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — sin dependencia del BLE.
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (6 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: importacion manual de CSV de la microSD"`
 
 ---
 
@@ -296,12 +296,12 @@ tests/                           espejo de src/ y app/
 - Produces: la pantalla de sincronización con progreso por registros confirmados, botón
   «Sincronizar» y «Importar CSV»; y la de conexión con escaneo, emparejamiento con PIN y estado.
 
-- [ ] **Step 1: Escribir las pruebas** — el componente de estado muestra los registros confirmados
+- [x] **Step 1: Escribir las pruebas** — el componente de estado muestra los registros confirmados
   y los duplicados en texto, no solo en color.
-- [ ] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
-- [ ] **Step 3: Implementar** — con los casos de uso de las tareas 7 y 8.
-- [ ] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (5 pruebas).
-- [ ] **Step 5: Commit** — `git commit -m "feat: pantallas de conexion y sincronizacion"`
+- [x] **Step 2: Ejecutar y verificar que falla** — Expected: FAIL.
+- [x] **Step 3: Implementar** — con los casos de uso de las tareas 7 y 8.
+- [x] **Step 4: Ejecutar y verificar que pasa** — Expected: PASS (5 pruebas).
+- [x] **Step 5: Commit** — `git commit -m "feat: pantallas de conexion y sincronizacion"`
 
 ---
 
@@ -311,18 +311,18 @@ tests/                           espejo de src/ y app/
 - Create: `tests/integration/sync-flow.test.ts`, `docs/architecture/protocolo-ble.md`
 - Modify: `README.md`, `docs/context/map.md`, `docs/architecture/estructura.md`, `.harness/task.md`
 
-- [ ] **Step 1: Escribir la prueba de integración** — sobre SQLite real: se crea el bastón
+- [x] **Step 1: Escribir la prueba de integración** — sobre SQLite real: se crea el bastón
   simulado con microSD, se sincroniza, se comprueba que los registros quedaron guardados y que el
   estado de sincronización quedó persistido; al reabrir la app, una sincronización nueva no
   duplica nada.
-- [ ] **Step 2: Ejecutar y verificar que pasa** — Expected: PASS (2 pruebas).
-- [ ] **Step 3: Verificación completa** — Run: `npm test` · `npm run typecheck` · `npm run lint` ·
+- [x] **Step 2: Ejecutar y verificar que pasa** — Expected: PASS (2 pruebas).
+- [x] **Step 3: Verificación completa** — Run: `npm test` · `npm run typecheck` · `npm run lint` ·
   `npm run format` · `npm run build` · `node .harness/bin/harness.mjs verify`
   Expected: todo exit 0.
-- [ ] **Step 4: Documentar** — `docs/architecture/protocolo-ble.md` con los UUID, el formato de
+- [x] **Step 4: Documentar** — `docs/architecture/protocolo-ble.md` con los UUID, el formato de
   trama, el sobre cifrado y los vectores de prueba para el firmware; actualizar el mapa, la
   estructura, el README y `.harness/task.md`.
-- [ ] **Step 5: Commit** — `git commit -m "feat: cierre del corte 2 con BLE y sincronizacion"`
+- [x] **Step 5: Commit** — `git commit -m "feat: cierre del corte 2 con BLE y sincronizacion"`
 
 ---
 
