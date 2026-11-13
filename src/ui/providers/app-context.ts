@@ -5,6 +5,7 @@ import type { CaptureStore } from '@/ports/stores/capture-store';
 import type { DiagnosisStore } from '@/ports/stores/diagnosis-store';
 import type { FarmStore } from '@/ports/stores/farm-store';
 import type { MeasurementStore } from '@/ports/stores/measurement-store';
+import type { MapPackageStore } from '@/ports/stores/map-package-store';
 import type { SessionStore } from '@/ports/stores/session-store';
 import type { SettingsStore } from '@/ports/stores/settings-store';
 import type { SyncStateStore } from '@/ports/stores/sync-state-store';
@@ -12,7 +13,7 @@ import type { StoreTransaction, UnitOfWork } from '@/ports/stores/unit-of-work';
 import type { StickGateway } from '@/ports/stick-gateway';
 import type { StickSync } from '@/ports/stick-sync';
 
-/** Almacenes que la UI usa: fincas, lotes, sesiones, diagnósticos, ajustes y sincronización. */
+/** Almacenes que la UI usa: fincas, lotes, sesiones, diagnósticos, ajustes, sincronización y paquetes de mapa. */
 export interface AppStores extends StoreTransaction {
   readonly farms: FarmStore;
   readonly sessions: SessionStore;
@@ -21,6 +22,7 @@ export interface AppStores extends StoreTransaction {
   readonly captures: CaptureStore;
   readonly measurements: MeasurementStore;
   readonly syncState: SyncStateStore;
+  readonly mapPackages: MapPackageStore;
 }
 
 /** Servicios ya cableados que consume la UI. */

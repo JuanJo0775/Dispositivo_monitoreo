@@ -50,7 +50,11 @@ export async function ingestCapture(
       id: measurementId,
       captureId: `${capture.deviceId}:${capture.sequence}`,
       plotId,
+      // La tarea 6 resuelve la sesión; acá todavía no se conoce.
+      sessionId: null,
       payload: capture.payload,
+      // La bandera no se deduce de las coordenadas: viaja con la captura.
+      positionValid: capture.flags.positionValid,
       capturedAtUtc: capture.capturedAtUtc,
       valid: validation.valid,
       invalidReasons: validation.reasons,

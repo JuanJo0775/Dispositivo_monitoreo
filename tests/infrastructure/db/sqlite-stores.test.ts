@@ -74,6 +74,25 @@ describe('almacenes SQLite', () => {
     expect(await stores.measurements.list()).toEqual([measurement]);
   });
 
+  it('guarda la sesión y la bandera de posición de la medición', async () => {
+    const stores = createSqliteStores(db);
+
+    await stores.sessions.insert(makeSession());
+    const measurement = makeMeasurement({}, { sessionId: 'session-1', positionValid: false });
+
+    await stores.measurements.insert(measurement);
+
+    expect(await stores.measurements.get(measurement.id)).toEqual(measurement);
+
+    const row = await db.getFirstAsync<{
+      session_id: string | null;
+      position_valid: number | null;
+    }>('SELECT session_id, position_valid FROM measurements WHERE id = ?', [measurement.id]);
+
+    expect(row?.session_id).toBe('session-1');
+    expect(row?.position_valid).toBe(0);
+  });
+
   it('excluye descartadas y filtra por lote al listar', async () => {
     const stores = createSqliteStores(db);
 

@@ -8,6 +8,7 @@ const version1 = MIGRATIONS.find((migration) => migration.version === 1)?.sql ??
 const version2 = MIGRATIONS.find((migration) => migration.version === 2)?.sql ?? '';
 const version3 = MIGRATIONS.find((migration) => migration.version === 3)?.sql ?? '';
 const version4 = MIGRATIONS.find((migration) => migration.version === 4)?.sql ?? '';
+const version5 = MIGRATIONS.find((migration) => migration.version === 5)?.sql ?? '';
 
 describe('migraciones', () => {
   it('empieza en la versión 1 y es consecutiva', () => {
@@ -46,7 +47,7 @@ describe('migraciones', () => {
 
   describe('versión 2', () => {
     it('publica las versiones en orden consecutive', () => {
-      expect(MIGRATIONS.map((migration) => migration.version)).toEqual([1, 2, 3, 4]);
+      expect(MIGRATIONS.map((migration) => migration.version)).toEqual([1, 2, 3, 4, 5]);
     });
 
     it('crea las tablas de sesiones, umbrales, diagnósticos y ajustes', () => {
@@ -122,6 +123,25 @@ describe('migraciones', () => {
     });
   });
 
+  describe('versión 5', () => {
+    it('crea los paquetes de mapa y agrega la bandera de posición', () => {
+      expect(version5).toContain('CREATE TABLE map_packages');
+      expect(version5).toContain('file_name TEXT NOT NULL');
+      expect(version5).toContain('path TEXT NOT NULL');
+      expect(version5).toContain('size_bytes INTEGER NOT NULL');
+      expect(version5).toContain('imported_at TEXT NOT NULL');
+      expect(version5).toContain('deleted_at TEXT');
+      expect(version5).toMatch(/ALTER TABLE measurements ADD COLUMN position_valid INTEGER/i);
+    });
+
+    it('no modifica las versiones ya publicadas', () => {
+      for (const sql of [version1, version2, version3, version4]) {
+        expect(sql).not.toContain('map_packages');
+        expect(sql).not.toContain('position_valid');
+      }
+    });
+  });
+
   describe('aplicación sobre SQLite real', () => {
     let db: TestSqlDatabase;
 
@@ -141,6 +161,69 @@ describe('migraciones', () => {
         'SELECT MAX(version) AS version FROM schema_migrations',
       );
       expect(row?.version).toBe(MIGRATIONS.length);
+    });
+
+    it('aplica la versión 5 sin tocar las filas anteriores', async () => {
+      const anterior = makeTestSqlDatabase();
+
+      try {
+        await anterior.execAsync(
+          'CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL);',
+        );
+
+        for (const migration of MIGRATIONS.filter((item) => item.version <= 4)) {
+          await anterior.execAsync(migration.sql);
+          await anterior.runAsync(
+            'INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)',
+            [migration.version, '2026-11-12T00:00:00Z'],
+          );
+        }
+
+        await anterior.runAsync(
+          'INSERT INTO farms (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)',
+          ['farm-1', 'Finca El Roble', '2026-11-12T00:00:00Z', '2026-11-12T00:00:00Z'],
+        );
+        await anterior.runAsync(
+          'INSERT INTO captures (device_id, sequence, payload_json, flags_json, captured_at_utc, received_at_utc, origin, config_id, plot_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [
+            'stick-01',
+            1,
+            '{}',
+            '{}',
+            '2026-11-12T00:00:00Z',
+            '2026-11-12T00:00:01Z',
+            'stick',
+            7,
+            null,
+            '2026-11-12T00:00:01Z',
+          ],
+        );
+
+        await expect(applyMigrations(anterior)).resolves.toBe(1);
+
+        const tables = await anterior.getAllAsync<{ name: string }>(
+          "SELECT name FROM sqlite_master WHERE type = 'table'",
+        );
+        const measurements = await anterior.getAllAsync<{ name: string }>(
+          'PRAGMA table_info(measurements)',
+        );
+
+        expect(tables.map((row) => row.name)).toContain('map_packages');
+        expect(measurements.map((row) => row.name)).toContain('position_valid');
+        expect(
+          await anterior.getFirstAsync<{ name: string }>('SELECT name FROM farms WHERE id = ?', [
+            'farm-1',
+          ]),
+        ).toEqual({ name: 'Finca El Roble' });
+        expect(
+          await anterior.getFirstAsync<{ device_id: string }>(
+            'SELECT device_id FROM captures WHERE device_id = ? AND sequence = ?',
+            ['stick-01', 1],
+          ),
+        ).toEqual({ device_id: 'stick-01' });
+      } finally {
+        anterior.close();
+      }
     });
 
     it('crea las tablas de la versión 2', async () => {

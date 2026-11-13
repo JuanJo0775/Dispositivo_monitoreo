@@ -23,6 +23,7 @@ import type { CaptureStore } from '@/ports/stores/capture-store';
 import type { DiagnosisStore, StoredDiagnosis } from '@/ports/stores/diagnosis-store';
 import type { FarmStore } from '@/ports/stores/farm-store';
 import type { MeasurementFilter, MeasurementStore } from '@/ports/stores/measurement-store';
+import type { MapPackage, MapPackageStore } from '@/ports/stores/map-package-store';
 import type { Session, SessionStore, SessionStatus } from '@/ports/stores/session-store';
 import type { SettingsStore } from '@/ports/stores/settings-store';
 import type { SyncState, SyncStateStore } from '@/ports/stores/sync-state-store';
@@ -46,6 +47,7 @@ interface MeasurementRow {
   id: string;
   capture_id: string;
   plot_id: string | null;
+  session_id: string | null;
   payload_json: string;
   captured_at_utc: string;
   valid: number;
@@ -54,6 +56,16 @@ interface MeasurementRow {
   photo_path: string | null;
   discarded_at: string | null;
   created_at: string;
+  position_valid: number | null;
+}
+
+interface MapPackageRow {
+  id: string;
+  file_name: string;
+  path: string;
+  size_bytes: number;
+  imported_at: string;
+  deleted_at: string | null;
 }
 
 interface FarmRow {
@@ -300,7 +312,10 @@ function toMeasurement(row: MeasurementRow): Measurement {
     id: row.id,
     captureId: row.capture_id,
     plotId: row.plot_id,
+    sessionId: row.session_id,
     payload: JSON.parse(row.payload_json) as CapturePayload,
+    // Una fila anterior al relleno se lee como sin posición conocida.
+    positionValid: row.position_valid === 1,
     capturedAtUtc: row.captured_at_utc,
     valid: row.valid === 1,
     invalidReasons: JSON.parse(row.invalid_reasons_json) as string[],
@@ -340,6 +355,17 @@ function toPlot(row: PlotRow): Plot {
     deletedAt: row.deleted_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function toMapPackage(row: MapPackageRow): MapPackage {
+  return {
+    id: row.id,
+    fileName: row.file_name,
+    path: row.path,
+    sizeBytes: row.size_bytes,
+    importedAt: row.imported_at,
+    deletedAt: row.deleted_at,
   };
 }
 
@@ -562,7 +588,7 @@ const CAPTURE_COLUMNS =
   'device_id, sequence, payload_json, flags_json, captured_at_utc, received_at_utc, origin, config_id, plot_id';
 
 const MEASUREMENT_COLUMNS =
-  'id, capture_id, plot_id, payload_json, captured_at_utc, valid, invalid_reasons_json, notes, photo_path, discarded_at, created_at';
+  'id, capture_id, plot_id, payload_json, captured_at_utc, valid, invalid_reasons_json, notes, photo_path, discarded_at, created_at, session_id, position_valid';
 
 const FARM_COLUMNS = 'id, name, created_at, updated_at';
 
@@ -577,13 +603,16 @@ const DIAGNOSIS_COLUMNS =
 
 const SYNC_STATE_COLUMNS = 'device_id, last_confirmed_sequence, status, updated_at';
 
-/** Almacenes respaldados por SQLite: fincas, lotes, sesiones, diagnósticos, ajustes y sincronización. */
+const MAP_PACKAGE_COLUMNS = 'id, file_name, path, size_bytes, imported_at, deleted_at';
+
+/** Almacenes respaldados por SQLite: fincas, lotes, sesiones, diagnósticos, ajustes, sincronización y paquetes de mapa. */
 export interface SqliteStores extends StoreTransaction {
   readonly farms: FarmStore;
   readonly sessions: SessionStore;
   readonly diagnoses: DiagnosisStore;
   readonly settings: SettingsStore;
   readonly syncState: SyncStateStore;
+  readonly mapPackages: MapPackageStore;
   readonly uow: UnitOfWork;
 }
 
@@ -616,12 +645,20 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
 
       return row === null ? null : toRawCapture(row);
     },
+
+    async listAll() {
+      const rows = await db.getAllAsync<CaptureRow>(
+        `SELECT ${CAPTURE_COLUMNS} FROM captures ORDER BY captured_at_utc ASC, device_id, sequence`,
+      );
+
+      return rows.map(toRawCapture);
+    },
   };
 
   const measurements: MeasurementStore = {
     async insert(measurement) {
       await db.runAsync(
-        `INSERT INTO measurements (${MEASUREMENT_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO measurements (${MEASUREMENT_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           measurement.id,
           measurement.captureId,
@@ -634,6 +671,8 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
           measurement.photoPath,
           measurement.discardedAt,
           measurement.createdAt,
+          measurement.sessionId,
+          measurement.positionValid ? 1 : 0,
         ],
       );
     },
@@ -667,6 +706,21 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
       );
 
       return row === null ? null : toMeasurement(row);
+    },
+
+    async setPlotId(id, plotId) {
+      await db.runAsync('UPDATE measurements SET plot_id = ? WHERE id = ?', [plotId, id]);
+    },
+
+    async setSessionId(id, sessionId) {
+      await db.runAsync('UPDATE measurements SET session_id = ? WHERE id = ?', [sessionId, id]);
+    },
+
+    async setPositionValid(id, positionValid) {
+      await db.runAsync('UPDATE measurements SET position_valid = ? WHERE id = ?', [
+        positionValid ? 1 : 0,
+        id,
+      ]);
     },
   };
 
@@ -924,6 +978,55 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
     },
   };
 
+  const mapPackages: MapPackageStore = {
+    async insert(mapPackage) {
+      await db.runAsync(
+        `INSERT INTO map_packages (${MAP_PACKAGE_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          mapPackage.id,
+          mapPackage.fileName,
+          mapPackage.path,
+          mapPackage.sizeBytes,
+          mapPackage.importedAt,
+          mapPackage.deletedAt,
+        ],
+      );
+    },
+
+    async get(id) {
+      const row = await db.getFirstAsync<MapPackageRow>(
+        `SELECT ${MAP_PACKAGE_COLUMNS} FROM map_packages WHERE id = ?`,
+        [id],
+      );
+
+      return row === null ? null : toMapPackage(row);
+    },
+
+    async list() {
+      const rows = await db.getAllAsync<MapPackageRow>(
+        `SELECT ${MAP_PACKAGE_COLUMNS} FROM map_packages WHERE deleted_at IS NULL ORDER BY imported_at DESC, id`,
+      );
+
+      return rows.map(toMapPackage);
+    },
+
+    async listAll() {
+      const rows = await db.getAllAsync<MapPackageRow>(
+        `SELECT ${MAP_PACKAGE_COLUMNS} FROM map_packages ORDER BY imported_at DESC, id`,
+      );
+
+      return rows.map(toMapPackage);
+    },
+
+    async markDeleted(id, deletedAt) {
+      await db.runAsync('UPDATE map_packages SET deleted_at = ? WHERE id = ?', [deletedAt, id]);
+    },
+
+    async remove(id) {
+      await db.runAsync('DELETE FROM map_packages WHERE id = ?', [id]);
+    },
+  };
+
   const uow: UnitOfWork = {
     async run<T>(work: (stores: StoreTransaction) => Promise<T>): Promise<T> {
       let result: T | undefined;
@@ -942,5 +1045,15 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
     },
   };
 
-  return { captures, measurements, farms, sessions, diagnoses, settings, syncState, uow };
+  return {
+    captures,
+    measurements,
+    farms,
+    sessions,
+    diagnoses,
+    settings,
+    syncState,
+    mapPackages,
+    uow,
+  };
 }

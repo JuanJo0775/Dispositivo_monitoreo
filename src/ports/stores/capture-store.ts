@@ -5,4 +5,6 @@ export interface CaptureStore {
   insertRaw(capture: RawCapture): Promise<void>;
   /** Identidad de la captura: `device_id + sequence`. */
   findByDeviceSequence(deviceId: string, sequence: number): Promise<RawCapture | null>;
+  /** Todas las capturas, de la más antigua a la más reciente. */
+  listAll(): Promise<RawCapture[]>;
 }

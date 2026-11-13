@@ -66,6 +66,9 @@ function makeDeps() {
         async get(id: string) {
           return id === 'm-1' ? makeMeasurement() : null;
         },
+        async setPlotId() {},
+        async setSessionId() {},
+        async setPositionValid() {},
       },
       sessions: {
         async insert() {},
