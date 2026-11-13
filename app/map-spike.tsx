@@ -164,7 +164,6 @@ export default function MapSpikeScreen() {
 
       <View style={styles.bloque}>
         <Text style={styles.etiqueta}>A: desde los assets del APK</Text>
-        <Text style={styles.uri}>{URL_DESDE_ASSETS}</Text>
         {modulo === null ? (
           <Text style={styles.nota}>
             {errorModulo === null
@@ -174,17 +173,12 @@ export default function MapSpikeScreen() {
         ) : (
           <MapaDePrueba modulo={modulo} url={URL_DESDE_ASSETS} />
         )}
+        <Text style={styles.nota}>URI que se usó:</Text>
+        <Text style={styles.uri}>{URL_DESDE_ASSETS}</Text>
       </View>
 
       <View style={styles.bloque}>
         <Text style={styles.etiqueta}>B: desde el almacenamiento de la app</Text>
-        <Text style={styles.uri}>{copia === null ? 'copiando el archivo…' : copia.url}</Text>
-        {copia !== null ? (
-          <Text style={styles.nota}>Copiado en el teléfono: {copia.bytes} bytes</Text>
-        ) : null}
-        {errorCopia !== null ? (
-          <Text style={styles.error}>No se pudo copiar: {errorCopia}</Text>
-        ) : null}
         {modulo === null ? (
           <Text style={styles.nota}>
             {errorModulo === null
@@ -193,6 +187,14 @@ export default function MapSpikeScreen() {
           </Text>
         ) : copia !== null ? (
           <MapaDePrueba modulo={modulo} url={copia.url} />
+        ) : null}
+        {errorCopia !== null ? (
+          <Text style={styles.error}>No se pudo copiar: {errorCopia}</Text>
+        ) : null}
+        <Text style={styles.nota}>URI que se usó:</Text>
+        <Text style={styles.uri}>{copia === null ? 'copiando el archivo…' : copia.url}</Text>
+        {copia !== null ? (
+          <Text style={styles.nota}>Copiado en el teléfono: {copia.bytes} bytes</Text>
         ) : null}
       </View>
 
