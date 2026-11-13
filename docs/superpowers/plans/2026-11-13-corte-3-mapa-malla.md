@@ -262,8 +262,9 @@ tests/                               espejo de src/ y app/
 - [ ] **Step 3: Implementar** — exactamente el algoritmo del diseño §7.2:
 
   1. proyectar los puntos con `lat0` = latitud media;
-  2. caja envolvente; cada eje se expande hasta `s = √(targetAreaHa·10 000)` m centrado en los
-     puntos (un solo punto → caja `s × s`);
+  2. caja envolvente; **solo los ejes con dispersión cero** se expanden hasta
+     `s = √(targetAreaHa·10 000)` m centrados en los puntos (un solo punto → caja `s × s`); un eje
+     con dispersión mayor que cero se deja igual, porque estirarlo inventaría área medida;
   3. `A = ancho × alto`; candidatos `floor(A/objetivo)` y `ceil(A/objetivo)`, sin repetir, mínimo 1;
   4. por candidato, factorizar `n` en `filas × columnas`; el par califica si la relación de
      aspecto de la celda (`max(lado)/min(lado)`) queda entre 0,4 y 2,5;

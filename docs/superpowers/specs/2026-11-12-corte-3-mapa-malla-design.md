@@ -141,9 +141,10 @@ Todo en `src/domain/geo/`, puro y con pruebas.
 1. Proyectar los puntos a metros locales: equirectangular con `R = 6 371 008,8 m` y
    `x = R·cos(lat0)·Δλ`, `y = R·Δφ`, con `lat0` la latitud media de los puntos. A escala de lote el
    error es despreciable y no se agrega una librería de proyecciones.
-2. Caja envolvente de los puntos. Si la dispersión en algún eje es menor que el lado objetivo
-   (`s = 63,2 m`), se expande hasta `s` centrada en los puntos. Con un solo punto la caja es
-   `s × s`.
+2. Caja envolvente de los puntos. **Solo los ejes con dispersión cero** se expanden hasta el lado
+   objetivo (`s = 63,2 m`) centrados en los puntos: un eje sin dispersión no forma una celda, y con
+   un solo punto la caja es `s × s`. Un eje con dispersión mayor que cero se deja como está: la
+   malla cubre el área medida, no un área inventada.
 3. Área `A = ancho × alto`. Candidatos de número de celdas: `floor(A / 0,4 ha)` y
    `ceil(A / 0,4 ha)`, sin repetir, mínimo 1.
 4. Para cada candidato `n`, buscar el par de factores `filas × columnas = n`. Un par califica si la
