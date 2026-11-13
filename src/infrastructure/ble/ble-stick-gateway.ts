@@ -78,6 +78,7 @@ const DISCONNECTED_STATUS: StickStatus = {
   satellites: null,
   hdop: null,
   recordCount: null,
+  pendingCount: null,
   deviceTimeUtc: null,
   state: 'idle',
 };
@@ -945,6 +946,7 @@ export class BleStickGateway implements StickGateway, StickSync {
       satellites: body.sats,
       hdop: body.hdop,
       recordCount: body.recordCount,
+      pendingCount: body.pendingCount,
       deviceTimeUtc: body.utcTime,
       state: this.currentState,
     };

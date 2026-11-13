@@ -43,6 +43,8 @@ export interface StickStatus {
   readonly hdop?: number | null;
   /** Registros que hay guardados en la microSD del bastón. */
   readonly recordCount?: number | null;
+  /** Registros que todavía no se le han confirmado al bastón. */
+  readonly pendingCount?: number | null;
   /** Hora UTC del bastón, ISO 8601. */
   readonly deviceTimeUtc?: string | null;
   /** Estado de la máquina del gateway. */

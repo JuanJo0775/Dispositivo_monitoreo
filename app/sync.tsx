@@ -143,9 +143,7 @@ export default function SyncScreen() {
   }
 
   const pendientes =
-    status.recordCount === null || status.recordCount === undefined
-      ? null
-      : Math.max(0, status.recordCount - (savedState?.lastConfirmedSequence ?? 0));
+    status.pendingCount === null || status.pendingCount === undefined ? null : status.pendingCount;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

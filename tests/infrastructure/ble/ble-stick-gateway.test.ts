@@ -132,6 +132,7 @@ describe('BleStickGateway', () => {
     expect(gateway.status().satellites).toBe(9);
     expect(gateway.status().hdop).toBe(0.9);
     expect(gateway.status().recordCount).toBe(0);
+    expect(gateway.status().pendingCount).toBe(0);
     expect(gateway.status().deviceTimeUtc).toBe('2026-11-12T15:00:00.000Z');
     expect(gateway.status().state).toBe('ready');
   });
