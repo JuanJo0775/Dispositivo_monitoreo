@@ -27,10 +27,16 @@ export default function HomeScreen() {
           variant="secondary"
           onPress={() => router.push('/sync')}
         />
+        <PrimaryButton
+          label="Pincho de mapa (temporal)"
+          variant="secondary"
+          onPress={() => router.push('/map-spike')}
+        />
       </View>
 
       <Text style={styles.note}>
-        Corte 2: la app habla BLE por el protocolo del bastón y sincroniza su microSD.
+        Corte 2: la app habla BLE por el protocolo del bastón y sincroniza su microSD. El botón del
+        pincho de mapa es temporal: se borra con la tarea 15 del corte 3.
       </Text>
     </View>
   );
