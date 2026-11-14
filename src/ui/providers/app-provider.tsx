@@ -13,6 +13,7 @@ import {
 import { expoRandomBytes } from '@/infrastructure/crypto/expo-random-bytes';
 import { adaptSqlDatabase, createSqliteStores, openDatabase } from '@/infrastructure/db/database';
 import type { SqlDatabase } from '@/infrastructure/db/sql-database';
+import { expoMapPackageFiles } from '@/infrastructure/maps/expo-map-package-files';
 import { importThresholdSet } from '@/infrastructure/thresholds/import-threshold-set';
 import { loadThresholdSet } from '@/infrastructure/thresholds/load-threshold-set';
 import { ACTIVE_THRESHOLDS_VERSION } from '@/shared/versions';
@@ -75,6 +76,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
             uow: stores.uow,
             gateway: stick.gateway,
             sync: stick.gateway,
+            mapFiles: expoMapPackageFiles,
             deviceId: stick.deviceId,
             thresholds,
           });

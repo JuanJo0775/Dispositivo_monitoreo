@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import type { ThresholdSet } from '@/domain/diagnosis/threshold-set';
+import type { MapPackageFiles } from '@/ports/map-package-files';
 import type { CaptureStore } from '@/ports/stores/capture-store';
 import type { DiagnosisStore } from '@/ports/stores/diagnosis-store';
 import type { FarmStore } from '@/ports/stores/farm-store';
@@ -32,6 +33,8 @@ export interface AppServices {
   readonly gateway: StickGateway;
   /** La misma vía hacia el bastón, vista como sincronización por microSD. */
   readonly sync: StickSync;
+  /** Disco de los paquetes de mapa: importar, borrar y consultar espacio. */
+  readonly mapFiles: MapPackageFiles;
   /** Identificador del bastón; sin él no se puede conectar ni sincronizar. */
   readonly deviceId: string;
   /** Set de umbrales activo: el motor lo usa para interpretar cualquier lectura. */
