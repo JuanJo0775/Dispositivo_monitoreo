@@ -38,6 +38,11 @@ export function makeInMemoryStores(options: InMemoryStoresOptions = {}): InMemor
     async listAll() {
       return [...captureRows];
     },
+    async setPlotId(deviceId, sequence, plotId) {
+      captureRows = captureRows.map((row) =>
+        row.deviceId === deviceId && row.sequence === sequence ? { ...row, plotId } : row,
+      );
+    },
   };
 
   /** Reemplaza los campos indicados de una medición ya guardada. */

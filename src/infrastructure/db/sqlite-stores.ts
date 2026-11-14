@@ -653,6 +653,14 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
 
       return rows.map(toRawCapture);
     },
+
+    async setPlotId(deviceId, sequence, plotId) {
+      await db.runAsync('UPDATE captures SET plot_id = ? WHERE device_id = ? AND sequence = ?', [
+        plotId,
+        deviceId,
+        sequence,
+      ]);
+    },
   };
 
   const measurements: MeasurementStore = {

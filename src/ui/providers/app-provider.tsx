@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { backfillMeasurementContext } from '@/application/capture/backfill-measurement-context';
 import type { ThresholdSet } from '@/domain/diagnosis/threshold-set';
 import { BleStickGateway } from '@/infrastructure/ble/ble-stick-gateway';
 import { makeFakeBleTransport } from '@/infrastructure/ble/fake-ble-transport';
@@ -55,6 +56,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const db = await openDatabase();
         const sql: SqlDatabase = adaptSqlDatabase(db);
         const stores = createSqliteStores(sql);
+
+        // Lo guardado antes de que la ingesta resolviera lote y sesión se
+        // completa al arrancar; sin esto el mapa solo vería capturas nuevas.
+        await backfillMeasurementContext({
+          captures: stores.captures,
+          measurements: stores.measurements,
+          farms: stores.farms,
+          sessions: stores.sessions,
+        });
+
         const thresholds: ThresholdSet = await loadThresholdSet(ACTIVE_THRESHOLDS_VERSION);
         await importThresholdSet(sql, thresholds);
 
@@ -85,7 +96,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   if (error !== null) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorTitle}>No se pudo abrir la base local</Text>
+        <Text style={styles.errorTitle}>No se pudo preparar la base local</Text>
         <Text style={styles.errorDetail}>{error.message}</Text>
       </View>
     );

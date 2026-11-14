@@ -64,6 +64,21 @@ describe('almacenes SQLite', () => {
     await expect(stores.captures.insertRaw(makeCapture())).rejects.toThrow();
   });
 
+  it('asigna el lote a una captura sin tocar su contenido', async () => {
+    const stores = createSqliteStores(db);
+    const capture = makeCapture();
+
+    await stores.captures.insertRaw({ ...capture, plotId: null });
+    await stores.captures.setPlotId('stick-01', 1, 'plot-1');
+
+    const stored = await stores.captures.findByDeviceSequence('stick-01', 1);
+
+    expect(stored?.plotId).toBe('plot-1');
+    expect(stored?.payload).toEqual(capture.payload);
+    expect(stored?.flags).toEqual(capture.flags);
+    expect(stored?.capturedAtUtc).toBe(capture.capturedAtUtc);
+  });
+
   it('guarda una medición con nulos, la lista y la recupera', async () => {
     const stores = createSqliteStores(db);
     const measurement = makeMeasurement({ humidityPct: null }, { notes: null, photoPath: null });
