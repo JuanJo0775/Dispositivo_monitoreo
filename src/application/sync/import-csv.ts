@@ -5,10 +5,16 @@ import {
 } from '@/application/sync/ingest-synced-records';
 import type { SyncSummary } from '@/application/sync/sync-from-stick';
 import { parseRecordHeader, type StickRecord } from '@/domain/protocol/record-codec';
+import type { FarmStore } from '@/ports/stores/farm-store';
+import type { SessionStore } from '@/ports/stores/session-store';
 import type { UnitOfWork } from '@/ports/stores/unit-of-work';
 
 export interface ImportCsvDeps {
   readonly uow: UnitOfWork;
+  /** Fincas y lotes, para asignar el lote de cada registro. */
+  readonly farms: FarmStore;
+  /** Sesiones guardadas, para resolver la sesión de cada registro. */
+  readonly sessions: SessionStore;
   readonly clock: () => string;
   readonly newId: () => string;
 }
@@ -124,7 +130,13 @@ export async function importCsvFromStick(
 
     const outcome = await ingestSyncedRecord(
       { line: row, deviceId: null, origin: 'import' },
-      { uow: deps.uow, clock: deps.clock, newId: deps.newId },
+      {
+        uow: deps.uow,
+        farms: deps.farms,
+        sessions: deps.sessions,
+        clock: deps.clock,
+        newId: deps.newId,
+      },
     );
 
     countOutcome(counters, outcome);

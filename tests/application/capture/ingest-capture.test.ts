@@ -66,7 +66,7 @@ describe('ingestCapture', () => {
     expect(measurement?.payload.latitude).toBe(4.5339);
   });
 
-  it('deja la sesión nula hasta que la tarea 6 la resuelva', async () => {
+  it('deja la sesión nula cuando el bastón no tenía sesión', async () => {
     const stores = makeInMemoryStores();
 
     await ingestCapture(
@@ -77,6 +77,20 @@ describe('ingestCapture', () => {
     const [measurement] = await stores.measurements.list();
 
     expect(measurement?.sessionId).toBeNull();
+  });
+
+  it('guarda la sesión con la que se capturó', async () => {
+    const stores = makeInMemoryStores();
+
+    await ingestCapture(
+      { capture: makeCapture(), plotId: 'plot-1', sessionId: 'sesion-7' },
+      { uow: stores.uow, clock, newId: () => 'm-1' },
+    );
+
+    const [measurement] = await stores.measurements.list();
+
+    expect(measurement?.sessionId).toBe('sesion-7');
+    expect(measurement?.plotId).toBe('plot-1');
   });
 
   it('no confirma al bastón si la escritura falla', async () => {

@@ -7,6 +7,8 @@ export interface IngestCaptureInput {
   readonly capture: RawCapture;
   /** Lote asignado; `null` cuando la captura llegó sin configuración. */
   readonly plotId: string | null;
+  /** Sesión con la que se capturó; `null` cuando el bastón no tenía sesión. */
+  readonly sessionId?: string | null;
   /** Confirma al bastón que la captura quedó guardada. */
   readonly confirm?: (sequence: number) => Promise<void>;
 }
@@ -32,7 +34,7 @@ export async function ingestCapture(
   input: IngestCaptureInput,
   deps: IngestCaptureDeps,
 ): Promise<IngestCaptureResult> {
-  const { capture, plotId, confirm } = input;
+  const { capture, plotId, sessionId = null, confirm } = input;
   const measurementId = deps.newId();
 
   const result = await deps.uow.run(async (stores) => {
@@ -50,8 +52,9 @@ export async function ingestCapture(
       id: measurementId,
       captureId: `${capture.deviceId}:${capture.sequence}`,
       plotId,
-      // La tarea 6 resuelve la sesión; acá todavía no se conoce.
-      sessionId: null,
+      // La sesión la resuelve quien ingiere, con la regla de asignación; acá
+      // solo se guarda su identificador para que el motor la use después.
+      sessionId,
       payload: capture.payload,
       // La bandera no se deduce de las coordenadas: viaja con la captura.
       positionValid: capture.flags.positionValid,

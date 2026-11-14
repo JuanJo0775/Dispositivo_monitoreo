@@ -60,6 +60,8 @@ describe('sincronización BLE de punta a punta', () => {
         sync: gateway,
         syncState: stores.syncState,
         uow: stores.uow,
+        farms: stores.farms,
+        sessions: stores.sessions,
         clock: () => '2026-11-12T17:10:00Z',
         newId: (() => {
           let contador = 0;
@@ -106,6 +108,8 @@ describe('sincronización BLE de punta a punta', () => {
       sync: gateway,
       syncState: stores.syncState,
       uow: stores.uow,
+      farms: stores.farms,
+      sessions: stores.sessions,
       clock: () => '2026-11-12T17:10:00Z',
       newId: (() => {
         let contador = 0;
