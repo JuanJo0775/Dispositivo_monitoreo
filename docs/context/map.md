@@ -14,7 +14,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
 | historial | app/history.tsx, src/application/capture/list-measurements.ts | ADR-APP-004 | RF-APP-034 a RF-APP-038 |
 | sincronizacion-sd | src/application/sync/, src/ports/stick-sync.ts, src/ports/stores/sync-state-store.ts, app/sync.tsx, tests/integration/ble-sync-flow.test.ts | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
-| mapas | app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
+| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
 | calibracion | - | ADR-APP-005 | RF-APP-052 a RF-APP-054 |
 | exportacion | src/application/export/, src/infrastructure/files/ | ADR-APP-014 | RF-APP-055 a RF-APP-057 |
 | estado-baston | app/connect.tsx, app/measure.tsx, src/ui/components/sync-status.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
@@ -90,3 +90,50 @@ absoluta.
 
 Sin esa respuesta no se puede decidir entre PMTiles y la contingencia MBTiles (`mbtiles://`), que solo
 cambia `pmtiles-archive-store` y `map-style`.
+
+## Estilo del mapa y apertura del paquete base (tarea 11)
+
+`src/infrastructure/maps/map-style.ts` arma el estilo con dos fuentes vectoriales:
+
+| Fuente | Identificador | Qué es |
+| --- | --- | --- |
+| Base | `base` | Paquete incluido en el APK (`BASE_ARCHIVE_NAME = 'base.pmtiles'`), país a zoom bajo |
+| Detallada | `detalle` | Paquete importado por la persona; se dibuja **encima** de la base |
+
+- Las capas salen de `layers(<fuente>, namedFlavor('light'))` **sin** opciones de idioma: eso deja
+  solo capas `fill`, `line` y `background`, sin `symbol`. No hay `glyphs` ni `sprite`, y una prueba
+  serializa el estilo y verifica que no aparezca `http://` ni `https://`.
+- `layers()` devuelve su propia capa `background` en cada llamada. El estilo pone **una sola** capa
+  de fondo, con identificador `fondo` y el color `flavor.background`; las de cada fuente la filtran.
+- Las capas de la fuente detallada llevan el prefijo `detalle:` en su identificador. Sin el prefijo,
+  las dos fuentes producirían los mismos identificadores y el estilo sería inválido.
+- Sin fuentes (`{ base: null, detalle: null }`) el estilo trae solo `fondo`, para poder abrir el mapa
+  mientras se resuelve el archivo base sin que MapLibre falle.
+
+`src/infrastructure/maps/pmtiles-archive-store.ts` arma las dos URI locales:
+
+| Función | Resultado | Cuándo |
+| --- | --- | --- |
+| `assetArchiveUri('base.pmtiles')` | `pmtiles://asset://base.pmtiles` | El archivo viaja dentro del APK |
+| `fileArchiveUri('/data/user/0/<paquete>/files/maps/x.pmtiles')` | `pmtiles://file:///data/user/0/<paquete>/files/maps/x.pmtiles` | El archivo está en el almacenamiento privado |
+
+`fileArchiveUri` acepta la ruta absoluta o la URI `file://` que entrega `expo-file-system`, y no
+duplica el esquema.
+
+### Estrategia de apertura del paquete base: pendiente de confirmar en el teléfono
+
+El pincho (arriba) decide si `pmtiles://asset://` funciona en MapLibre Native Android 13.6.1. Hasta
+que la persona reporte cuál de los dos mapas dibujó:
+
+- **Estrategia por defecto: asset primero, copia como respaldo.** El mapa intenta abrir el base con
+  `assetArchiveUri(BASE_ARCHIVE_NAME)`; si el estilo no carga, copia el archivo una vez a
+  `Paths.document/maps/base.pmtiles` con el puerto `MapPackageFiles` y usa
+  `fileArchiveUri(<ruta copiada>)`. El respaldo cuesta una copia de ~20 MB en el primer arranque y
+  después el archivo ya está.
+- Si el pincho confirma que **A** dibuja: se conserva el orden y la copia queda como red de
+  seguridad para equipos donde el asset no se resuelva.
+- Si el pincho confirma que **B** dibuja: la copia deja de ser respaldo y pasa a ser el camino
+  normal; el asset se elimina del plugin.
+- Si **ninguno** dibuja: se aplica la contingencia MBTiles y solo cambian
+  `pmtiles-archive-store.ts` y `map-style.ts`.
+
