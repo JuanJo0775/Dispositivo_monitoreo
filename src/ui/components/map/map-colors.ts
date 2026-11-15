@@ -1,5 +1,6 @@
 import type { AptitudeClass } from '@/domain/diagnosis/types';
 import type { CellVerdict } from '@/domain/geo/cell-verdict';
+import { CLASS_LABELS } from '@/ui/labels';
 
 /**
  * Colores y rótulos del mapa.
@@ -7,6 +8,8 @@ import type { CellVerdict } from '@/domain/geo/cell-verdict';
  * El color nunca va solo: cada estado tiene un texto que lo nombra, en la
  * leyenda y en el detalle. Una celda vacía no toma el color de ninguna clase.
  */
+
+export { CLASS_LABELS };
 
 /** Orden de aptitud, de la mejor a la peor. */
 export const CLASS_ORDER: readonly AptitudeClass[] = ['S1', 'S2', 'S3', 'N'];
@@ -17,14 +20,6 @@ export const CLASS_COLORS: Record<AptitudeClass, string> = {
   S2: '#7CB342',
   S3: '#F9A825',
   N: '#C62828',
-};
-
-/** Nombre de cada clase, el que se lee en la leyenda. */
-export const CLASS_LABELS: Record<AptitudeClass, string> = {
-  S1: 'Apto',
-  S2: 'Moderadamente apto',
-  S3: 'Marginalmente apto',
-  N: 'No apto',
 };
 
 /** Celda sin ninguna medición válida: no se colorea por clase. */

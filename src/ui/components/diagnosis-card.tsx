@@ -1,13 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import type {
-  AptitudeClass,
-  DiagnosisAlert,
-  DiagnosisResult,
-  DiagnosisVariable,
-  VariableRole,
-} from '@/domain/diagnosis/types';
+import type { AptitudeClass, DiagnosisAlert, DiagnosisResult } from '@/domain/diagnosis/types';
 import { MISSING_VALUE_TEXT, formatNumber } from '@/shared/format';
+import { CLASS_LABELS, ROLE_LABELS, VARIABLE_LABELS } from '@/ui/labels';
 
 /**
  * Tarjeta de diagnóstico: clases, factor limitante, variables, alertas y evidencia.
@@ -16,35 +11,6 @@ import { MISSING_VALUE_TEXT, formatNumber } from '@/shared/format';
  * ausente se muestra como «sin dato» (nunca como cero) y los estados se distinguen con texto,
  * no solo con color.
  */
-
-/** Nombre de cada clase de aptitud en español. */
-export const CLASS_LABELS: Record<AptitudeClass, string> = {
-  S1: 'Apto',
-  S2: 'Moderadamente apto',
-  S3: 'Marginalmente apto',
-  N: 'No apto',
-};
-
-/** Nombre de cada variable en español. */
-export const VARIABLE_LABELS: Record<DiagnosisVariable, string> = {
-  humidity: 'Humedad',
-  ph: 'pH',
-  ec: 'Conductividad',
-  n: 'Nitrógeno',
-  nSensor: 'Nitrógeno de la sonda',
-  p: 'Fósforo',
-  k: 'Potasio',
-  temperature: 'Temperatura',
-  organicMatter: 'Materia orgánica',
-  cic: 'Capacidad de intercambio',
-};
-
-/** Papel de la variable en el veredicto, en texto. */
-export const ROLE_LABELS: Record<VariableRole, string> = {
-  verdict: 'entra en el veredicto',
-  indicative: 'informativo',
-  reference: 'solo referencia',
-};
 
 /** Qué tan fuerte es una alerta, en texto. */
 const SEVERITY_LABELS: Record<DiagnosisAlert['severity'], string> = {

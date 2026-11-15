@@ -23,6 +23,11 @@ export default function HomeScreen() {
           onPress={() => router.push('/history')}
         />
         <PrimaryButton
+          label="Mapa del lote"
+          variant="secondary"
+          onPress={() => router.push('/map')}
+        />
+        <PrimaryButton
           label="Sincronizar microSD"
           variant="secondary"
           onPress={() => router.push('/sync')}

@@ -58,6 +58,10 @@ export default function FarmsScreen() {
     router.push({ pathname: '/plot-form', params: { id: plot.id } });
   }
 
+  function abrirMapa(plot: Plot): void {
+    router.push({ pathname: '/map', params: { plotId: plot.id } });
+  }
+
   function abrirFinca(farm: Farm): void {
     router.push({ pathname: '/farm-form', params: { id: farm.id } });
   }
@@ -127,6 +131,15 @@ export default function FarmsScreen() {
                             {etiquetaCultivo(plot)}
                             {plot.depthCm === null ? '' : ` · ${plot.depthCm} cm`}
                           </Text>
+                        </Pressable>
+
+                        <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel={`Ver el mapa del lote ${plot.name}`}
+                          onPress={() => abrirMapa(plot)}
+                          style={styles.link}
+                        >
+                          <Text style={styles.linkText}>Mapa</Text>
                         </Pressable>
 
                         <Pressable

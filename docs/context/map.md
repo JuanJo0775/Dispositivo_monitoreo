@@ -14,7 +14,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
 | historial | app/history.tsx, src/application/capture/list-measurements.ts | ADR-APP-004 | RF-APP-034 a RF-APP-038 |
 | sincronizacion-sd | src/application/sync/, src/ports/stick-sync.ts, src/ports/stores/sync-state-store.ts, app/sync.tsx, tests/integration/ble-sync-flow.test.ts | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
-| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, src/ui/components/map/, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
+| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, src/ui/components/map/, app/map.tsx, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
 | calibracion | - | ADR-APP-005 | RF-APP-052 a RF-APP-054 |
 | exportacion | src/application/export/, src/infrastructure/files/ | ADR-APP-014 | RF-APP-055 a RF-APP-057 |
 | estado-baston | app/connect.tsx, app/measure.tsx, src/ui/components/sync-status.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
@@ -136,4 +136,25 @@ que la persona reporte cuál de los dos mapas dibujó:
   normal; el asset se elimina del plugin.
 - Si **ninguno** dibuja: se aplica la contingencia MBTiles y solo cambian
   `pmtiles-archive-store.ts` y `map-style.ts`.
+
+## Pantalla del lote (tarea 13)
+
+`app/map.tsx` muestra, de arriba hacia abajo: selector de lote, encabezado (nombre, cultivo, unidad
+cartográfica y **área medida**), aviso del paquete detallado, mapa, resumen, leyenda, detalle de la
+celda tocada, alertas del motor, avisos de registro y puntos documentados.
+
+- Al abrir el lote corre `ensurePlotDiagnoses` y después `describePlotSpace`. Si la reparación de
+  diagnósticos falla, el mapa abre igual y muestra un aviso; no se oculta el lote.
+- El encabezado dice «Área medida» y la calcula con la malla (`cellAreaHa × celdas`). El lote no
+  tiene área declarada: la malla cubre lo medido, no el contorno.
+- Colores de las celdas en `map-colors.ts`; geometría en `map-geometry.ts`; la hoja de la celda en
+  `cell-sheet.tsx` y la lista en `point-list.tsx`. La pantalla no dictamina ni promedia.
+- Fuentes del mapa: el paquete incluido (`assetArchiveUri(BASE_ARCHIVE_NAME)`) y, si hay uno activo,
+  el detallado (`fileArchiveUri(<ruta>)`). Sin detallado activo aparece un aviso con enlace a
+  `/map-packages`.
+- «Encuadrar» remonta el mapa (`key`) para volver a la caja de los puntos. La atribución
+  «Teselas © OpenStreetMap · Protomaps» va debajo del mapa y no se superpone con el botón.
+- Un punto sin posición queda en la lista con el texto «sin posición»; no se dibuja en el mapa.
+- La pantalla se abre desde «Mapa del lote» en el inicio y desde el botón «Mapa» de cada lote en
+  Fincas y lotes, con `plotId` como parámetro.
 
