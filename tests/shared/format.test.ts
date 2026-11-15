@@ -1,4 +1,5 @@
 import {
+  formatBytes,
   formatDateTimeLocal,
   formatMeasure,
   formatNumber,
@@ -36,5 +37,15 @@ describe('formatDateTimeLocal', () => {
 
   it('cruza de día cuando corresponde', () => {
     expect(formatDateTimeLocal('2026-11-13T02:30:00Z')).toBe('12/11/2026, 21:30');
+  });
+});
+
+describe('formatBytes', () => {
+  it('usa megas con un decimal para un paquete de mapa', () => {
+    expect(formatBytes(24_641_536)).toBe('23,5 MB');
+  });
+
+  it('baja a KB cuando el archivo es pequeño', () => {
+    expect(formatBytes(1536)).toBe('1,5 KB');
   });
 });

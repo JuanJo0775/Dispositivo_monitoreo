@@ -87,8 +87,8 @@ describe('CellSheet', () => {
       />,
     );
 
-    fireEvent.press(getByLabelText(/Medición del/));
-    fireEvent.press(getByText('Cerrar'));
+    await fireEvent.press(getByLabelText(/Medición del/));
+    await fireEvent.press(getByText('Cerrar'));
 
     expect(abiertas).toEqual(['m-uno']);
     expect(cerrada).toBe(true);

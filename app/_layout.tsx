@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack.Screen name="measure" options={{ title: 'Medir' }} />
         <Stack.Screen name="history" options={{ title: 'Historial' }} />
         <Stack.Screen name="map" options={{ title: 'Mapa del lote' }} />
+        <Stack.Screen name="map-packages" options={{ title: 'Paquetes de mapa' }} />
         <Stack.Screen name="farms" options={{ title: 'Fincas y lotes' }} />
         <Stack.Screen name="farm-form" options={{ title: 'Finca' }} />
         <Stack.Screen name="plot-form" options={{ title: 'Lote' }} />

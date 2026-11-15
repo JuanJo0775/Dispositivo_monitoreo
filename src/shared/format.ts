@@ -59,3 +59,16 @@ export function formatArea(areaHa: number): string {
 export function formatCoordinate(value: number): string {
   return coordinateFormatter.format(value);
 }
+
+/** Formatea un tamaño de archivo en la unidad que le corresponde. */
+export function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) {
+    return `${formatNumber(bytes / (1024 * 1024))} MB`;
+  }
+
+  if (bytes >= 1024) {
+    return `${formatNumber(bytes / 1024)} KB`;
+  }
+
+  return `${bytes} B`;
+}

@@ -122,9 +122,14 @@ export async function deleteMapPackage(id: string, deps: ManageMapPackagesDeps):
     await deps.files.deleteAt(paquete.path);
   }
 
+  // Hay que saber si era el activo **antes** del borrado lógico: después, la
+  // clave ya no resuelve a un paquete vigente y parecería que no lo era.
+  const eraActivo =
+    (await getActiveMapPackage({ packages: deps.packages, settings: deps.settings })) === id;
+
   await deps.packages.markDeleted(id, deps.clock());
 
-  if ((await getActiveMapPackage(deps)) === id) {
+  if (eraActivo) {
     await setActiveMapPackage(null, deps);
   }
 }

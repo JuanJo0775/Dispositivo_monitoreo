@@ -185,7 +185,7 @@ describe('manageMapPackages', () => {
   });
 
   it('borrar el paquete activo lo desactiva', async () => {
-    const { deps } = makeDeps({ sizes: { 'file:///tmp/quindio.pmtiles': MB } });
+    const { deps, ajustes } = makeDeps({ sizes: { 'file:///tmp/quindio.pmtiles': MB } });
 
     const paquete = await importMapPackage(
       { uri: 'file:///tmp/quindio.pmtiles', fileName: 'quindio.pmtiles' },
@@ -195,6 +195,7 @@ describe('manageMapPackages', () => {
     await deleteMapPackage(paquete.id, deps);
 
     expect(await getActiveMapPackage(deps)).toBeNull();
+    expect(ajustes.settingRows[ACTIVE_MAP_PACKAGE_KEY]).toBe('');
   });
 
   it('listar no trae los paquetes borrados', async () => {

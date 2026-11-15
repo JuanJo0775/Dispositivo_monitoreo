@@ -42,7 +42,7 @@ describe('PointList', () => {
     expect(getByText('Moderadamente apto')).toBeTruthy();
     expect(getByText('La humedad está por debajo del umbral.')).toBeTruthy();
 
-    fireEvent.press(getByLabelText(/Medición del/));
+    await fireEvent.press(getByLabelText(/Medición del/));
 
     expect(abiertas).toEqual(['m-moderado']);
   });

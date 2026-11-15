@@ -204,7 +204,7 @@ describe('pantalla de mapa', () => {
     expect(pantalla.getByTestId('mapa-lote')).toBeTruthy();
     expect(pantalla.getByText(/paquete incluido/)).toBeTruthy();
 
-    fireEvent.press(pantalla.getByText('Ver paquetes de mapa'));
+    await fireEvent.press(pantalla.getByText('Ver paquetes de mapa'));
 
     expect(mockRouter.push).toHaveBeenCalledWith('/map-packages');
   });

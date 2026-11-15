@@ -14,7 +14,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
 | historial | app/history.tsx, src/application/capture/list-measurements.ts | ADR-APP-004 | RF-APP-034 a RF-APP-038 |
 | sincronizacion-sd | src/application/sync/, src/ports/stick-sync.ts, src/ports/stores/sync-state-store.ts, app/sync.tsx, tests/integration/ble-sync-flow.test.ts | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
-| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, src/ui/components/map/, app/map.tsx, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
+| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, src/ui/components/map/, app/map.tsx, app/map-packages.tsx, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
 | calibracion | - | ADR-APP-005 | RF-APP-052 a RF-APP-054 |
 | exportacion | src/application/export/, src/infrastructure/files/ | ADR-APP-014 | RF-APP-055 a RF-APP-057 |
 | estado-baston | app/connect.tsx, app/measure.tsx, src/ui/components/sync-status.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
@@ -158,3 +158,18 @@ celda tocada, alertas del motor, avisos de registro y puntos documentados.
 - La pantalla se abre desde «Mapa del lote» en el inicio y desde el botón «Mapa» de cada lote en
   Fincas y lotes, con `plotId` como parámetro.
 
+
+## Paquetes de mapa (tarea 14)
+
+`app/map-packages.tsx` lista el paquete incluido y los importados, importa un .pmtiles desde el
+selector del sistema y permite activar, borrar o volver al incluido.
+
+- Importar deja el paquete recién copiado **activo**, aunque hubiera otro: la persona acaba de
+  elegirlo. Volver al anterior o al incluido es una acción aparte ("Usar solo el incluido").
+- El archivo se copia al almacenamiento privado como `<id>.pmtiles`; el tamaño se compara contra
+  el espacio libre antes de copiar y el límite es `MAX_MAP_PACKAGE_BYTES` (200 MB).
+- Borrar pide confirmación con `Alert`, borra el archivo y luego marca la fila. Si el paquete
+  borrado era el activo, el ajuste queda en `''` y el mapa vuelve al incluido.
+- Todo el estado sale de `ManageMapPackagesDeps` (`packages`, `settings`, `files`, `clock`,
+  `newId`), armado en la pantalla con `mapFiles` del contexto. La prueba usa
+  `tests/helpers/in-memory-map-package-files.ts`.
