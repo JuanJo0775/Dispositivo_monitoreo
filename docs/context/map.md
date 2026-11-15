@@ -14,7 +14,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
 | historial | app/history.tsx, src/application/capture/list-measurements.ts | ADR-APP-004 | RF-APP-034 a RF-APP-038 |
 | sincronizacion-sd | src/application/sync/, src/ports/stick-sync.ts, src/ports/stores/sync-state-store.ts, app/sync.tsx, tests/integration/ble-sync-flow.test.ts | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
-| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
+| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, src/ui/components/map/, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
 | calibracion | - | ADR-APP-005 | RF-APP-052 a RF-APP-054 |
 | exportacion | src/application/export/, src/infrastructure/files/ | ADR-APP-014 | RF-APP-055 a RF-APP-057 |
 | estado-baston | app/connect.tsx, app/measure.tsx, src/ui/components/sync-status.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
