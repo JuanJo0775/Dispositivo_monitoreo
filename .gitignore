@@ -43,6 +43,13 @@ expo-env.d.ts
 # (`.easignore` lo vuelve a incluir para que el build de EAS lo lleve al APK)
 assets/maps/prueba.pmtiles
 
+# binario de pmtiles que descarga el script de mapas (herramienta de construcción)
+scripts/map/.bin/
+
+# paquete detallado de una zona: se genera aparte y se importa al teléfono
+assets/maps/detalle.pmtiles
+assets/maps/quindio.pmtiles
+
 # debug
 npm-debug.*
 yarn-debug.*

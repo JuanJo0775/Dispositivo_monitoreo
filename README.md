@@ -15,15 +15,16 @@ camino crítico.
 app/                     Rutas de expo-router. Una pantalla por archivo, sin lógica de negocio.
 src/
   shared/                Utilidades sin dependencias (metadatos de la app).
-  domain/                TypeScript puro: capture/, measurement/, diagnosis/, farm/, protocol/.
-  application/           Casos de uso por área: capture/, export/, diagnosis/, sync/.
-  ports/                 Interfaces de salida: stick-gateway.ts, ble-transport.ts y stores/.
+  domain/                TypeScript puro: capture/, measurement/, diagnosis/, farm/, protocol/, geo/.
+  application/           Casos de uso por área: capture/, export/, diagnosis/, sync/, map/.
+  ports/                 Interfaces de salida: stick-gateway.ts, ble-transport.ts, map-package-files.ts y stores/.
   infrastructure/        Adaptadores: ble/, crypto/, db/, files/, maps/.
-  ui/                    components/, hooks/, stores/.
-assets/                  Íconos, splash y, más adelante, umbrales y teselas.
+  ui/                    components/ (incluye map/), hooks/, stores/.
+scripts/map/             Herramientas de construcción: generan paquetes .pmtiles.
+assets/                  Íconos, splash, umbrales y paquetes de mapa (maps/).
 tests/                   Espejo de src/: domain/, application/, infrastructure/, ui/, helpers/.
 docs/
-  architecture/          Estructura y reglas de dependencia.
+  architecture/          Estructura, reglas de dependencia y la malla del mapa.
   context/               soul, glossary, map (contexto para agentes y personas).
   adr/                   Decisiones de implementación del repositorio.
   requirements/          Ciencia de origen copiada al repo.
@@ -39,9 +40,27 @@ dependen de `src/application/`; `src/application/` de `src/domain/` y `src/ports
 ## Requisitos
 
 - Node 22 o superior y npm.
-- Android SDK y un teléfono o emulador para la app.
+- Un teléfono Android. **No hace falta instalar Android SDK ni JDK**: el APK se compila en la nube
+  con EAS Build (cuenta gratuita de Expo).
 - El bastón es **simulado** hasta que exista el prototipo; no se necesita hardware para probar el
   BLE, la configuración de sesión ni la sincronización por microSD.
+
+El mapa usa MapLibre con teselas PMTiles, así que **Expo Go no sirve**: hay que instalar el APK de
+EAS o un development build. Ver `docs/adr/0003-mapa-offline-pmtiles.md`.
+
+## Paquetes de mapa
+
+La app trae `assets/maps/base.pmtiles` (Colombia, zoom 0–6, ~1,2 MB) y funciona sin descargar nada.
+Para una zona con detalle se genera un paquete y se importa desde la pantalla «Paquetes de mapa» del
+teléfono:
+
+```powershell
+node scripts/map/extract-pmtiles.mjs `
+  --source=https://build.protomaps.com/20261115.pmtiles `
+  --bbox=-75.75,4.45,-75.60,4.60 --maxzoom=15 --out=assets/maps/quindio.pmtiles
+```
+
+Los detalles y la atribución están en `assets/maps/README.md`.
 
 ## Comandos
 
@@ -98,17 +117,23 @@ empezar.
 
 ## Estado
 
-| Corte | Alcance                                      | Estado    |
-| ----- | -------------------------------------------- | --------- |
-| 0     | Esqueleto: simulador, SQLite, historial, CSV | listo     |
-| 1     | Recorrido de campo mínimo con diagnóstico    | listo     |
-| 2     | BLE real y sincronización por microSD        | listo     |
-| 3     | Mapa con teselas offline y guía de muestreo  | pendiente |
-| 4     | v1.0: calibración individual, PDF, análisis  | pendiente |
-| 5     | v2.0: dosis y exportación geoespacial        | pendiente |
+| Corte | Alcance                                       | Estado    |
+| ----- | --------------------------------------------- | --------- |
+| 0     | Esqueleto: simulador, SQLite, historial, CSV  | listo     |
+| 1     | Recorrido de campo mínimo con diagnóstico     | listo     |
+| 2     | BLE real y sincronización por microSD         | listo     |
+| 3     | Mapa offline con malla y dictamen por espacio | listo     |
+| 4     | v1.0: calibración individual, PDF, análisis   | pendiente |
+| 5     | v2.0: dosis y exportación geoespacial         | pendiente |
 
 En el corte 1 la app ya diagnostica de verdad: los umbrales vienen de las tablas publicadas en
 `docs/requirements/objetivo-1-umbrales-ecuaciones-motor.md` y están en
 `assets/thresholds/2026.11-v1.json`, el motor es TypeScript puro en `src/domain/diagnosis/` y cada
 diagnóstico guarda su versión de umbrales, calibración, motor y firmware, con la evidencia de qué
 supuestos usó y qué datos la ciencia no publica.
+
+En el corte 3 el mapa documenta lo medido: la malla se calcula con las coordenadas del GPS del
+bastón, cada celda dictamina con los diagnósticos de sus puntos y nunca se promedia una clase ni se
+colorea una celda vacía. La app no es una guía de muestreo: no cuenta puntos ni dice dónde medir.
+Queda pendiente confirmar en un teléfono si el paquete incluido se abre desde el APK o si hay que
+copiarlo al almacenamiento privado; el resto del corte está cubierto por pruebas.

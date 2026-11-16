@@ -43,6 +43,11 @@ expo-env.d.ts
 # (`.easignore` lo vuelve a incluir para que el build de EAS lo lleve al APK)
 assets/maps/prueba.pmtiles
 
+# herramientas de construcción y paquetes de zonas: no viajan en el APK
+scripts/map/.bin/
+assets/maps/detalle.pmtiles
+assets/maps/quindio.pmtiles
+
 # debug
 npm-debug.*
 yarn-debug.*

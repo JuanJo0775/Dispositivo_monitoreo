@@ -39,7 +39,8 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 ## Pincho de mapa (tarea 0 del corte 3)
 
 Pantalla temporal `app/map-spike.tsx`: abre el mismo archivo `.pmtiles` de dos maneras para saber
-cuál de las dos URI funciona en un teléfono real. La borra la tarea 15.
+cuál de las dos URI funciona en un teléfono real. Se abre con el botón «Prueba de mapa en teléfono»
+del inicio y se borra cuando la persona reporte el resultado.
 
 ### Las dos URI que se van a probar
 
@@ -84,7 +85,7 @@ absoluta.
    `eas build --profile development --platform android` (o `--profile preview` para un APK con el
    JavaScript embebido, que no necesita Metro).
 2. Instalar el APK en el teléfono.
-3. Abrir la app y tocar «Pincho de mapa (temporal)».
+3. Abrir la app y tocar «Prueba de mapa en teléfono».
 4. Reportar cuál de los dos mapas dibujó los Alpes centrales: **A**, **B** o **ninguno**. Si ninguno,
    copiar las dos URI que aparecen en pantalla y el mensaje de error de abajo.
 
@@ -173,3 +174,18 @@ selector del sistema y permite activar, borrar o volver al incluido.
 - Todo el estado sale de `ManageMapPackagesDeps` (`packages`, `settings`, `files`, `clock`,
   `newId`), armado en la pantalla con `mapFiles` del contexto. La prueba usa
   `tests/helpers/in-memory-map-package-files.ts`.
+
+## Cierre del corte 3 (tarea 15)
+
+- `assets/maps/base.pmtiles` ya existe: Colombia, zoom 0 a 6, 1,2 MB, generado con
+  `scripts/map/extract-pmtiles.mjs` desde el build `20261115` de Protomaps y verificado con
+  `pmtiles verify`. Va versionado y el plugin lo copia al APK.
+- El script valida `--source`, `--bbox` y `--maxzoom` antes de tocar la red, descarga el
+  binario oficial de `pmtiles` a `scripts/map/.bin/` (ignorado por git) y borra la salida si el
+  extractor falla. Cómo se usa: `assets/maps/README.md`.
+- El historial muestra el lote de cada medición y, si no tiene, abre el selector de lotes. Asignar
+  cambia solo `plot_id`: valores, hora y diagnóstico quedan igual.
+- ADR nuevo: `docs/adr/0003-mapa-offline-pmtiles.md`. Explicación de la malla y del dictamen:
+  `docs/architecture/mapa-y-malla.md`.
+- El pincho de mapa sigue en el inicio hasta que se confirme en un teléfono cuál URI dibuja; el
+  resultado se escribe en la sección de arriba y entonces se borra `app/map-spike.tsx`.

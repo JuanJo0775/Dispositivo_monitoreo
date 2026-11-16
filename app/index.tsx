@@ -33,15 +33,16 @@ export default function HomeScreen() {
           onPress={() => router.push('/sync')}
         />
         <PrimaryButton
-          label="Pincho de mapa (temporal)"
+          label="Prueba de mapa en teléfono"
           variant="secondary"
           onPress={() => router.push('/map-spike')}
         />
       </View>
 
       <Text style={styles.note}>
-        Corte 2: la app habla BLE por el protocolo del bastón y sincroniza su microSD. El botón del
-        pincho de mapa es temporal: se borra con la tarea 15 del corte 3.
+        Todo funciona sin internet: el bastón guarda cada medición y la app la conserva en el
+        teléfono. El mapa se arma con las coordenadas del GPS del bastón. El botón de prueba
+        comprueba el paquete de mapa en el teléfono y se retira cuando esa prueba quede registrada.
       </Text>
     </View>
   );

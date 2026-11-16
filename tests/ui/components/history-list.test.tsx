@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 import { HistoryList } from '@/ui/components/history-list';
 
@@ -37,5 +37,33 @@ describe('HistoryList', () => {
     const { getByText } = await render(<HistoryList measurements={[]} onSelect={() => {}} />);
 
     expect(getByText('Todavía no hay mediciones guardadas.')).toBeTruthy();
+  });
+
+  it('muestra el lote de la medición y no ofrece asignarlo', async () => {
+    const pantalla = await render(
+      <HistoryList
+        measurements={[makeMeasurement({}, { plotId: 'plot-1' })]}
+        onSelect={() => {}}
+        plotNames={{ 'plot-1': 'El Guamo' }}
+        onAssignPlot={() => {}}
+      />,
+    );
+
+    expect(pantalla.getByText('Lote: El Guamo')).toBeTruthy();
+    expect(pantalla.queryByText('Asignar lote')).toBeNull();
+  });
+
+  it('pide la pantalla para asignar lote cuando la medición no tiene', async () => {
+    const onAssignPlot = jest.fn();
+    const medicion = makeMeasurement({}, { id: 'm-2', plotId: null });
+    const pantalla = await render(
+      <HistoryList measurements={[medicion]} onSelect={() => {}} onAssignPlot={onAssignPlot} />,
+    );
+
+    expect(pantalla.getByText('Sin lote asignado')).toBeTruthy();
+
+    await fireEvent.press(pantalla.getByText('Asignar lote'));
+
+    expect(onAssignPlot).toHaveBeenCalledWith(medicion);
   });
 });

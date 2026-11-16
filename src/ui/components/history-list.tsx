@@ -9,28 +9,51 @@ export interface HistoryListProps {
   emptyMessage?: string;
   /** Identificadores de las mediciones marcadas como ensayo. */
   trialMeasurementIds?: readonly string[];
+  /** Nombre del lote de cada medición, con el id del lote como clave. */
+  plotNames?: Readonly<Record<string, string>>;
+  /**
+   * Si viene, las mediciones sin lote muestran el botón «Asignar lote».
+   * La lista no asigna nada: avisa y la pantalla decide.
+   */
+  onAssignPlot?: (measurement: Measurement) => void;
+}
+
+function textoDelLote(
+  measurement: Measurement,
+  plotNames: Readonly<Record<string, string>>,
+): string {
+  if (measurement.plotId === null) {
+    return 'Sin lote asignado';
+  }
+
+  return `Lote: ${plotNames[measurement.plotId] ?? 'no disponible'}`;
 }
 
 function MeasurementRow({
   measurement,
   onSelect,
+  onAssign,
   trial,
+  plotNames,
 }: {
   measurement: Measurement;
   onSelect: (measurement: Measurement) => void;
+  onAssign?: (measurement: Measurement) => void;
   trial: boolean;
+  plotNames: Readonly<Record<string, string>>;
 }) {
   const status = measurement.valid ? 'válida' : 'revisar';
+  const fecha = formatDateTimeLocal(measurement.capturedAtUtc);
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Medición del ${formatDateTimeLocal(measurement.capturedAtUtc)}, ${status}`}
+      accessibilityLabel={`Medición del ${fecha}, ${status}`}
       onPress={() => onSelect(measurement)}
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
     >
       <View style={styles.rowHeader}>
-        <Text style={styles.date}>{formatDateTimeLocal(measurement.capturedAtUtc)}</Text>
+        <Text style={styles.date}>{fecha}</Text>
         <View style={styles.badges}>
           {trial ? <Text style={styles.trial}>ensayo</Text> : null}
           <Text style={measurement.valid ? styles.statusValid : styles.statusWarning}>
@@ -55,6 +78,20 @@ function MeasurementRow({
           <Text style={styles.value}>{formatMeasure(measurement.payload.ecUsCm, 'µS/cm')}</Text>
         </View>
       </View>
+
+      <View style={styles.plotRow}>
+        <Text style={styles.plot}>{textoDelLote(measurement, plotNames)}</Text>
+        {measurement.plotId === null && onAssign !== undefined ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Asignar lote a la medición del ${fecha}`}
+            onPress={() => onAssign(measurement)}
+            style={({ pressed }) => [styles.assign, pressed && styles.assignPressed]}
+          >
+            <Text style={styles.assignText}>Asignar lote</Text>
+          </Pressable>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -65,6 +102,8 @@ export function HistoryList({
   onSelect,
   emptyMessage = 'Todavía no hay mediciones guardadas.',
   trialMeasurementIds = [],
+  plotNames = {},
+  onAssignPlot,
 }: HistoryListProps) {
   return (
     <FlatList
@@ -75,7 +114,9 @@ export function HistoryList({
         <MeasurementRow
           measurement={item}
           onSelect={onSelect}
+          onAssign={onAssignPlot}
           trial={trialMeasurementIds.includes(item.id)}
+          plotNames={plotNames}
         />
       )}
       ListEmptyComponent={<Text style={styles.empty}>{emptyMessage}</Text>}
@@ -160,5 +201,35 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 17,
     color: '#1F1F1F',
+  },
+  plotRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#EEF1EC',
+    paddingTop: 8,
+  },
+  plot: {
+    flexShrink: 1,
+    fontSize: 14,
+    color: '#3F3F3F',
+  },
+  assign: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#1B4332',
+  },
+  assignPressed: {
+    backgroundColor: '#EEF3EC',
+  },
+  assignText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1B4332',
   },
 });
