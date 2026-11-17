@@ -121,4 +121,29 @@ describe('PlotMap', () => {
     expect(celdasTocadas).toEqual(['c-1']);
     expect(puntosTocados).toEqual(['m-este']);
   });
+
+  it('avisa cuando MapLibre no puede cargar el estilo o las teselas', async () => {
+    const space = await makePlotSpace();
+    const alFallar = jest.fn();
+
+    await render(
+      <PlotMap
+        space={space}
+        baseUri={BASE_URI}
+        detailUri={null}
+        onSelectCell={() => {}}
+        onSelectPoint={() => {}}
+        onTilesFailed={alFallar}
+      />,
+    );
+
+    const onDidFailLoadingMap = mockMapLibre.mapProps?.onDidFailLoadingMap as
+      ((event: unknown) => void) | undefined;
+
+    expect(onDidFailLoadingMap).toBeInstanceOf(Function);
+
+    onDidFailLoadingMap?.({ nativeEvent: null });
+
+    expect(alFallar).toHaveBeenCalledTimes(1);
+  });
 });

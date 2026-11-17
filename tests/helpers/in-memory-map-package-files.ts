@@ -3,6 +3,8 @@ import type { CopiedMapFile, MapPackageFiles } from '@/ports/map-package-files';
 export interface InMemoryMapPackageFilesSeed {
   /** Tamaño en bytes de cada archivo de origen, por URI. */
   readonly sizes?: Readonly<Record<string, number>>;
+  /** Cabecera simulada de cada archivo de origen, por URI; por defecto, PMTiles. */
+  readonly headers?: Readonly<Record<string, Uint8Array>>;
   /** Espacio libre simulado del volumen, en bytes. */
   readonly availableSpaceBytes?: number;
   /** Archivos que el doble considera ya presentes en disco. */
@@ -33,16 +35,21 @@ export function makeInMemoryMapPackageFiles(
   seed: InMemoryMapPackageFilesSeed = {},
 ): InMemoryMapPackageFiles {
   const sizes = seed.sizes ?? {};
+  const headers = seed.headers ?? {};
   const disponible = seed.availableSpaceBytes ?? 1024 * 1024 * 1024;
   const directorio =
     seed.directory ?? 'file:///data/user/0/com.semillero.monitoreosuelo/files/maps';
   const copies: CopiedMapFile[] = [];
   const deleted: string[] = [];
   const existing = new Set<string>(seed.existingPaths ?? []);
+  const firmaPmtiles = new Uint8Array([0x50, 0x4d, 0x54, 0x69, 0x6c, 0x65, 0x73]);
 
   const files: MapPackageFiles = {
     async sizeOf(uri) {
       return sizes[uri] ?? 0;
+    },
+    async readFirstBytes(uri, count) {
+      return (headers[uri] ?? firmaPmtiles).slice(0, count);
     },
     async availableSpaceBytes() {
       return disponible;

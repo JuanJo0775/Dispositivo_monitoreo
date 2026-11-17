@@ -198,6 +198,17 @@ describe('buildGrid', () => {
     expect(grid.targetAreaHa).toBeCloseTo(1, 6);
     expect(grid.cellAreaHa).toBeCloseTo(1, 4);
   });
+
+  it('no factoriza el número de celdas de un área desmedida antes de aplicar el tope', () => {
+    // Mil kilómetros de lado: con el área objetivo de 0,4 ha serían 250 millones
+    // de celdas. Si el tope se aplicara después de buscar los divisores, la app
+    // se quedaría colgada con una coordenada mala del GPS.
+    const grid = malla(dispersion(1_000_000, 1_000_000));
+
+    expect(grid.cells.length).toBeLessThanOrEqual(MAX_CELLS);
+    expect(grid.adjusted).toBe(true);
+    expect(grid.cellAreaHa).toBeGreaterThan(1);
+  });
 });
 
 describe('cellForPoint', () => {

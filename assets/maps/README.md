@@ -45,7 +45,7 @@ incluido.
 
 Límites que la app comprueba al importar:
 
-- debe ser un `.pmtiles`;
+- debe ser un `.pmtiles` y empezar con la firma `PMTiles` (un archivo renombrado se rechaza);
 - debe caber en el espacio libre del teléfono;
 - no puede superar 200 MB (`MAX_MAP_PACKAGE_BYTES`).
 

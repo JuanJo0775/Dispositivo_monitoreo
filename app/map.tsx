@@ -8,6 +8,7 @@ import { ensurePlotDiagnoses } from '@/application/map/ensure-plot-diagnoses';
 import { getActiveMapPackage } from '@/application/map/manage-map-packages';
 import type { AptitudeClass } from '@/domain/diagnosis/types';
 import type { Plot } from '@/domain/farm/types';
+import { MAX_CELLS } from '@/domain/geo/grid';
 import {
   assetArchiveUri,
   BASE_ARCHIVE_NAME,
@@ -17,6 +18,7 @@ import type { MapPackage } from '@/ports/stores/map-package-store';
 import { formatArea } from '@/shared/format';
 import { CellSheet } from '@/ui/components/map/cell-sheet';
 import { FallbackMap } from '@/ui/components/map/fallback-map';
+import { MapErrorBoundary } from '@/ui/components/map/map-error-boundary';
 import { MapLegend } from '@/ui/components/map/map-legend';
 import { PlotMap } from '@/ui/components/map/plot-map';
 import { PointList } from '@/ui/components/map/point-list';
@@ -26,6 +28,10 @@ import { useApp } from '@/ui/providers/app-context';
 /** Texto cuando la app no pudo completar los diagnósticos que faltaban. */
 const AVISO_DIAGNOSTICOS =
   'No se pudieron completar todos los diagnósticos de este lote. El mapa abre con lo que sí se pudo leer.';
+
+/** Texto cuando el paquete de teselas no abre y el mapa cae al croquis. */
+const AVISO_TESELAS =
+  'El mapa no pudo abrir el paquete de teselas. Se muestra el croquis con las celdas y los puntos medidos.';
 
 /**
  * Pantalla del lote: encabezado, mapa, resumen, leyenda, alertas y puntos.
@@ -52,6 +58,7 @@ export default function MapScreen() {
   const [detailUri, setDetailUri] = useState<string | null>(null);
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [mapKey, setMapKey] = useState(0);
+  const [tilesFailed, setTilesFailed] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loadingPlots, setLoadingPlots] = useState(true);
@@ -115,6 +122,7 @@ export default function MapScreen() {
       setLoadingSpace(true);
       setWarning(null);
       setSelectedCellId(null);
+      setTilesFailed(false);
 
       try {
         let aviso: string | null = null;
@@ -256,6 +264,13 @@ export default function MapScreen() {
     space === null || space.grid === null
       ? 'sin dato'
       : formatArea(space.grid.cellAreaHa * space.cells.length);
+  // Cuando el área medida no cabe en 400 celdas de 0,4 ha, la malla sube el
+  // tamaño de celda: se dice, para que nadie lea la malla como si fuera la
+  // original (diseño §7.2).
+  const notaMalla =
+    space !== null && space.grid !== null && space.grid.adjusted
+      ? `Malla ajustada a celdas de ${formatArea(space.grid.cellAreaHa)} para no pasar de ${MAX_CELLS} celdas.`
+      : null;
   // El paquete base va empaquetado con la app; el detallado se importa aparte.
   const baseUri: string | null = assetArchiveUri(BASE_ARCHIVE_NAME);
 
@@ -274,6 +289,7 @@ export default function MapScreen() {
           <Text style={styles.headerLine}>Cultivo: {cultivo ?? 'sin dato'}</Text>
           <Text style={styles.headerLine}>Unidad cartográfica: {unidad ?? 'sin dato'}</Text>
           <Text style={styles.headerLine}>Área medida: {areaMedida}</Text>
+          {notaMalla === null ? null : <Text style={styles.headerNote}>{notaMalla}</Text>}
 
           {faltaContexto ? (
             <Pressable
@@ -315,23 +331,36 @@ export default function MapScreen() {
             ) : null}
 
             <View style={styles.mapFrame}>
-              {baseUri === null && detailUri === null ? (
+              {tilesFailed ? (
                 <FallbackMap
                   space={space}
                   onSelectCell={setSelectedCellId}
                   onSelectPoint={abrirDiagnostico}
                 />
               ) : (
-                <PlotMap
-                  key={mapKey}
-                  space={space}
-                  baseUri={baseUri}
-                  detailUri={detailUri}
-                  onSelectCell={setSelectedCellId}
-                  onSelectPoint={abrirDiagnostico}
-                />
+                <MapErrorBoundary
+                  fallback={
+                    <FallbackMap
+                      space={space}
+                      onSelectCell={setSelectedCellId}
+                      onSelectPoint={abrirDiagnostico}
+                    />
+                  }
+                >
+                  <PlotMap
+                    key={mapKey}
+                    space={space}
+                    baseUri={baseUri}
+                    detailUri={detailUri}
+                    onSelectCell={setSelectedCellId}
+                    onSelectPoint={abrirDiagnostico}
+                    onTilesFailed={() => setTilesFailed(true)}
+                  />
+                </MapErrorBoundary>
               )}
             </View>
+
+            {tilesFailed ? <Text style={styles.warning}>{AVISO_TESELAS}</Text> : null}
 
             <View style={styles.mapFooter}>
               <Pressable
@@ -467,6 +496,11 @@ const styles = StyleSheet.create({
   headerLine: {
     fontSize: 14,
     color: '#1F1F1F',
+  },
+  headerNote: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#5A5A5A',
   },
   mapBlock: {
     gap: 8,

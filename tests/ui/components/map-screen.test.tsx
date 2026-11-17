@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import type { AptitudeClass } from '@/domain/diagnosis/types';
 import { parseThresholdSet } from '@/domain/diagnosis/threshold-set';
@@ -33,13 +33,19 @@ jest.mock('expo-router', () => {
   };
 });
 
+/** Últimas propiedades que recibió el mapa de MapLibre. */
+let mockMapProps: Record<string, unknown> | null = null;
+
 jest.mock('@maplibre/maplibre-react-native', () => {
   const React = jest.requireActual<typeof import('react')>('react');
   const { View } = jest.requireActual<typeof import('react-native')>('react-native');
   type MockProps = Record<string, unknown> & { testID?: string; children?: React.ReactNode };
 
   return {
-    Map: (props: MockProps) => React.createElement(View, { testID: props.testID }, props.children),
+    Map: (props: MockProps) => {
+      mockMapProps = props;
+      return React.createElement(View, { testID: props.testID }, props.children);
+    },
     Camera: () => null,
     GeoJSONSource: (props: MockProps) =>
       React.createElement(View, { testID: `source-${props.id}` }, props.children),
@@ -128,6 +134,7 @@ beforeEach(() => {
   mockRouter.push.mockClear();
   mockRouter.back.mockClear();
   mockRouter.replace.mockClear();
+  mockMapProps = null;
 });
 
 describe('pantalla de mapa', () => {
@@ -207,6 +214,61 @@ describe('pantalla de mapa', () => {
     await fireEvent.press(pantalla.getByText('Ver paquetes de mapa'));
 
     expect(mockRouter.push).toHaveBeenCalledWith('/map-packages');
+  });
+
+  it('avisa cuando la malla se ajusta para no pasar de 400 celdas', async () => {
+    const { services, stores, diagnoses } = makeServices();
+
+    await stores.measurements.insert(makeMeasurement({}, { id: 'm-oeste' }));
+    await stores.measurements.insert(
+      makeMeasurement(
+        { longitude: -75.6611 },
+        { id: 'm-este', capturedAtUtc: '2026-11-12T17:06:00Z' },
+      ),
+    );
+    await stores.measurements.insert(
+      makeMeasurement(
+        { latitude: 4.5539 },
+        { id: 'm-norte', capturedAtUtc: '2026-11-12T17:07:00Z' },
+      ),
+    );
+    await guardarDiagnostico(diagnoses, 'm-oeste', ['S1']);
+    await guardarDiagnostico(diagnoses, 'm-este', ['S1']);
+    await guardarDiagnostico(diagnoses, 'm-norte', ['S1']);
+
+    const pantalla = await render(
+      <AppContext.Provider value={{ services, error: null }}>
+        <MapScreen />
+      </AppContext.Provider>,
+    );
+
+    expect(await pantalla.findByText(/Malla ajustada a celdas de/)).toBeTruthy();
+  });
+
+  it('si el paquete de teselas no abre, cae al croquis y lo avisa', async () => {
+    const { services, stores, diagnoses } = makeServices();
+
+    await stores.measurements.insert(makeMeasurement({}, { id: 'm-oeste' }));
+    await guardarDiagnostico(diagnoses, 'm-oeste', ['S1']);
+
+    const pantalla = await render(
+      <AppContext.Provider value={{ services, error: null }}>
+        <MapScreen />
+      </AppContext.Provider>,
+    );
+
+    expect(await pantalla.findByTestId('mapa-lote')).toBeTruthy();
+
+    const onDidFailLoadingMap = mockMapProps?.onDidFailLoadingMap as
+      ((event: unknown) => void) | undefined;
+
+    await act(async () => {
+      onDidFailLoadingMap?.({ nativeEvent: null });
+    });
+
+    expect(pantalla.queryByTestId('mapa-lote')).toBeNull();
+    expect(pantalla.getByTestId('mapa-sin-teselas')).toBeTruthy();
+    expect(pantalla.getByText(/no pudo abrir el paquete de teselas/)).toBeTruthy();
   });
 
   it('si falla el diagnóstico, el mapa abre igual y avisa', async () => {

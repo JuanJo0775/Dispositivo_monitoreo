@@ -121,7 +121,8 @@ Una captura que llegó sin lote se puede asignar después:
 | Archivo | Qué hace |
 | --- | --- |
 | `plot-map.tsx` | MapLibre con las fuentes base y detallada, celdas y puntos como GeoJSON |
-| `fallback-map.tsx` | Dibujo sin teselas (si no hay paquete) para que la malla no desaparezca |
+| `fallback-map.tsx` | Croquis con celdas y puntos para cuando el mapa de teselas no puede abrir |
+| `map-error-boundary.tsx` | Atrapa un fallo al montar el módulo nativo y cambia al croquis |
 | `map-colors.ts` | Colores y etiquetas por clase; relleno y borde del rango de dos clases |
 | `map-geometry.ts` | Pasa la malla local a GeoJSON y calcula la caja con relleno del 10 % |
 | `map-legend.tsx` | Leyenda; siempre incluye «Sin dato» y «No concluyente» |
@@ -135,6 +136,14 @@ Reglas de honestidad visual:
 - la caja del mapa se abre sobre los puntos y se reencuadra a pedido («Encuadrar»);
 - la atribución «Teselas © OpenStreetMap · Protomaps» siempre está visible.
 
+Cuando el mapa de teselas no puede abrir —MapLibre avisa que falló al cargar el estilo o el paquete,
+o el módulo nativo revienta al montar— la pantalla **cambia al croquis** y lo dice con un aviso. El
+área medida, sus celdas y sus puntos nunca quedan en blanco (diseño §11.4). El croquis usa la misma
+proyección y permite tocar celdas y puntos igual que el mapa.
+
+Si la malla se ajustó para no pasar de 400 celdas, la cabecera lo dice con el tamaño de celda
+resultante: nadie debe leer la malla como si fuera la original de 0,4 ha.
+
 ## 8. Paquetes de mapa
 
 - **Incluido:** `assets/maps/base.pmtiles`, Colombia a zoom 0–6, versionado en el repositorio y
@@ -143,6 +152,8 @@ Reglas de honestidad visual:
   al almacenamiento privado y se dibuja encima del incluido. No se descarga nada.
 - Un paquete importado queda activo; «Usar solo el incluido» vuelve al base. Borrar el activo
   devuelve el mapa al incluido.
+- Al importar se comprueba la **firma** `PMTiles` en los primeros bytes, antes de leer el tamaño o
+  copiar: un archivo cualquiera renombrado se rechaza y no entra al mapa.
 - Cómo se generan: `assets/maps/README.md` y `scripts/map/extract-pmtiles.mjs`.
 
 ## 9. Pruebas que lo sostienen

@@ -76,6 +76,9 @@ en la nube con EAS Build, que es gratuito para este uso.
 - La lectura del archivo empaquetado con `pmtiles://asset://` está pendiente de confirmar en un
   teléfono real (pincho de la tarea 0). Si no funciona, la app copia el paquete incluido al
   almacenamiento privado la primera vez y usa `file://`; el resto no cambia.
+- Si el paquete no abre —archivo dañado, URI que el motor no resuelve o módulo nativo que falla— la
+  pantalla cae a un croquis con celdas y puntos y lo avisa. El mapa nunca deja el área en blanco.
+- Un paquete importado se valida por su firma `PMTiles`, no por la extensión del nombre.
 - Los paquetes detallados no se versionan: se generan por zona y se importan desde el teléfono.
 
 ## Reversibility

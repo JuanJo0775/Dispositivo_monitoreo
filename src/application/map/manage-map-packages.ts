@@ -8,6 +8,9 @@ export const ACTIVE_MAP_PACKAGE_KEY = 'active_map_package_id';
 /** Tope de tamaño de un paquete importado: 200 MB. */
 export const MAX_MAP_PACKAGE_BYTES = 200 * 1024 * 1024;
 
+/** Firma con la que empieza todo archivo PMTiles v3. */
+const PMTILES_MAGIC = [0x50, 0x4d, 0x54, 0x69, 0x6c, 0x65, 0x73];
+
 export interface ManageMapPackagesDeps {
   readonly packages: MapPackageStore;
   readonly settings: SettingsStore;
@@ -46,6 +49,11 @@ export async function importMapPackage(
     throw new Error('El archivo debe ser un paquete .pmtiles.');
   }
 
+  // El nombre no garantiza el contenido: un archivo cualquiera renombrado
+  // entraría al mapa y lo dejaría sin teselas. La firma se comprueba antes de
+  // copiar un solo byte al almacenamiento de la app.
+  await assertPmtilesSignature(input.uri, deps);
+
   const sizeBytes = await deps.files.sizeOf(input.uri);
   const limiteMb = Math.round(MAX_MAP_PACKAGE_BYTES / (1024 * 1024));
 
@@ -82,6 +90,22 @@ export async function importMapPackage(
 /** Paquetes vigentes, del más reciente al más antiguo; los borrados no aparecen. */
 export async function listMapPackages(deps: ManageMapPackagesDeps): Promise<MapPackage[]> {
   return deps.packages.list();
+}
+
+/**
+ * Comprueba la firma `PMTiles` del archivo elegido.
+ *
+ * Un archivo corto o con otra cabecera se rechaza con un texto que dice qué
+ * pasó; nunca se copia ni se activa. La comprobación ocurre antes de leer el
+ * tamaño y de pedir espacio, para no gastar trabajo en un archivo inválido.
+ */
+async function assertPmtilesSignature(uri: string, deps: ManageMapPackagesDeps): Promise<void> {
+  const cabecera = await deps.files.readFirstBytes(uri, PMTILES_MAGIC.length);
+  const firma = PMTILES_MAGIC.every((byte, indice) => cabecera[indice] === byte);
+
+  if (!firma) {
+    throw new Error('El archivo elegido no es un paquete .pmtiles válido.');
+  }
 }
 
 /** Identificador del paquete activo, o `null` si no hay o ya fue borrado. */

@@ -15,6 +15,11 @@ export interface CopiedMapFile {
 export interface MapPackageFiles {
   /** Tamaño del archivo de origen, en bytes. */
   sizeOf(uri: string): Promise<number>;
+  /**
+   * Primeros `count` bytes del archivo, para comprobar que es un PMTiles de
+   * verdad y no un archivo cualquiera renombrado.
+   */
+  readFirstBytes(uri: string, count: number): Promise<Uint8Array>;
   /** Espacio libre en el volumen donde se guarda el paquete, en bytes. */
   availableSpaceBytes(): Promise<number>;
   /** Copia el archivo elegido al almacenamiento privado con el nombre indicado. */

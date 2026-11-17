@@ -17,6 +17,12 @@ export interface PlotMapProps {
   detailUri: string | null;
   onSelectCell: (cellId: string) => void;
   onSelectPoint: (measurementId: string) => void;
+  /**
+   * Avisa que MapLibre no pudo cargar el estilo o las teselas. La pantalla
+   * cambia al croquis: un paquete que no abre no puede dejar el área en blanco
+   * (diseño §11.4).
+   */
+  onTilesFailed?: () => void;
 }
 
 /**
@@ -29,7 +35,14 @@ export interface PlotMapProps {
  * El mapa no decide nada: recibe el `PlotSpace` ya resuelto y solo lo pinta.
  * Tocar una celda o un punto llama a la pantalla, que abre el detalle.
  */
-export function PlotMap({ space, baseUri, detailUri, onSelectCell, onSelectPoint }: PlotMapProps) {
+export function PlotMap({
+  space,
+  baseUri,
+  detailUri,
+  onSelectCell,
+  onSelectPoint,
+  onTilesFailed,
+}: PlotMapProps) {
   const bounds = spaceBounds(space);
   const initialViewState =
     bounds === null
@@ -41,6 +54,7 @@ export function PlotMap({ space, baseUri, detailUri, onSelectCell, onSelectPoint
       style={styles.map}
       mapStyle={buildMapStyle({ base: baseUri, detalle: detailUri })}
       testID="mapa-lote"
+      onDidFailLoadingMap={() => onTilesFailed?.()}
     >
       <Camera initialViewState={initialViewState} />
 

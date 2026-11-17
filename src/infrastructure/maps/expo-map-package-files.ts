@@ -34,6 +34,16 @@ export const expoMapPackageFiles: MapPackageFiles = {
     return size;
   },
 
+  async readFirstBytes(uri, count) {
+    const handle = new File(uri).open();
+
+    try {
+      return await handle.readBytes(count);
+    } finally {
+      handle.close();
+    }
+  },
+
   async availableSpaceBytes() {
     return Paths.availableDiskSpace;
   },

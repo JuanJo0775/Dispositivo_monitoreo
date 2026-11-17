@@ -103,11 +103,27 @@ export function buildGrid(
   }
 
   const areaM2 = boxArea(caja);
+  const objetivoM2 = targetAreaHa * METROS_CUADRADOS_POR_HECTAREA;
   let objetivoHa = targetAreaHa;
-  let eleccion = elegirMalla(caja, objetivoHa * METROS_CUADRADOS_POR_HECTAREA);
   let ajustado = false;
 
-  // 8. Si la malla elegida supera el tope, se recalcula una sola vez.
+  // El tope se aplica **antes** de factorizar: con un área desmedida (una
+  // coordenada mala del GPS en una esquina lejana), buscar los divisores del
+  // número de celdas objetivo costaría cientos de millones de vueltas y la
+  // pantalla se congelaría. Subiendo el área objetivo de entrada, el número de
+  // celdas queda en el tope y la búsqueda es barata.
+  if (areaM2 / objetivoM2 > MAX_CELLS) {
+    ajustado = true;
+  }
+
+  let eleccion = elegirMalla(caja, ajustado ? areaM2 / MAX_CELLS : objetivoM2);
+
+  if (ajustado) {
+    objetivoHa = areaM2 / MAX_CELLS / METROS_CUADRADOS_POR_HECTAREA;
+  }
+
+  // Red de seguridad: el redondeo de los candidatos podría dejar la malla un
+  // poco por encima del tope aunque el área objetivo ya se haya ajustado.
   if (eleccion.rows * eleccion.columns > MAX_CELLS) {
     objetivoHa = areaM2 / METROS_CUADRADOS_POR_HECTAREA / MAX_CELLS;
     eleccion = elegirMalla(caja, objetivoHa * METROS_CUADRADOS_POR_HECTAREA);
@@ -297,13 +313,24 @@ function candidatosDeCeldas(areaM2: number, objetivoM2: number): readonly number
   return [...cantidades];
 }
 
-/** Todos los pares `filas × columnas = n`, con filas de 1 a n. */
+/**
+ * Todos los pares `filas × columnas = n`.
+ *
+ * Recorre solo hasta la raíz cuadrada y agrega las dos orientaciones: con un
+ * número grande, un recorrido completo sería trabajo sin techo.
+ */
 function paresDeFactores(n: number): readonly ParFilasColumnas[] {
   const pares: ParFilasColumnas[] = [];
 
-  for (let rows = 1; rows <= n; rows += 1) {
+  for (let rows = 1; rows * rows <= n; rows += 1) {
     if (n % rows === 0) {
-      pares.push({ rows, columns: n / rows });
+      const columns = n / rows;
+
+      pares.push({ rows, columns });
+
+      if (columns !== rows) {
+        pares.push({ rows: columns, columns: rows });
+      }
     }
   }
 

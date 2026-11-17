@@ -17,11 +17,19 @@ const MB = 1024 * 1024;
 const clock = () => '2026-11-12T19:00:00Z';
 
 /** Doble del puerto de archivos: nada toca el disco de verdad. */
-function makeFakeFiles(options: { sizes?: Record<string, number>; available?: number } = {}) {
+function makeFakeFiles(
+  options: {
+    sizes?: Record<string, number>;
+    available?: number;
+    /** Cabecera por URI; por defecto todos son PMTiles válidos. */
+    headers?: Record<string, Uint8Array>;
+  } = {},
+) {
   const sizes = new Map(Object.entries(options.sizes ?? {}));
   const copiados = new Map<string, number>();
   const copias: { uri: string; fileName: string }[] = [];
   const borrados: string[] = [];
+  const firma = new Uint8Array([0x50, 0x4d, 0x54, 0x69, 0x6c, 0x65, 0x73]);
 
   const files: MapPackageFiles = {
     async sizeOf(uri) {
@@ -32,6 +40,11 @@ function makeFakeFiles(options: { sizes?: Record<string, number>; available?: nu
       }
 
       return tamano;
+    },
+    async readFirstBytes(uri, count) {
+      const cabecera = options.headers?.[uri] ?? firma;
+
+      return cabecera.slice(0, count);
     },
     async availableSpaceBytes() {
       return options.available ?? 1024 * MB;
@@ -57,7 +70,13 @@ function makeFakeFiles(options: { sizes?: Record<string, number>; available?: nu
   return { files, copias, copiados, borrados };
 }
 
-function makeDeps(options: { sizes?: Record<string, number>; available?: number } = {}) {
+function makeDeps(
+  options: {
+    sizes?: Record<string, number>;
+    available?: number;
+    headers?: Record<string, Uint8Array>;
+  } = {},
+) {
   const paquetes = makeInMemoryMapPackageStore();
   const ajustes = makeInMemorySettingsStore();
   const archivos = makeFakeFiles(options);
@@ -97,6 +116,19 @@ describe('manageMapPackages', () => {
     await expect(
       importMapPackage({ uri: 'file:///tmp/mapa.zip', fileName: 'mapa.zip' }, deps),
     ).rejects.toThrow(/\.pmtiles/);
+
+    expect(archivos.copias).toHaveLength(0);
+  });
+
+  it('rechaza un archivo renombrado que no tiene la firma PMTiles', async () => {
+    const { deps, archivos } = makeDeps({
+      sizes: { 'file:///tmp/video.pmtiles': MB },
+      headers: { 'file:///tmp/video.pmtiles': new Uint8Array([0x00, 0x00, 0x00, 0x18]) },
+    });
+
+    await expect(
+      importMapPackage({ uri: 'file:///tmp/video.pmtiles', fileName: 'video.pmtiles' }, deps),
+    ).rejects.toThrow(/no es un paquete \.pmtiles válido/);
 
     expect(archivos.copias).toHaveLength(0);
   });
