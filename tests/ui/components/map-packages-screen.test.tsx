@@ -14,6 +14,7 @@ import {
   type InMemoryMapPackageFilesSeed,
 } from '../../helpers/in-memory-map-package-files';
 import { makeInMemoryMapPackageStore } from '../../helpers/in-memory-map-package-store';
+import { makeInMemoryUserDataStore } from '../../helpers/in-memory-user-data-store';
 
 /** Lo que el selector de archivos devuelve en la prueba. */
 const mockPickDocument = jest.fn();
@@ -56,6 +57,7 @@ function makeServices(
 
   const stores = {
     mapPackages: paquetes.packages,
+    userData: makeInMemoryUserDataStore(),
     settings: settings.settings,
   } as unknown as AppStores;
 

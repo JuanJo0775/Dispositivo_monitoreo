@@ -10,6 +10,7 @@ import type { MapPackageStore } from '@/ports/stores/map-package-store';
 import type { SessionStore } from '@/ports/stores/session-store';
 import type { SettingsStore } from '@/ports/stores/settings-store';
 import type { SyncStateStore } from '@/ports/stores/sync-state-store';
+import type { UserDataStore } from '@/ports/stores/user-data-store';
 import type { StoreTransaction, UnitOfWork } from '@/ports/stores/unit-of-work';
 import type { StickGateway } from '@/ports/stick-gateway';
 import type { StickSync } from '@/ports/stick-sync';
@@ -24,6 +25,8 @@ export interface AppStores extends StoreTransaction {
   readonly measurements: MeasurementStore;
   readonly syncState: SyncStateStore;
   readonly mapPackages: MapPackageStore;
+  /** Borrado de todos los datos personales, en una sola transacción. */
+  readonly userData: UserDataStore;
 }
 
 /** Servicios ya cableados que consume la UI. */

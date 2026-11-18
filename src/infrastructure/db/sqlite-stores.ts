@@ -27,6 +27,7 @@ import type { MapPackage, MapPackageStore } from '@/ports/stores/map-package-sto
 import type { Session, SessionStore, SessionStatus } from '@/ports/stores/session-store';
 import type { SettingsStore } from '@/ports/stores/settings-store';
 import type { SyncState, SyncStateStore } from '@/ports/stores/sync-state-store';
+import type { ErasedUserData, UserDataStore } from '@/ports/stores/user-data-store';
 import type { StoreTransaction, UnitOfWork } from '@/ports/stores/unit-of-work';
 
 import type { SqlBindValue, SqlDatabase } from './sql-database';
@@ -613,6 +614,7 @@ export interface SqliteStores extends StoreTransaction {
   readonly settings: SettingsStore;
   readonly syncState: SyncStateStore;
   readonly mapPackages: MapPackageStore;
+  readonly userData: UserDataStore;
   readonly uow: UnitOfWork;
 }
 
@@ -1035,6 +1037,78 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
     },
   };
 
+  /**
+   * Borrado de todos los datos de la persona.
+   *
+   * El orden respeta las claves foráneas: diagnósticos antes que mediciones,
+   * mediciones antes que capturas, sesiones antes que lotes y lote antes que
+   * finca. Los umbrales (`threshold_sets`) no se tocan: son ciencia, no datos
+   * de la persona. De `settings` se conserva solo la constancia del aviso de
+   * privacidad; el resto vuelve a su valor por defecto.
+   */
+  const userData: UserDataStore = {
+    async eraseAll() {
+      let erased: ErasedUserData = {
+        farms: 0,
+        plots: 0,
+        captures: 0,
+        measurements: 0,
+        diagnoses: 0,
+        sessions: 0,
+        syncStates: 0,
+        mapPackages: 0,
+      };
+
+      await db.withTransactionAsync(async () => {
+        const counts = await db.getFirstAsync<{
+          farms: number;
+          plots: number;
+          captures: number;
+          measurements: number;
+          diagnoses: number;
+          sessions: number;
+          sync_states: number;
+          map_packages: number;
+        }>(`
+          SELECT
+            (SELECT COUNT(*) FROM farms) AS farms,
+            (SELECT COUNT(*) FROM plots) AS plots,
+            (SELECT COUNT(*) FROM captures) AS captures,
+            (SELECT COUNT(*) FROM measurements) AS measurements,
+            (SELECT COUNT(*) FROM diagnoses) AS diagnoses,
+            (SELECT COUNT(*) FROM sessions) AS sessions,
+            (SELECT COUNT(*) FROM sync_state) AS sync_states,
+            (SELECT COUNT(*) FROM map_packages) AS map_packages
+        `);
+
+        erased = {
+          farms: counts?.farms ?? 0,
+          plots: counts?.plots ?? 0,
+          captures: counts?.captures ?? 0,
+          measurements: counts?.measurements ?? 0,
+          diagnoses: counts?.diagnoses ?? 0,
+          sessions: counts?.sessions ?? 0,
+          syncStates: counts?.sync_states ?? 0,
+          mapPackages: counts?.map_packages ?? 0,
+        };
+
+        await db.runAsync('DELETE FROM diagnoses');
+        await db.runAsync('DELETE FROM measurements');
+        await db.runAsync('DELETE FROM captures');
+        await db.runAsync('DELETE FROM sessions');
+        await db.runAsync('DELETE FROM plots');
+        await db.runAsync('DELETE FROM farms');
+        await db.runAsync('DELETE FROM sync_state');
+        await db.runAsync('DELETE FROM map_packages');
+        // `privacy_notice_ack` es la constancia de un consentimiento, no un
+        // dato de campo: se conserva para no volver a pedirlo al reabrir.
+        await db.runAsync("DELETE FROM settings WHERE key <> 'privacy_notice_ack'");
+      });
+
+      return erased;
+    },
+  };
+
   const uow: UnitOfWork = {
     async run<T>(work: (stores: StoreTransaction) => Promise<T>): Promise<T> {
       let result: T | undefined;
@@ -1062,6 +1136,7 @@ export function createSqliteStores(db: SqlDatabase): SqliteStores {
     settings,
     syncState,
     mapPackages,
+    userData,
     uow,
   };
 }

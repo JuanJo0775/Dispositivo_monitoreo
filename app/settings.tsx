@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 
 import { getSettings } from '@/application/settings/get-settings';
 import { setTrialMode } from '@/application/settings/set-trial-mode';
+import { deleteUserData } from '@/application/privacy/delete-user-data';
 import { FACTORY_CALIBRATION_VERSION, ENGINE_VERSION } from '@/shared/versions';
 import { PrimaryButton } from '@/ui/components/primary-button';
 import { useApp } from '@/ui/providers/app-context';
@@ -14,10 +15,12 @@ import { useApp } from '@/ui/providers/app-context';
  * Solo presenta lo que hay y llama a los casos de uso: no borra datos ni decide reglas.
  */
 export default function SettingsScreen() {
-  const { stores, thresholds } = useApp();
+  const { stores, thresholds, mapFiles } = useApp();
   const router = useRouter();
 
   const [trialMode, setTrialModeValue] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,6 +69,50 @@ export default function SettingsScreen() {
     }
   }
 
+  async function handleDeleteAll(): Promise<void> {
+    setError(null);
+    setMessage(null);
+    setDeleting(true);
+
+    try {
+      const result = await deleteUserData({
+        userData: stores.userData,
+        mapPackages: stores.mapPackages,
+        files: mapFiles,
+      });
+
+      const partes = [
+        `${result.erased.measurements} ${result.erased.measurements === 1 ? 'medición' : 'mediciones'}`,
+        `${result.erased.plots} ${result.erased.plots === 1 ? 'lote' : 'lotes'}`,
+        `${result.erased.farms} ${result.erased.farms === 1 ? 'finca' : 'fincas'}`,
+      ];
+      let texto = `Se borraron ${partes.join(', ')}.`;
+
+      if (result.erased.mapPackages > 0) {
+        texto += ` También se borraron ${result.erased.mapPackages} ${
+          result.erased.mapPackages === 1
+            ? 'paquete de mapa importado'
+            : 'paquetes de mapa importados'
+        }.`;
+      }
+
+      if (result.failedFiles > 0) {
+        texto +=
+          ' Algunos archivos de mapa no se pudieron borrar del almacenamiento; el resto de sus datos sí se borró.';
+      }
+
+      setTrialModeValue(false);
+      setConfirmingDelete(false);
+      setMessage(texto);
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error ? deleteError.message : 'No se pudieron borrar los datos',
+      );
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.card}>
@@ -109,6 +156,54 @@ export default function SettingsScreen() {
             thumbColor="#FFFFFF"
           />
         </View>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Sus datos</Text>
+
+        {confirmingDelete ? (
+          <View style={styles.confirmBox}>
+            <Text style={styles.confirmTitle}>¿Borrar todos sus datos?</Text>
+            <Text style={styles.hint}>
+              Se borran las fincas, los lotes, las capturas, las mediciones, los diagnósticos, las
+              sesiones y los paquetes de mapa importados. No se puede deshacer. Se conservan los
+              umbrales científicos y el mapa incluido en la app.
+            </Text>
+
+            <PrimaryButton
+              label={deleting ? 'Borrando…' : 'Sí, borrar todo'}
+              variant="danger"
+              disabled={deleting}
+              onPress={() => {
+                void handleDeleteAll();
+              }}
+            />
+            <PrimaryButton
+              label="Cancelar"
+              variant="secondary"
+              disabled={deleting}
+              onPress={() => {
+                setConfirmingDelete(false);
+              }}
+            />
+          </View>
+        ) : (
+          <>
+            <Text style={styles.hint}>
+              Fincas, lotes, mediciones y diagnósticos viven solo en este teléfono. Puede borrarlos
+              aquí cuando quiera.
+            </Text>
+            <PrimaryButton
+              label="Borrar todos mis datos"
+              variant="secondary"
+              onPress={() => {
+                setMessage(null);
+                setError(null);
+                setConfirmingDelete(true);
+              }}
+            />
+          </>
+        )}
       </View>
 
       {message !== null ? <Text style={styles.message}>{message}</Text> : null}
@@ -173,7 +268,21 @@ const styles = StyleSheet.create({
   },
   hint: {
     fontSize: 14,
+    lineHeight: 20,
     color: '#4A4A4A',
+  },
+  confirmBox: {
+    gap: 10,
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E3C3B4',
+    backgroundColor: '#FFF6F1',
+  },
+  confirmTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#8A3B12',
   },
   message: {
     fontSize: 15,

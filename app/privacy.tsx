@@ -82,9 +82,15 @@ export default function PrivacyScreen() {
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Puede borrar sus datos</Text>
         <Text style={styles.paragraph}>
-          Usted puede borrar sus datos cuando quiera: le basta con borrar los datos de la app desde
-          los ajustes de su teléfono o con desinstalarla. En una versión posterior habrá también un
-          botón dentro de la app para borrar todo lo guardado.
+          Usted puede borrar sus datos cuando quiera desde Ajustes, con el botón «Borrar todos mis
+          datos»: se borran las fincas, los lotes, las capturas, las mediciones, los diagnósticos,
+          las sesiones y los paquetes de mapa importados. También puede borrar los datos de la app
+          desde los ajustes de su teléfono o desinstalarla.
+        </Text>
+        <Text style={styles.paragraph}>
+          El borrado no toca los umbrales científicos ni el mapa incluido en la app, que no son
+          datos suyos. Una vez borrados, sus datos no se pueden recuperar: no hay copia en ningún
+          otro lugar.
         </Text>
       </View>
 

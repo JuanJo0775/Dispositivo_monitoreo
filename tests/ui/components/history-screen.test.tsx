@@ -13,6 +13,7 @@ import {
 } from '../../helpers/in-memory-diagnosis-stores';
 import { makeInMemoryFarmStore } from '../../helpers/in-memory-farm-store';
 import { makeInMemoryMapPackageStore } from '../../helpers/in-memory-map-package-store';
+import { makeInMemoryUserDataStore } from '../../helpers/in-memory-user-data-store';
 import { makeInMemorySessionStore } from '../../helpers/in-memory-session-store';
 import { makeInMemoryStores } from '../../helpers/in-memory-stores';
 import { makeMeasurement } from '../../helpers/measurements';
@@ -61,6 +62,7 @@ function makeServices() {
     diagnoses: diagnoses.diagnoses,
     settings: settings.settings,
     mapPackages: packages.packages,
+    userData: makeInMemoryUserDataStore(),
     syncState: {
       async get() {
         return null;

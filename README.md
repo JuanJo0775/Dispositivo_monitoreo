@@ -6,6 +6,7 @@ camino crítico.
 
 - Requisitos y ciencia: Notion «Dispositivo de monitoreo del suelo» y
   `docs/requirements/objetivo-1-umbrales-ecuaciones-motor.md`.
+- Estado actual, pendientes y límites conocidos: `docs/context/estado.md`.
 - Diseño técnico: `docs/superpowers/specs/2026-11-12-app-movil-arquitectura-design.md`.
 - Plan del corte 0 (cerrado): `docs/superpowers/plans/2026-11-12-corte-0-esqueleto.md`.
 
@@ -117,14 +118,14 @@ empezar.
 
 ## Estado
 
-| Corte | Alcance                                       | Estado    |
-| ----- | --------------------------------------------- | --------- |
-| 0     | Esqueleto: simulador, SQLite, historial, CSV  | listo     |
-| 1     | Recorrido de campo mínimo con diagnóstico     | listo     |
-| 2     | BLE real y sincronización por microSD         | listo     |
-| 3     | Mapa offline con malla y dictamen por espacio | listo     |
-| 4     | v1.0: calibración individual, PDF, análisis   | pendiente |
-| 5     | v2.0: dosis y exportación geoespacial         | pendiente |
+| Corte | Alcance                                       | Estado                      |
+| ----- | --------------------------------------------- | --------------------------- |
+| 0     | Esqueleto: simulador, SQLite, historial, CSV  | cerrado                     |
+| 1     | Recorrido de campo mínimo con diagnóstico     | cerrado                     |
+| 2     | BLE y sincronización por microSD              | cerrado                     |
+| 3     | Mapa offline con malla y dictamen por espacio | en verificación en teléfono |
+| 4     | v1.0: calibración individual, PDF, análisis   | pendiente                   |
+| 5     | v2.0: dosis y exportación geoespacial         | pendiente                   |
 
 En el corte 1 la app ya diagnostica de verdad: los umbrales vienen de las tablas publicadas en
 `docs/requirements/objetivo-1-umbrales-ecuaciones-motor.md` y están en

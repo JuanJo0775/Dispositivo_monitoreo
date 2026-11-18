@@ -4,7 +4,7 @@ export interface PrimaryButtonProps {
   label: string;
   onPress: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
 }
 
 /** Botón grande, legible bajo luz solar y con zona táctil ≥ 48 dp. */
@@ -15,6 +15,7 @@ export function PrimaryButton({
   variant = 'primary',
 }: PrimaryButtonProps) {
   const isPrimary = variant === 'primary';
+  const isDanger = variant === 'danger';
 
   return (
     <Pressable
@@ -24,12 +25,14 @@ export function PrimaryButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.secondary,
+        isPrimary ? styles.primary : isDanger ? styles.danger : styles.secondary,
         pressed && !disabled && styles.pressed,
         disabled && styles.disabled,
       ]}
     >
-      <Text style={[styles.label, isPrimary ? styles.primaryLabel : styles.secondaryLabel]}>
+      <Text
+        style={[styles.label, isPrimary || isDanger ? styles.primaryLabel : styles.secondaryLabel]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -53,6 +56,10 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: '#FFFFFF',
     borderColor: '#1B4332',
+  },
+  danger: {
+    backgroundColor: '#8A3B12',
+    borderColor: '#8A3B12',
   },
   pressed: {
     opacity: 0.85,
