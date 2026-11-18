@@ -58,32 +58,34 @@ diagnostica, documenta y exporta. La meta es terminar el producto durante 2027.
 
 ## Pendientes inmediatos
 
-1. Iniciar sesión en EAS con la cuenta `juanjo_38`.
-2. Compilar e instalar el APK `preview` y probar el mapa en el teléfono.
+1. Generar el keystore de Android en la página de credenciales de EAS; sin él el build falla.
+2. Compilar e instalar el APK `preview` desde `main` y probar el mapa en el teléfono.
 3. Reportar cuál URI dibuja (`asset://` o `file://`), registrar el resultado y retirar el pincho
-   temporal.
+   temporal (`app/map-spike.tsx`, su ruta y `assets/maps/prueba.pmtiles`) antes de cualquier build de
+   producción.
 4. Revisar los umbrales con criterio agronómico antes de llamar «v1.0» al producto.
 5. Completar el correo de contacto del aviso de privacidad antes de publicar.
 
 ## Compilar (EAS)
 
-El APK de prueba se compila en la nube; no hace falta Android SDK ni JDK local:
-
-```powershell
-npx eas-cli@latest build --profile preview --platform android
-```
-
-El perfil `preview` produce un **APK** instalable. El perfil `production` produce un **AAB** para
-Google Play, con incremento automático de versión; no se instala directamente en el teléfono.
+La release se compila desde `main`. El corte 3 ya está integrado: el PR #5 se fusionó en
+`2df470f`. El APK se compila en la nube; no hace falta Android SDK ni JDK local.
 
 En la web de EAS, para este repositorio:
 
 - **Base directory:** vacío (el proyecto está en la raíz).
-- **Git ref:** `main` solo después de integrar el corte 3; mientras tanto, `corte-3-mapa`.
-- **Environment:** `Production` para `main`; no hay variables de entorno configuradas.
+- **Git ref:** `main`.
+- **Expo Build profile:** `preview` (produce un **APK** instalable).
+- **Environment:** `Default`; no hay variables de entorno configuradas.
 - **Expo Submit:** desactivado; todavía no hay cuenta de tienda ni perfil de envío.
+
+El perfil `production` produce un **AAB** para Google Play, con incremento automático de versión; no se
+instala directamente en el teléfono y no debe usarse mientras siga el pincho del mapa.
+
+Credenciales: en **Credentials → Android** hay que generar un keystore («Generate new keystore»). EAS
+lo guarda; si se pierde, no se pueden publicar actualizaciones que instalen encima de la app existente.
 
 ## Publicación del código
 
-El corte 3 vive en la rama `corte-3-mapa` y el Pull Request #5 contra `main`. El arnés de ingeniería
-(`.harness/`, `.claude/`, `.opencode/`, `AGENTS.md`, `CLAUDE.md`, `opencode.json`) no se publica.
+El corte 3 se fusionó en `main` con el PR #5 (`2df470f`). El arnés de ingeniería (`.harness/`,
+`.claude/`, `.opencode/`, `AGENTS.md`, `CLAUDE.md`, `opencode.json`) no se publica.
