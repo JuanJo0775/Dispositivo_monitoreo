@@ -14,7 +14,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | diagnostico | src/domain/diagnosis/, src/application/diagnosis/ | ADR-APP-002, ADR-APP-006, ADR-APP-007, ADR-APP-008 | RF-APP-021 a RF-APP-033, RF-APP-065 |
 | historial | app/history.tsx, src/application/capture/list-measurements.ts | ADR-APP-004 | RF-APP-034 a RF-APP-038 |
 | sincronizacion-sd | src/application/sync/, src/ports/stick-sync.ts, src/ports/stores/sync-state-store.ts, app/sync.tsx, tests/integration/ble-sync-flow.test.ts | ADR-APP-013 | RF-APP-039 a RF-APP-043 |
-| mapas | - | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
+| mapas | src/domain/geo/, src/application/map/, src/infrastructure/maps/, src/ports/map-package-files.ts, src/ports/stores/map-package-store.ts, src/ui/components/map/, app/map.tsx, app/map-packages.tsx, app/map-spike.tsx, plugins/with-map-assets.js | ADR-APP-009 | RF-APP-044 a RF-APP-047 |
 | calibracion | - | ADR-APP-005 | RF-APP-052 a RF-APP-054 |
 | exportacion | src/application/export/, src/infrastructure/files/ | ADR-APP-014 | RF-APP-055 a RF-APP-057 |
 | estado-baston | app/connect.tsx, app/measure.tsx, src/ui/components/sync-status.tsx | ADR-APP-012 | RF-APP-058, RF-APP-059 |
@@ -25,7 +25,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | decisiones | docs/adr/ | - | ADR-APP-001 a ADR-APP-017 en Notion `collection://dfe39c4a-833b-8315-88ec-07f76cfec317` |
 | diseno | docs/superpowers/specs/ | - | Mapa de pantallas `40439c4a833b819291dfefd7dc545b88` |
 | estructura | docs/architecture/ | - | Este repositorio: dónde vive cada capa y cada área |
-| ciencia-origen | docs/requirements/ | - | Objetivo 1 v2: umbrales, ecuaciones y motor de decisión |
+| ciencia-origen | docs/requirements/ | - | Objetivo 1 v2: umbrales, ecuaciones y motor de decisión; `muestreo-espacial-mallas-gradientes.md` |
 
 ## Reglas
 
@@ -35,3 +35,157 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
   este archivo. Un número de ADR suelto no se comprueba.
 - `harness doctor` reporta cada ruta literal de la columna Code o ADR que no exista.
 - El índice de ADR tiene una columna Area con estos mismos nombres.
+
+## Pincho de mapa (tarea 0 del corte 3)
+
+Pantalla temporal `app/map-spike.tsx`: abre el mismo archivo `.pmtiles` de dos maneras para saber
+cuál de las dos URI funciona en un teléfono real. Se abre con el botón «Prueba de mapa en teléfono»
+del inicio y se borra cuando la persona reporte el resultado.
+
+### Las dos URI que se van a probar
+
+| Mapa | De dónde sale el archivo | URI |
+| --- | --- | --- |
+| A | Empaquetado en el APK (`android/app/src/main/assets/prueba.pmtiles`) | `pmtiles://asset://prueba.pmtiles` |
+| B | Copiado al almacenamiento privado de la app | `pmtiles://file:///data/user/0/com.semillero.monitoreosuelo/files/prueba.pmtiles` |
+
+La ruta del mapa B sale de `Paths.document` (`expo-file-system`) y en Android empieza por
+`/data/user/0/<paquete>/files/`. Por eso la URI lleva tres barras: `pmtiles://` + `file://` + la ruta
+absoluta.
+
+### Qué se encontró
+
+- `@maplibre/maplibre-react-native@11.5.1` trae MapLibre Native Android **13.6.1**
+  (`node_modules/@maplibre/maplibre-react-native/android/gradle.properties`,
+  `org.maplibre.reactnative.nativeVersion=13.6.1`). El plan lo acertó.
+- El archivo de prueba es PMTiles v3, 23,5 MB, teselas PNG, zoom 0 a 11, longitud 9 a 15 y
+  latitud 46 a 49 (Alpes centrales). El mapa se abre centrado en 12.0 / 47.5, zoom 8.
+- `npx expo export --platform android` (el build del repositorio) compila bien con la dependencia
+  nativa nueva: 1427 módulos y un bundle de 3,8 MB.
+- `npx eas-cli@latest build --profile development --platform android --non-interactive` falla porque
+  la cuenta de Expo no está conectada. Lo hace la persona, no el agente. El mensaje exacto:
+  ```
+  An Expo user account is required to proceed.
+  Either log in with eas login or set the EXPO_TOKEN environment variable if you're using EAS CLI on CI (Learn more: https://docs.expo.dev/accounts/programmatic-access/)
+      Error: build command failed.
+  ```
+- Metro **no** deja el `.pmtiles` en la carpeta `assets/` del APK: lo deja en `res/raw/`, y MapLibre
+  solo abre un archivo empaquetado con `pmtiles://asset://`. Por eso el plugin local
+  `plugins/with-map-assets.js` copia `assets/maps/*.pmtiles` a `android/app/src/main/assets/`
+  durante `expo prebuild` (comprobado: el archivo queda en el proyecto Android generado).
+- El `.pmtiles` de prueba no está en el repositorio (23,5 MB): está en `.gitignore`, y `.easignore`
+  lo vuelve a incluir, porque EAS sube el proyecto con las reglas de `.easignore` en lugar de las de
+  `.gitignore`. Sin esa línea, el APK no llevaría el archivo y el pincho no probaría nada.
+- Pendiente de medir en el teléfono: tamaño del APK (sube unos 23 MB por el archivo de prueba),
+  tiempo hasta que aparece el mapa y confirmación de cuál de las dos URI dibuja.
+
+### Cómo verificar (la persona)
+
+1. `eas login` con la cuenta de Expo y luego
+   `eas build --profile development --platform android` (o `--profile preview` para un APK con el
+   JavaScript embebido, que no necesita Metro).
+2. Instalar el APK en el teléfono.
+3. Abrir la app y tocar «Prueba de mapa en teléfono».
+4. Reportar cuál de los dos mapas dibujó los Alpes centrales: **A**, **B** o **ninguno**. Si ninguno,
+   copiar las dos URI que aparecen en pantalla y el mensaje de error de abajo.
+
+Sin esa respuesta no se puede decidir entre PMTiles y la contingencia MBTiles (`mbtiles://`), que solo
+cambia `pmtiles-archive-store` y `map-style`.
+
+## Estilo del mapa y apertura del paquete base (tarea 11)
+
+`src/infrastructure/maps/map-style.ts` arma el estilo con dos fuentes vectoriales:
+
+| Fuente | Identificador | Qué es |
+| --- | --- | --- |
+| Base | `base` | Paquete incluido en el APK (`BASE_ARCHIVE_NAME = 'base.pmtiles'`), país a zoom bajo |
+| Detallada | `detalle` | Paquete importado por la persona; se dibuja **encima** de la base |
+
+- Las capas salen de `layers(<fuente>, namedFlavor('light'))` **sin** opciones de idioma: eso deja
+  solo capas `fill`, `line` y `background`, sin `symbol`. No hay `glyphs` ni `sprite`, y una prueba
+  serializa el estilo y verifica que no aparezca `http://` ni `https://`.
+- `layers()` devuelve su propia capa `background` en cada llamada. El estilo pone **una sola** capa
+  de fondo, con identificador `fondo` y el color `flavor.background`; las de cada fuente la filtran.
+- Las capas de la fuente detallada llevan el prefijo `detalle:` en su identificador. Sin el prefijo,
+  las dos fuentes producirían los mismos identificadores y el estilo sería inválido.
+- Sin fuentes (`{ base: null, detalle: null }`) el estilo trae solo `fondo`, para poder abrir el mapa
+  mientras se resuelve el archivo base sin que MapLibre falle.
+
+`src/infrastructure/maps/pmtiles-archive-store.ts` arma las dos URI locales:
+
+| Función | Resultado | Cuándo |
+| --- | --- | --- |
+| `assetArchiveUri('base.pmtiles')` | `pmtiles://asset://base.pmtiles` | El archivo viaja dentro del APK |
+| `fileArchiveUri('/data/user/0/<paquete>/files/maps/x.pmtiles')` | `pmtiles://file:///data/user/0/<paquete>/files/maps/x.pmtiles` | El archivo está en el almacenamiento privado |
+
+`fileArchiveUri` acepta la ruta absoluta o la URI `file://` que entrega `expo-file-system`, y no
+duplica el esquema.
+
+### Estrategia de apertura del paquete base: pendiente de confirmar en el teléfono
+
+El pincho (arriba) decide si `pmtiles://asset://` funciona en MapLibre Native Android 13.6.1. Hasta
+que la persona reporte cuál de los dos mapas dibujó:
+
+- **Estrategia por defecto: asset primero, copia como respaldo.** El mapa intenta abrir el base con
+  `assetArchiveUri(BASE_ARCHIVE_NAME)`; si el estilo no carga, copia el archivo una vez a
+  `Paths.document/maps/base.pmtiles` con el puerto `MapPackageFiles` y usa
+  `fileArchiveUri(<ruta copiada>)`. El respaldo cuesta una copia de ~20 MB en el primer arranque y
+  después el archivo ya está.
+- Si el pincho confirma que **A** dibuja: se conserva el orden y la copia queda como red de
+  seguridad para equipos donde el asset no se resuelva.
+- Si el pincho confirma que **B** dibuja: la copia deja de ser respaldo y pasa a ser el camino
+  normal; el asset se elimina del plugin.
+- Si **ninguno** dibuja: se aplica la contingencia MBTiles y solo cambian
+  `pmtiles-archive-store.ts` y `map-style.ts`.
+
+## Pantalla del lote (tarea 13)
+
+`app/map.tsx` muestra, de arriba hacia abajo: selector de lote, encabezado (nombre, cultivo, unidad
+cartográfica y **área medida**), aviso del paquete detallado, mapa, resumen, leyenda, detalle de la
+celda tocada, alertas del motor, avisos de registro y puntos documentados.
+
+- Al abrir el lote corre `ensurePlotDiagnoses` y después `describePlotSpace`. Si la reparación de
+  diagnósticos falla, el mapa abre igual y muestra un aviso; no se oculta el lote.
+- El encabezado dice «Área medida» y la calcula con la malla (`cellAreaHa × celdas`). El lote no
+  tiene área declarada: la malla cubre lo medido, no el contorno.
+- Colores de las celdas en `map-colors.ts`; geometría en `map-geometry.ts`; la hoja de la celda en
+  `cell-sheet.tsx` y la lista en `point-list.tsx`. La pantalla no dictamina ni promedia.
+- Fuentes del mapa: el paquete incluido (`assetArchiveUri(BASE_ARCHIVE_NAME)`) y, si hay uno activo,
+  el detallado (`fileArchiveUri(<ruta>)`). Sin detallado activo aparece un aviso con enlace a
+  `/map-packages`.
+- «Encuadrar» remonta el mapa (`key`) para volver a la caja de los puntos. La atribución
+  «Teselas © OpenStreetMap · Protomaps» va debajo del mapa y no se superpone con el botón.
+- Un punto sin posición queda en la lista con el texto «sin posición»; no se dibuja en el mapa.
+- La pantalla se abre desde «Mapa del lote» en el inicio y desde el botón «Mapa» de cada lote en
+  Fincas y lotes, con `plotId` como parámetro.
+
+
+## Paquetes de mapa (tarea 14)
+
+`app/map-packages.tsx` lista el paquete incluido y los importados, importa un .pmtiles desde el
+selector del sistema y permite activar, borrar o volver al incluido.
+
+- Importar deja el paquete recién copiado **activo**, aunque hubiera otro: la persona acaba de
+  elegirlo. Volver al anterior o al incluido es una acción aparte ("Usar solo el incluido").
+- El archivo se copia al almacenamiento privado como `<id>.pmtiles`; el tamaño se compara contra
+  el espacio libre antes de copiar y el límite es `MAX_MAP_PACKAGE_BYTES` (200 MB).
+- Borrar pide confirmación con `Alert`, borra el archivo y luego marca la fila. Si el paquete
+  borrado era el activo, el ajuste queda en `''` y el mapa vuelve al incluido.
+- Todo el estado sale de `ManageMapPackagesDeps` (`packages`, `settings`, `files`, `clock`,
+  `newId`), armado en la pantalla con `mapFiles` del contexto. La prueba usa
+  `tests/helpers/in-memory-map-package-files.ts`.
+
+## Cierre del corte 3 (tarea 15)
+
+- `assets/maps/base.pmtiles` ya existe: Colombia, zoom 0 a 6, 1,2 MB, generado con
+  `scripts/map/extract-pmtiles.mjs` desde el build `20261115` de Protomaps y verificado con
+  `pmtiles verify`. Va versionado y el plugin lo copia al APK.
+- El script valida `--source`, `--bbox` y `--maxzoom` antes de tocar la red, descarga el
+  binario oficial de `pmtiles` a `scripts/map/.bin/` (ignorado por git) y borra la salida si el
+  extractor falla. Cómo se usa: `assets/maps/README.md`.
+- El historial muestra el lote de cada medición y, si no tiene, abre el selector de lotes. Asignar
+  cambia solo `plot_id`: valores, hora y diagnóstico quedan igual.
+- ADR nuevo: `docs/adr/0003-mapa-offline-pmtiles.md`. Explicación de la malla y del dictamen:
+  `docs/architecture/mapa-y-malla.md`.
+- El pincho de mapa sigue en el inicio hasta que se confirme en un teléfono cuál URI dibuja; el
+  resultado se escribe en la sección de arriba y entonces se borra `app/map-spike.tsx`.

@@ -23,14 +23,26 @@ export default function HomeScreen() {
           onPress={() => router.push('/history')}
         />
         <PrimaryButton
+          label="Mapa del lote"
+          variant="secondary"
+          onPress={() => router.push('/map')}
+        />
+        <PrimaryButton
           label="Sincronizar microSD"
           variant="secondary"
           onPress={() => router.push('/sync')}
         />
+        <PrimaryButton
+          label="Prueba de mapa en teléfono"
+          variant="secondary"
+          onPress={() => router.push('/map-spike')}
+        />
       </View>
 
       <Text style={styles.note}>
-        Corte 2: la app habla BLE por el protocolo del bastón y sincroniza su microSD.
+        Todo funciona sin internet: el bastón guarda cada medición y la app la conserva en el
+        teléfono. El mapa se arma con las coordenadas del GPS del bastón. El botón de prueba
+        comprueba el paquete de mapa en el teléfono y se retira cuando esa prueba quede registrada.
       </Text>
     </View>
   );

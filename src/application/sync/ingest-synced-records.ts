@@ -1,6 +1,9 @@
 import { ingestCapture } from '@/application/capture/ingest-capture';
+import { resolveCaptureAssignment } from '@/application/capture/resolve-capture-assignment';
 import type { CaptureOrigin, CapturePayload, RawCapture } from '@/domain/capture/types';
 import { decodeRecord, flagsFromBits, type StickRecord } from '@/domain/protocol/record-codec';
+import type { FarmStore } from '@/ports/stores/farm-store';
+import type { SessionStore } from '@/ports/stores/session-store';
 import type { UnitOfWork } from '@/ports/stores/unit-of-work';
 
 /** Qué pasó con un registro que llegó del bastón o de la microSD. */
@@ -17,6 +20,10 @@ export interface IngestSyncedRecordInput {
 
 export interface IngestSyncedRecordDeps {
   readonly uow: UnitOfWork;
+  /** Fincas y lotes, para asignar el lote de la captura. */
+  readonly farms: FarmStore;
+  /** Sesiones guardadas, para resolver la sesión por `configId`. */
+  readonly sessions: SessionStore;
   readonly clock: () => string;
   readonly newId: () => string;
 }
@@ -159,16 +166,26 @@ export async function ingestSyncedRecord(
   }
 
   const receivedAtUtc = deps.clock();
+  const payload = toPayload(record);
+  const configId = record.configId ?? 0;
+
+  // El registro trae con qué lote y con qué sesión se capturó: sin esto, lo
+  // sincronizado quedaría fuera del mapa y sin diagnóstico.
+  const asignacion = await resolveCaptureAssignment(
+    { plotCode: payload.plotCode, configId },
+    { farms: deps.farms, sessions: deps.sessions },
+  );
+
   const capture: RawCapture = {
     deviceId,
     sequence,
-    payload: toPayload(record),
+    payload,
     capturedAtUtc: toCapturedAtUtc(record, receivedAtUtc),
     receivedAtUtc,
     origin: input.origin ?? 'stick',
     flags: flagsFromBits(record.banderas ?? 0),
-    configId: record.configId ?? 0,
-    plotId: null,
+    configId,
+    plotId: asignacion.plotId,
   };
 
   const stored = await deps.uow.run(async (stores) =>
@@ -180,7 +197,7 @@ export async function ingestSyncedRecord(
   }
 
   const result = await ingestCapture(
-    { capture, plotId: null },
+    { capture, plotId: asignacion.plotId, sessionId: asignacion.sessionId },
     { uow: deps.uow, clock: deps.clock, newId: deps.newId },
   );
 

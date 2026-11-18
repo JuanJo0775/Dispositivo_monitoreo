@@ -64,6 +64,21 @@ describe('almacenes SQLite', () => {
     await expect(stores.captures.insertRaw(makeCapture())).rejects.toThrow();
   });
 
+  it('asigna el lote a una captura sin tocar su contenido', async () => {
+    const stores = createSqliteStores(db);
+    const capture = makeCapture();
+
+    await stores.captures.insertRaw({ ...capture, plotId: null });
+    await stores.captures.setPlotId('stick-01', 1, 'plot-1');
+
+    const stored = await stores.captures.findByDeviceSequence('stick-01', 1);
+
+    expect(stored?.plotId).toBe('plot-1');
+    expect(stored?.payload).toEqual(capture.payload);
+    expect(stored?.flags).toEqual(capture.flags);
+    expect(stored?.capturedAtUtc).toBe(capture.capturedAtUtc);
+  });
+
   it('guarda una medición con nulos, la lista y la recupera', async () => {
     const stores = createSqliteStores(db);
     const measurement = makeMeasurement({ humidityPct: null }, { notes: null, photoPath: null });
@@ -72,6 +87,25 @@ describe('almacenes SQLite', () => {
 
     expect(await stores.measurements.get(measurement.id)).toEqual(measurement);
     expect(await stores.measurements.list()).toEqual([measurement]);
+  });
+
+  it('guarda la sesión y la bandera de posición de la medición', async () => {
+    const stores = createSqliteStores(db);
+
+    await stores.sessions.insert(makeSession());
+    const measurement = makeMeasurement({}, { sessionId: 'session-1', positionValid: false });
+
+    await stores.measurements.insert(measurement);
+
+    expect(await stores.measurements.get(measurement.id)).toEqual(measurement);
+
+    const row = await db.getFirstAsync<{
+      session_id: string | null;
+      position_valid: number | null;
+    }>('SELECT session_id, position_valid FROM measurements WHERE id = ?', [measurement.id]);
+
+    expect(row?.session_id).toBe('session-1');
+    expect(row?.position_valid).toBe(0);
   });
 
   it('excluye descartadas y filtra por lote al listar', async () => {

@@ -3,9 +3,16 @@ import { encodeRecord, type StickRecord } from '@/domain/protocol/record-codec';
 import type { StickSync, SyncChunk } from '@/ports/stick-sync';
 import type { SyncState, SyncStateStore } from '@/ports/stores/sync-state-store';
 
+import { makeInMemoryFarmStore } from '../../helpers/in-memory-farm-store';
+import { makeInMemorySessionStore } from '../../helpers/in-memory-session-store';
 import { makeInMemoryStores } from '../../helpers/in-memory-stores';
+import { makePlot, makeSession } from '../../helpers/farm-fixtures';
 
 const clock = () => '2026-11-12T12:00:00Z';
+
+/** Fincas y sesiones vacías: la asignación de lote no interviene en estas pruebas. */
+const farms = makeInMemoryFarmStore();
+const sessions = makeInMemorySessionStore();
 
 /** Banderas del contrato: posición, fix reciente, sonda y hora válida. */
 const FLAGS_OK = 23;
@@ -133,7 +140,15 @@ describe('syncFromStick', () => {
 
     const summary = await syncFromStick(
       { deviceId: 'stick-01' },
-      { sync: stick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+      {
+        sync: stick,
+        syncState,
+        uow: stores.uow,
+        farms: farms.farms,
+        sessions: sessions.sessions,
+        clock,
+        newId: makeNewId(),
+      },
     );
 
     expect(summary).toEqual({
@@ -160,7 +175,15 @@ describe('syncFromStick', () => {
 
     const summary = await syncFromStick(
       { deviceId: 'stick-01' },
-      { sync: stick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+      {
+        sync: stick,
+        syncState,
+        uow: stores.uow,
+        farms: farms.farms,
+        sessions: sessions.sessions,
+        clock,
+        newId: makeNewId(),
+      },
     );
 
     expect(stick.requests).toEqual([{ deviceId: 'stick-01', fromSequence: 3 }]);
@@ -177,6 +200,8 @@ describe('syncFromStick', () => {
       sync: stick,
       syncState,
       uow: stores.uow,
+      farms: farms.farms,
+      sessions: sessions.sessions,
       clock,
       newId: makeNewId(),
     };
@@ -200,7 +225,15 @@ describe('syncFromStick', () => {
 
     await syncFromStick(
       { deviceId: 'stick-01' },
-      { sync: firstStick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+      {
+        sync: firstStick,
+        syncState,
+        uow: stores.uow,
+        farms: farms.farms,
+        sessions: sessions.sessions,
+        clock,
+        newId: makeNewId(),
+      },
     );
 
     const otherStick = makeFakeStick({
@@ -209,7 +242,15 @@ describe('syncFromStick', () => {
 
     const summary = await syncFromStick(
       { deviceId: 'stick-01' },
-      { sync: otherStick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+      {
+        sync: otherStick,
+        syncState,
+        uow: stores.uow,
+        farms: farms.farms,
+        sessions: sessions.sessions,
+        clock,
+        newId: makeNewId(),
+      },
     );
 
     expect(summary.conflicts).toBe(1);
@@ -237,7 +278,15 @@ describe('syncFromStick', () => {
 
     const summary = await syncFromStick(
       { deviceId: 'stick-01' },
-      { sync: stick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+      {
+        sync: stick,
+        syncState,
+        uow: stores.uow,
+        farms: farms.farms,
+        sessions: sessions.sessions,
+        clock,
+        newId: makeNewId(),
+      },
     );
 
     expect(stick.confirmations).toEqual([
@@ -264,7 +313,15 @@ describe('syncFromStick', () => {
     await expect(
       syncFromStick(
         { deviceId: 'stick-01' },
-        { sync: stick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+        {
+          sync: stick,
+          syncState,
+          uow: stores.uow,
+          farms: farms.farms,
+          sessions: sessions.sessions,
+          clock,
+          newId: makeNewId(),
+        },
       ),
     ).rejects.toThrow('se cayó la conexión');
 
@@ -286,11 +343,50 @@ describe('syncFromStick', () => {
 
     const summary = await syncFromStick(
       { deviceId: 'stick-01' },
-      { sync: stick, syncState, uow: stores.uow, clock, newId: makeNewId() },
+      {
+        sync: stick,
+        syncState,
+        uow: stores.uow,
+        farms: farms.farms,
+        sessions: sessions.sessions,
+        clock,
+        newId: makeNewId(),
+      },
     );
 
     expect(summary.errors).toBe(1);
     expect(summary.imported).toBe(1);
     expect(summary.received).toBe(2);
+  });
+
+  it('ubica lo sincronizado en su lote y con la sesión de su configId', async () => {
+    const stores = makeInMemoryStores();
+    const fincas = makeInMemoryFarmStore({ plots: [makePlot({ id: 'lote-1' })] });
+    const sesiones = makeInMemorySessionStore([
+      makeSession({ id: 'sesion-7', configId: 7, plotId: 'lote-1' }),
+    ]);
+    const stick = makeFakeStick({
+      chunks: [{ records: [makeLine({ idRegistro: 1 })], lastSequence: 1 }],
+    });
+
+    await syncFromStick(
+      { deviceId: 'stick-01' },
+      {
+        sync: stick,
+        syncState: makeFakeSyncState(),
+        uow: stores.uow,
+        farms: fincas.farms,
+        sessions: sesiones.sessions,
+        clock,
+        newId: makeNewId(),
+      },
+    );
+
+    const [medicion] = await stores.measurements.list();
+    const captura = await stores.captures.findByDeviceSequence('stick-01', 1);
+
+    expect(medicion?.plotId).toBe('lote-1');
+    expect(medicion?.sessionId).toBe('sesion-7');
+    expect(captura?.plotId).toBe('lote-1');
   });
 });

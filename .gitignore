@@ -39,6 +39,17 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
+# fixture del pincho de mapa: pesa 23,5 MB y no entra al repositorio
+# (`.easignore` lo vuelve a incluir para que el build de EAS lo lleve al APK)
+assets/maps/prueba.pmtiles
+
+# binario de pmtiles que descarga el script de mapas (herramienta de construcción)
+scripts/map/.bin/
+
+# paquete detallado de una zona: se genera aparte y se importa al teléfono
+assets/maps/detalle.pmtiles
+assets/maps/quindio.pmtiles
+
 # debug
 npm-debug.*
 yarn-debug.*
@@ -73,3 +84,6 @@ coverage/
 # macOS
 .DS_Store
 *.pem
+
+# bocetos del compañero visual (locales)
+.superpowers/

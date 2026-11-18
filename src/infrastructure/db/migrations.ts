@@ -170,6 +170,21 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+  {
+    version: 5,
+    sql: `
+      ALTER TABLE measurements ADD COLUMN position_valid INTEGER;
+
+      CREATE TABLE map_packages (
+        id TEXT PRIMARY KEY,
+        file_name TEXT NOT NULL,
+        path TEXT NOT NULL,
+        size_bytes INTEGER NOT NULL,
+        imported_at TEXT NOT NULL,
+        deleted_at TEXT
+      );
+    `,
+  },
 ];
 
 /** Migraciones que faltan aplicar, dada la última versión registrada. */

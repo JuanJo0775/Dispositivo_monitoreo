@@ -48,6 +48,51 @@ describe('ingestCapture', () => {
     expect(measurement?.invalidReasons).toContain('humidity_out_of_range');
   });
 
+  it('guarda la bandera de posición de la captura sin duplicar la posición', async () => {
+    const stores = makeInMemoryStores();
+
+    await ingestCapture(
+      {
+        capture: makeCapture({ latitude: 4.5339, longitude: -75.6811 }, { positionValid: false }),
+        plotId: 'plot-1',
+      },
+      { uow: stores.uow, clock, newId: () => 'm-1' },
+    );
+
+    const [measurement] = await stores.measurements.list();
+
+    expect(measurement?.positionValid).toBe(false);
+    // La posición es una sola verdad: vive en el payload, no en un campo aparte.
+    expect(measurement?.payload.latitude).toBe(4.5339);
+  });
+
+  it('deja la sesión nula cuando el bastón no tenía sesión', async () => {
+    const stores = makeInMemoryStores();
+
+    await ingestCapture(
+      { capture: makeCapture(), plotId: 'plot-1' },
+      { uow: stores.uow, clock, newId: () => 'm-1' },
+    );
+
+    const [measurement] = await stores.measurements.list();
+
+    expect(measurement?.sessionId).toBeNull();
+  });
+
+  it('guarda la sesión con la que se capturó', async () => {
+    const stores = makeInMemoryStores();
+
+    await ingestCapture(
+      { capture: makeCapture(), plotId: 'plot-1', sessionId: 'sesion-7' },
+      { uow: stores.uow, clock, newId: () => 'm-1' },
+    );
+
+    const [measurement] = await stores.measurements.list();
+
+    expect(measurement?.sessionId).toBe('sesion-7');
+    expect(measurement?.plotId).toBe('plot-1');
+  });
+
   it('no confirma al bastón si la escritura falla', async () => {
     const stores = makeInMemoryStores({ failMeasurementInsert: true });
     const confirm = jest.fn(async () => {});

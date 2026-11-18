@@ -16,6 +16,16 @@ const dateTimeFormatter = new Intl.DateTimeFormat('es-CO', {
   hour12: false,
 });
 
+const areaFormatter = new Intl.NumberFormat('es-CO', {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 2,
+});
+
+const coordinateFormatter = new Intl.NumberFormat('es-CO', {
+  maximumFractionDigits: 5,
+  minimumFractionDigits: 5,
+});
+
 /** Formatea un número con separador decimal de Colombia. */
 export function formatNumber(value: number): string {
   return numberFormatter.format(value);
@@ -38,4 +48,27 @@ export function formatMeasure(value: number | null, unit: string): string {
  */
 export function formatDateTimeLocal(isoUtc: string): string {
   return dateTimeFormatter.format(new Date(isoUtc));
+}
+
+/** Formatea un área en hectáreas con dos decimales. */
+export function formatArea(areaHa: number): string {
+  return `${areaFormatter.format(areaHa)} ha`;
+}
+
+/** Formatea una coordenada en grados decimales, con la coma de Colombia. */
+export function formatCoordinate(value: number): string {
+  return coordinateFormatter.format(value);
+}
+
+/** Formatea un tamaño de archivo en la unidad que le corresponde. */
+export function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) {
+    return `${formatNumber(bytes / (1024 * 1024))} MB`;
+  }
+
+  if (bytes >= 1024) {
+    return `${formatNumber(bytes / 1024)} KB`;
+  }
+
+  return `${bytes} B`;
 }

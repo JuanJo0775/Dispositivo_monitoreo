@@ -32,17 +32,24 @@ app/                              Rutas de expo-router. Una pantalla por archivo
   index.tsx
   connect.tsx                     Estado del bastón y emparejamiento. (corte 2)
   measure.tsx                     (corte 0)
-  history.tsx                     (corte 0)
+  history.tsx                     Historial; muestra el lote y permite asignarlo. (corte 3)
   sync.tsx                        Sincronización por microSD y CSV. (corte 2)
   farms.tsx                       Fincas y lotes. (corte 1)
   farm-form.tsx                   Alta y edición de finca. (corte 1)
   plot-form.tsx                   Alta y edición de lote. (corte 1)
   session.tsx                     Configuración de sesión. (corte 1)
   diagnosis.tsx                   Resultado del diagnóstico. (corte 1)
+  map.tsx                         Mapa del lote: malla, celdas y puntos. (corte 3)
+  map-packages.tsx                Paquetes de mapa offline. (corte 3)
+  map-spike.tsx                   Pincho temporal del mapa; se borra al confirmar en teléfono.
   settings.tsx                    Ajustes mínimos. (corte 1)
   privacy.tsx                     Aviso de privacidad. (corte 1)
 
+scripts/map/                      Herramientas de construcción, no código de la app.
+  extract-pmtiles.mjs             Genera un .pmtiles desde un build de Protomaps.
+
 assets/thresholds/                Sets de umbrales versionados (datos, no código).
+assets/maps/                      Paquetes .pmtiles; base.pmtiles va en el APK. (corte 3)
 
 src/
   shared/                         Sin dependencias externas.
@@ -72,12 +79,20 @@ src/
       frame.ts                    Tramas, CRC-16 y opcodes.
       record-codec.ts             Códec del registro (línea CSV).
       encryption.ts               Sobre XChaCha20-Poly1305.
+    geo/                          Malla y posición. (corte 3)
+      types.ts                    LatLon, caja local y punto proyectado.
+      projection.ts               Proyección local y caja envolvente.
+      grid.ts                     Malla automática sobre el área medida.
+      cell-verdict.ts             Dictamen por celda, sin promediar clases.
+      position.ts                 Posición del bastón y calidad por HDOP.
     calibration/                  Calibración individual. (corte 4)
 
   application/                    Casos de uso, uno por intención.
     capture/
       ingest-capture.ts
       list-measurements.ts
+      resolve-capture-assignment.ts   Lote y sesión de una captura. (corte 3)
+      backfill-measurement-context.ts Rellena lote y sesión vacíos al arrancar. (corte 3)
     export/
       export-csv.ts
       csv-file-name.ts            Nombre del archivo, en UTC.
@@ -97,12 +112,17 @@ src/
       sync-from-stick.ts
       import-csv.ts
       ingest-synced-records.ts
+    map/                          (corte 3)
+      describe-plot-space.ts      Malla, celdas, puntos, conteos y alertas.
+      ensure-plot-diagnoses.ts    Completa diagnósticos antes de dibujar.
+      manage-map-packages.ts      Importar, activar y borrar paquetes.
 
   ports/                          Interfaces de salida.
     stick-gateway.ts
     ble-transport.ts              Puerto de transporte BLE. (corte 2)
     clock.ts
     random-bytes.ts               Bytes aleatorios para el cifrado. (corte 2)
+    map-package-files.ts          Disco de los paquetes de mapa. (corte 3)
     stores/
       capture-store.ts
       measurement-store.ts
@@ -112,6 +132,7 @@ src/
       diagnosis-store.ts
       settings-store.ts
       sync-state-store.ts          (corte 2)
+      map-package-store.ts         (corte 3)
 
   infrastructure/                 Adaptadores concretos.
     ble/
@@ -133,15 +154,27 @@ src/
     files/
       csv-share.ts
     maps/                         (corte 3)
+      pmtiles-archive-store.ts    URI local del paquete incluido y del importado.
+      map-style.ts                Estilo MapLibre con las dos fuentes vectoriales.
+      expo-map-package-files.ts   Copia, espacio libre y borrado de paquetes.
 
   ui/                             Componentes, hooks, proveedores y tiendas.
+    labels.ts                     Etiquetas de clases, variables y roles.
     components/
-      history-list.tsx
+      history-list.tsx            Lista de mediciones; muestra el lote.
       primary-button.tsx
-      diagnosis-card.tsx           Resultado de un diagnóstico.
-      field.tsx                    Campo de formulario con etiqueta.
-      plot-picker.tsx              Selector de lote.
-      sync-status.tsx              Resumen de la sincronización, en texto. (corte 2)
+      diagnosis-card.tsx          Resultado de un diagnóstico.
+      field.tsx                   Campo de formulario con etiqueta.
+      plot-picker.tsx             Selector de lote.
+      sync-status.tsx             Resumen de la sincronización, en texto. (corte 2)
+      map/                        (corte 3)
+        plot-map.tsx              MapLibre con celdas y puntos.
+        fallback-map.tsx          Dibujo sin teselas.
+        map-colors.ts             Colores y etiquetas por clase.
+        map-geometry.ts           GeoJSON y caja con relleno.
+        map-legend.tsx            Leyenda, incluido «sin dato».
+        cell-sheet.tsx            Detalle de la celda tocada.
+        point-list.tsx            Puntos documentados.
     hooks/
       use-stick-status.ts         Suscripción al bastón sin renders en cascada.
     providers/
@@ -151,21 +184,25 @@ src/
 
 assets/                           Íconos, splash y teselas.
   thresholds/                     Sets de umbrales versionados.
+  maps/                           Paquetes .pmtiles; ver assets/maps/README.md.
 
 tests/                            Espejo exacto de src/ y app/.
   domain/capture/
   domain/diagnosis/
   domain/farm/
+  domain/geo/
   application/capture/
   application/export/
   application/farm/
   application/session/
   application/diagnosis/
   application/settings/
+  application/map/
   infrastructure/ble/
   infrastructure/db/
+  infrastructure/maps/
   infrastructure/thresholds/
-  integration/                    Flujos de punta a punta: simulador → base → CSV.
+  integration/                    Flujos de punta a punta: simulador → base → CSV → mapa.
   ui/
   helpers/                        Factories compartidas (captures, measurements, almacenes).
 
@@ -200,6 +237,8 @@ docs/
 4. ¿Es una interfaz que otro implementa? → `src/ports/`.
 5. ¿Es una pantalla o un componente? → `app/` o `src/ui/`.
 6. ¿No tiene dependencias y lo usan varias capas? → `src/shared/`.
+7. ¿Es una herramienta de construcción (generar un paquete de mapa, preparar un fixture)? →
+   `scripts/`. No se importa desde `src/` ni desde la app.
 
 ## Pruebas
 

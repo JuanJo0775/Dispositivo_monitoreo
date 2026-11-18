@@ -58,6 +58,9 @@ function makeDeps() {
     async get() {
       return null;
     },
+    async setPlotId() {},
+    async setSessionId() {},
+    async setPositionValid() {},
   };
 
   return {

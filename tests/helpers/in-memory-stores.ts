@@ -35,7 +35,20 @@ export function makeInMemoryStores(options: InMemoryStoresOptions = {}): InMemor
         captureRows.find((row) => row.deviceId === deviceId && row.sequence === sequence) ?? null
       );
     },
+    async listAll() {
+      return [...captureRows];
+    },
+    async setPlotId(deviceId, sequence, plotId) {
+      captureRows = captureRows.map((row) =>
+        row.deviceId === deviceId && row.sequence === sequence ? { ...row, plotId } : row,
+      );
+    },
   };
+
+  /** Reemplaza los campos indicados de una medición ya guardada. */
+  function updateMeasurement(id: string, patch: Partial<Measurement>): void {
+    measurementRows = measurementRows.map((row) => (row.id === id ? { ...row, ...patch } : row));
+  }
 
   const measurements: MeasurementStore = {
     async insert(measurement) {
@@ -54,6 +67,15 @@ export function makeInMemoryStores(options: InMemoryStoresOptions = {}): InMemor
     },
     async get(id) {
       return measurementRows.find((measurement) => measurement.id === id) ?? null;
+    },
+    async setPlotId(id, plotId) {
+      updateMeasurement(id, { plotId });
+    },
+    async setSessionId(id, sessionId) {
+      updateMeasurement(id, { sessionId });
+    },
+    async setPositionValid(id, positionValid) {
+      updateMeasurement(id, { positionValid });
     },
   };
 

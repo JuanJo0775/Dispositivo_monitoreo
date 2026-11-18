@@ -4,6 +4,8 @@ import {
   type SyncCounters,
 } from '@/application/sync/ingest-synced-records';
 import type { StickSync } from '@/ports/stick-sync';
+import type { FarmStore } from '@/ports/stores/farm-store';
+import type { SessionStore } from '@/ports/stores/session-store';
 import type { SyncStateStore } from '@/ports/stores/sync-state-store';
 import type { UnitOfWork } from '@/ports/stores/unit-of-work';
 
@@ -23,6 +25,10 @@ export interface SyncFromStickDeps {
   /** El estado de sincronización, para reanudar y para mostrar el progreso. */
   readonly syncState: SyncStateStore;
   readonly uow: UnitOfWork;
+  /** Fincas y lotes, para asignar el lote de cada registro. */
+  readonly farms: FarmStore;
+  /** Sesiones guardadas, para resolver la sesión de cada registro. */
+  readonly sessions: SessionStore;
   readonly clock: () => string;
   readonly newId: () => string;
 }
@@ -69,7 +75,13 @@ export async function syncFromStick(
 
         const outcome = await ingestSyncedRecord(
           { line, deviceId, origin: 'stick' },
-          { uow: deps.uow, clock: deps.clock, newId: deps.newId },
+          {
+            uow: deps.uow,
+            farms: deps.farms,
+            sessions: deps.sessions,
+            clock: deps.clock,
+            newId: deps.newId,
+          },
         );
 
         countOutcome(counters, outcome);

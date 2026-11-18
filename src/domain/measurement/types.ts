@@ -6,7 +6,16 @@ export interface Measurement {
   /** Clave de la captura de origen: `deviceId:sequence`. */
   readonly captureId: string;
   readonly plotId: string | null;
+  /** Sesión resuelta por la ingesta; `null` mientras nadie la haya resuelto. */
+  readonly sessionId: string | null;
   readonly payload: CapturePayload;
+  /**
+   * Bandera de posición del bastón.
+   *
+   * No se reconstruye de las coordenadas: `false` significa "sin posición"
+   * aunque el payload traiga latitud y longitud.
+   */
+  readonly positionValid: boolean;
   readonly capturedAtUtc: string;
   readonly valid: boolean;
   readonly invalidReasons: readonly string[];

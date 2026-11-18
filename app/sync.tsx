@@ -76,6 +76,8 @@ export default function SyncScreen() {
           sync,
           syncState: stores.syncState,
           uow,
+          farms: stores.farms,
+          sessions: stores.sessions,
           clock: () => new Date().toISOString(),
           newId: makeMeasurementIds(deviceId),
         },
@@ -123,6 +125,8 @@ export default function SyncScreen() {
       const contenido = await new File(archivo.uri).text();
       const resultado = await importCsvFromStick(contenido, {
         uow,
+        farms: stores.farms,
+        sessions: stores.sessions,
         clock: () => new Date().toISOString(),
         newId: makeMeasurementIds(deviceId),
       });

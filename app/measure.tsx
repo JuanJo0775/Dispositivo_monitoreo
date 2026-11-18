@@ -3,10 +3,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { diagnoseMeasurement } from '@/application/diagnosis/diagnose-measurement';
 import { ingestCapture } from '@/application/capture/ingest-capture';
+import {
+  resolveCaptureAssignment,
+  type CaptureAssignment,
+} from '@/application/capture/resolve-capture-assignment';
 import type { RawCapture } from '@/domain/capture/types';
 import type { DiagnosisResult } from '@/domain/diagnosis/types';
 import type { Measurement } from '@/domain/measurement/types';
-import type { Session } from '@/ports/stores/session-store';
 import { useStickStatus } from '@/ui/hooks/use-stick-status';
 import { PrimaryButton } from '@/ui/components/primary-button';
 import { classesToText } from '@/ui/components/diagnosis-card';
@@ -21,35 +24,37 @@ export default function MeasureScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /** Sesión con la que se capturó: la del bastón o la última del lote. */
-  const findSession = useCallback(
-    async (capture: RawCapture): Promise<Session | null> => {
-      if (capture.configId > 0) {
-        return stores.sessions.findByConfigId(capture.configId);
-      }
-
-      if (capture.plotId !== null) {
-        const sessions = await stores.sessions.listByPlot(capture.plotId);
-
-        return sessions[0] ?? null;
-      }
-
-      return null;
-    },
+  /**
+   * Lote y sesión de la captura, resueltos ANTES de guardarla.
+   *
+   * La sesión se reutiliza para el diagnóstico: así el punto y su dictamen
+   * llevan el mismo contexto, el que el bastón tenía al capturar.
+   */
+  const resolveAssignment = useCallback(
+    async (capture: RawCapture): Promise<CaptureAssignment> =>
+      resolveCaptureAssignment(
+        {
+          plotCode: capture.payload.plotCode,
+          configId: capture.configId,
+          fallbackPlotId: capture.plotId,
+        },
+        { farms: stores.farms, sessions: stores.sessions },
+      ),
     [stores],
   );
 
   /** Diagnóstico de la medición recién guardada; sin sesión no hay diagnóstico. */
   const diagnoseCapture = useCallback(
     async (
-      capture: RawCapture,
       measurement: Measurement | null,
+      assignment: CaptureAssignment,
     ): Promise<DiagnosisResult | null> => {
       if (measurement === null) {
         return null;
       }
 
-      const session = await findSession(capture);
+      const session =
+        assignment.sessionId === null ? null : await stores.sessions.get(assignment.sessionId);
 
       return diagnoseMeasurement(
         { measurement, session },
@@ -64,17 +69,20 @@ export default function MeasureScreen() {
         },
       );
     },
-    [findSession, stores, thresholds],
+    [stores, thresholds],
   );
 
   useEffect(() => {
     const unsubscribeCapture = gateway.onCapture((capture) => {
       void (async () => {
         try {
+          const assignment = await resolveAssignment(capture);
+
           const result = await ingestCapture(
             {
               capture,
-              plotId: capture.plotId,
+              plotId: assignment.plotId,
+              sessionId: assignment.sessionId,
               confirm: (sequence) => gateway.confirm(sequence),
             },
             {
@@ -89,7 +97,7 @@ export default function MeasureScreen() {
             setLastMeasurement(measurement);
 
             try {
-              setDiagnosis(await diagnoseCapture(capture, measurement));
+              setDiagnosis(await diagnoseCapture(measurement, assignment));
             } catch (diagnosisError) {
               setDiagnosis(null);
               setError(
@@ -110,7 +118,7 @@ export default function MeasureScreen() {
     return () => {
       unsubscribeCapture();
     };
-  }, [diagnoseCapture, gateway, stores, uow]);
+  }, [diagnoseCapture, gateway, resolveAssignment, stores, uow]);
 
   async function handleCapture(): Promise<void> {
     setBusy(true);

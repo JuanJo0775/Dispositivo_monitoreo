@@ -1,9 +1,15 @@
 import { importCsvFromStick } from '@/application/sync/import-csv';
 import { encodeRecord, RECORD_HEADERS, type StickRecord } from '@/domain/protocol/record-codec';
 
+import { makeInMemoryFarmStore } from '../../helpers/in-memory-farm-store';
+import { makeInMemorySessionStore } from '../../helpers/in-memory-session-store';
 import { makeInMemoryStores } from '../../helpers/in-memory-stores';
 
 const clock = () => '2026-11-12T12:00:00Z';
+
+/** Fincas y sesiones vacías: la asignación de lote no interviene en estas pruebas. */
+const farms = makeInMemoryFarmStore();
+const sessions = makeInMemorySessionStore();
 
 /** Banderas del contrato: posición, fix reciente, sonda y hora válida. */
 const FLAGS_OK = 23;
@@ -64,6 +70,8 @@ describe('importCsvFromStick', () => {
 
     const summary = await importCsvFromStick(contents, {
       uow: stores.uow,
+      farms: farms.farms,
+      sessions: sessions.sessions,
       clock,
       newId: makeNewId(),
     });
@@ -90,7 +98,13 @@ describe('importCsvFromStick', () => {
     const stores = makeInMemoryStores();
     const line = encodeRecord(makeRecord({ idRegistro: 1 }));
     const contents = makeCsv([line, line]);
-    const deps = { uow: stores.uow, clock, newId: makeNewId() };
+    const deps = {
+      uow: stores.uow,
+      farms: farms.farms,
+      sessions: sessions.sessions,
+      clock,
+      newId: makeNewId(),
+    };
 
     const summary = await importCsvFromStick(contents, deps);
 
@@ -102,7 +116,13 @@ describe('importCsvFromStick', () => {
 
   it('avisa el conflicto con el mismo id y distinto contenido y conserva el primero', async () => {
     const stores = makeInMemoryStores();
-    const deps = { uow: stores.uow, clock, newId: makeNewId() };
+    const deps = {
+      uow: stores.uow,
+      farms: farms.farms,
+      sessions: sessions.sessions,
+      clock,
+      newId: makeNewId(),
+    };
 
     await importCsvFromStick(
       makeCsv([encodeRecord(makeRecord({ idRegistro: 1, humedadPct: 38 }))]),
@@ -133,6 +153,8 @@ describe('importCsvFromStick', () => {
 
     const summary = await importCsvFromStick(contents, {
       uow: stores.uow,
+      farms: farms.farms,
+      sessions: sessions.sessions,
       clock,
       newId: makeNewId(),
     });
@@ -148,6 +170,8 @@ describe('importCsvFromStick', () => {
 
     const summary = await importCsvFromStick('', {
       uow: stores.uow,
+      farms: farms.farms,
+      sessions: sessions.sessions,
       clock,
       newId: makeNewId(),
     });

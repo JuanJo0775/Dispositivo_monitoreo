@@ -1,0 +1,92 @@
+# >>> harness (managed by harness init)
+.harness/profile.json
+.harness/verify.json
+.harness/task.md
+.harness/proposals/
+.harness/handoffs/
+.harness/review.diff
+# <<< harness
+
+# Arnés de ingeniería y sus agentes: son herramientas locales de desarrollo,
+# no forman parte de la app. El repositorio publica solo el producto.
+.harness/
+.claude/
+.opencode/
+opencode.json
+AGENTS.md
+CLAUDE.md
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/android
+/ios
+
+# Metro
+.metro-health-check*
+
+# fixture del pincho de mapa: pesa 23,5 MB y no entra al repositorio
+# (`.easignore` lo vuelve a incluir para que el build de EAS lo lleve al APK)
+assets/maps/prueba.pmtiles
+
+# herramientas de construcción y paquetes de zonas: no viajan en el APK
+scripts/map/.bin/
+assets/maps/detalle.pmtiles
+assets/maps/quindio.pmtiles
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# secrets
+secrets/
+*.keystore
+
+# logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# editors
+.idea/
+.vscode/
+.claude/settings.local.json
+
+# typescript
+*.tsbuildinfo
+
+# test output
+coverage/
+
+# macOS
+.DS_Store
+*.pem
+
+# bocetos del compañero visual (locales)
+.superpowers/
+
+# EAS Build sube el proyecto con estas reglas en lugar de las de .gitignore.
+# El archivo de prueba del pincho de mapa no se versiona, pero el APK lo necesita:
+# se incluye a mano para que llegue al build.
+!assets/maps/prueba.pmtiles

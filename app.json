@@ -23,7 +23,13 @@
       },
       "predictiveBackGestureEnabled": false
     },
-    "plugins": ["expo-router", "expo-sqlite", "expo-sharing"],
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-sharing",
+      "@maplibre/maplibre-react-native",
+      "./plugins/with-map-assets"
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }

@@ -51,6 +51,8 @@ describe('flujo de la microSD sobre SQLite real', () => {
     const stores = createSqliteStores(db);
     const resumen = await importCsvFromStick([ENCABEZADO, REGISTRO_1, REGISTRO_2].join('\n'), {
       uow: stores.uow,
+      farms: stores.farms,
+      sessions: stores.sessions,
       clock: () => '2026-11-12T17:10:00Z',
       newId: makeIds(),
     });
@@ -70,6 +72,8 @@ describe('flujo de la microSD sobre SQLite real', () => {
     const archivo = [ENCABEZADO, REGISTRO_1, REGISTRO_2].join('\n');
     const deps = {
       uow: stores.uow,
+      farms: stores.farms,
+      sessions: stores.sessions,
       clock: () => '2026-11-12T17:10:00Z',
       newId: makeIds(),
     };
@@ -86,6 +90,8 @@ describe('flujo de la microSD sobre SQLite real', () => {
     const stores = createSqliteStores(db);
     const deps = {
       uow: stores.uow,
+      farms: stores.farms,
+      sessions: stores.sessions,
       clock: () => '2026-11-12T17:10:00Z',
       newId: makeIds(),
     };

@@ -20,6 +20,8 @@ export default function RootLayout() {
         <Stack.Screen name="sync" options={{ title: 'Sincronizar' }} />
         <Stack.Screen name="measure" options={{ title: 'Medir' }} />
         <Stack.Screen name="history" options={{ title: 'Historial' }} />
+        <Stack.Screen name="map" options={{ title: 'Mapa del lote' }} />
+        <Stack.Screen name="map-packages" options={{ title: 'Paquetes de mapa' }} />
         <Stack.Screen name="farms" options={{ title: 'Fincas y lotes' }} />
         <Stack.Screen name="farm-form" options={{ title: 'Finca' }} />
         <Stack.Screen name="plot-form" options={{ title: 'Lote' }} />
@@ -27,6 +29,7 @@ export default function RootLayout() {
         <Stack.Screen name="diagnosis" options={{ title: 'Diagnóstico' }} />
         <Stack.Screen name="settings" options={{ title: 'Ajustes' }} />
         <Stack.Screen name="privacy" options={{ title: 'Aviso de privacidad' }} />
+        <Stack.Screen name="map-spike" options={{ title: 'Pincho de mapa' }} />
       </Stack>
     </AppProvider>
   );
