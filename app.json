@@ -2,17 +2,12 @@
   "expo": {
     "name": "Monitoreo de suelo",
     "slug": "monitoreo-suelo",
+    "owner": "juanjo_38",
     "version": "0.1.0",
     "orientation": "portrait",
     "scheme": "monitoreosuelo",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#E6F4FE"
-    },
     "android": {
       "package": "com.semillero.monitoreosuelo",
       "adaptiveIcon": {
@@ -28,10 +23,24 @@
       "expo-sqlite",
       "expo-sharing",
       "@maplibre/maplibre-react-native",
-      "./plugins/with-map-assets"
+      "./plugins/with-map-assets",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#E6F4FE"
+        }
+      ]
     ],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "84fc947c-6e0e-4ce9-9483-7d5d8fd9ee25"
+      }
     }
   }
 }
