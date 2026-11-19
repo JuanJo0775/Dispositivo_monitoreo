@@ -84,10 +84,28 @@ En la web de EAS, para este repositorio:
 - **Expo Submit:** desactivado; todavía no hay cuenta de tienda ni perfil de envío.
 
 El perfil `production` produce un **AAB** para Google Play, con incremento automático de versión; no se
-instala directamente en el teléfono y no debe usarse mientras siga el pincho del mapa.
+instala directamente en el teléfono.
 
-Credenciales: en **Credentials → Android** hay que generar un keystore («Generate new keystore»). EAS
-lo guarda; si se pierde, no se pueden publicar actualizaciones que instalen encima de la app existente.
+Credenciales: el keystore de Android ya está generado y guardado en EAS (alias `monitoreo`). La copia
+local y la contraseña están fuera del repositorio, en `monitoreo-credenciales`. Si se pierde, no se
+pueden publicar actualizaciones que instalen encima de la app existente.
+
+## Actualizaciones (EAS Update)
+
+`expo-updates` está configurado con `runtimeVersion` por `appVersion`: una actualización solo se aplica
+a la misma versión nativa de la app.
+
+- Mientras el producto está en desarrollo, `main` publica al canal **`preview`**, que es el que escucha
+  el APK de prueba. Cuando salga la versión, el push a `main` pasa a `production` cambiando una línea
+  del flujo; los dos canales no se mezclan.
+- GitHub Actions (`.github/workflows/eas-update.yml`) corre `npm run check` y publica con
+  `eas update --channel … --auto`. El secreto `EXPO_TOKEN` ya está cargado en el repositorio.
+- Publicar a mano: `npx eas-cli update --channel preview --auto` (solo Node; no hace falta Android SDK).
+  En el equipo local el token va en `.env`; en CI va como secreto.
+- Viaja JavaScript y assets (imágenes, el `.pmtiles` incluido). Lo nativo —SDK, permisos, MapLibre,
+  BLE— sigue exigiendo un build de EAS.
+- Si el teléfono no tiene internet, arranca con la versión que ya tiene: la actualización nunca
+  bloquea el trabajo de campo.
 
 ## Publicación del código
 
