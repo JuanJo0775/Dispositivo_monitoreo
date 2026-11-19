@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { AppProvider } from '@/ui/providers/app-provider';
+import { colors } from '@/ui/theme';
 
 export default function RootLayout() {
   return (
@@ -9,10 +10,10 @@ export default function RootLayout() {
       <StatusBar style="light" />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: '#1B4332' },
-          headerTintColor: '#FFFFFF',
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.textOnDark,
           headerTitleStyle: { fontWeight: '600' },
-          contentStyle: { backgroundColor: '#F7F7F2' },
+          contentStyle: { backgroundColor: colors.background },
         }}
       >
         <Stack.Screen name="index" options={{ title: 'Monitoreo de suelo' }} />

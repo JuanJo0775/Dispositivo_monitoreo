@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     maxHeight: 420,
   },
   header: {
@@ -196,11 +196,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   subtitle: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   close: {
     minHeight: 44,
@@ -213,15 +213,15 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   area: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   reason: {
     fontSize: 14,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   groups: {
     flexDirection: 'row',
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
   },
   group: {
     fontSize: 14,
-    color: '#1F1F1F',
-    backgroundColor: '#F2F0E9',
+    color: '#2D3733',
+    backgroundColor: '#F3ECE2',
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -242,16 +242,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
     marginTop: 4,
   },
   summaryRow: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   empty: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   list: {
     maxHeight: 160,
@@ -265,14 +265,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#EEF0EA',
   },
   measurementPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   measurementTime: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   measurementState: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
 });

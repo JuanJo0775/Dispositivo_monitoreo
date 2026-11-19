@@ -1,10 +1,12 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
+import { colors, radius } from '@/ui/theme';
+
 export interface PrimaryButtonProps {
   label: string;
   onPress: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
 }
 
 /** Botón grande, legible bajo luz solar y con zona táctil ≥ 48 dp. */
@@ -16,6 +18,7 @@ export function PrimaryButton({
 }: PrimaryButtonProps) {
   const isPrimary = variant === 'primary';
   const isDanger = variant === 'danger';
+  const isGhost = variant === 'ghost';
 
   return (
     <Pressable
@@ -25,13 +28,20 @@ export function PrimaryButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : isDanger ? styles.danger : styles.secondary,
-        pressed && !disabled && styles.pressed,
+        isPrimary && styles.primary,
+        isDanger && styles.danger,
+        variant === 'secondary' && styles.secondary,
+        isGhost && styles.ghost,
+        pressed && !disabled && (isPrimary || isDanger ? styles.pressedDark : styles.pressedSoft),
         disabled && styles.disabled,
       ]}
     >
       <Text
-        style={[styles.label, isPrimary || isDanger ? styles.primaryLabel : styles.secondaryLabel]}
+        style={[
+          styles.label,
+          isPrimary || isDanger ? styles.onDarkLabel : styles.onLightLabel,
+          isGhost && styles.ghostLabel,
+        ]}
       >
         {label}
       </Text>
@@ -42,7 +52,7 @@ export function PrimaryButton({
 const styles = StyleSheet.create({
   base: {
     minHeight: 48,
-    borderRadius: 12,
+    borderRadius: radius.md,
     paddingHorizontal: 20,
     paddingVertical: 12,
     alignItems: 'center',
@@ -50,31 +60,42 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   primary: {
-    backgroundColor: '#1B4332',
-    borderColor: '#1B4332',
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   secondary: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#1B4332',
+    backgroundColor: colors.surface,
+    borderColor: colors.primary,
+  },
+  ghost: {
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
   danger: {
-    backgroundColor: '#8A3B12',
-    borderColor: '#8A3B12',
+    backgroundColor: colors.danger,
+    borderColor: colors.danger,
   },
-  pressed: {
-    opacity: 0.85,
+  pressedDark: {
+    backgroundColor: colors.primaryPressed,
+    borderColor: colors.primaryPressed,
+  },
+  pressedSoft: {
+    backgroundColor: colors.primarySoft,
   },
   disabled: {
     opacity: 0.45,
   },
   label: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: '700',
   },
-  primaryLabel: {
-    color: '#FFFFFF',
+  onDarkLabel: {
+    color: colors.textOnDark,
   },
-  secondaryLabel: {
-    color: '#1B4332',
+  onLightLabel: {
+    color: colors.primary,
+  },
+  ghostLabel: {
+    color: colors.accent,
   },
 });

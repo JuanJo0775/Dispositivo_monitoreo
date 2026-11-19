@@ -1,7 +1,10 @@
 # Publica una actualización OTA (JavaScript y assets) sin recompilar el APK.
 #
-# - Push a `main`  -> canal `production` (lo que reciben los teléfonos).
+# - Push a `main`  -> canal `preview` mientras el producto está en desarrollo.
 # - Ejecución manual -> permite elegir `preview` o `production`.
+#
+# Cuando el producto salga, el push a `main` pasa a `production` y los teléfonos
+# de los usuarios reciben las mejoras. Ver `docs/context/estado.md`.
 #
 # Requiere el secreto `EXPO_TOKEN` en el repositorio: un token de acceso de
 # expo.dev con permiso sobre el proyecto. Sin él, el paso de publicación falla
@@ -38,7 +41,7 @@ jobs:
     timeout-minutes: 20
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      CANAL: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || 'production' }}
+      CANAL: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || 'preview' }}
     steps:
       - name: Traer el repositorio
         uses: actions/checkout@v4

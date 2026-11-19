@@ -24,6 +24,7 @@ carpeta; una fila sin código todavía queda en `-` a propósito.
 | contexto-proyecto | docs/context/ | ADR-APP-001 | Notion página raíz `40439c4a833b80ab9be5e708777b1497` |
 | decisiones | docs/adr/ | - | ADR-APP-001 a ADR-APP-017 en Notion `collection://dfe39c4a-833b-8315-88ec-07f76cfec317` |
 | diseno | docs/superpowers/specs/ | - | Mapa de pantallas `40439c4a833b819291dfefd7dc545b88` |
+| diseno-visual | docs/design/, src/ui/theme.ts, src/ui/components/ui/ | - | RNF-APP-007, RNF-APP-016 |
 | estructura | docs/architecture/ | - | Este repositorio: dónde vive cada capa y cada área |
 | ciencia-origen | docs/requirements/ | - | Objetivo 1 v2: umbrales, ecuaciones y motor de decisión; `muestreo-espacial-mallas-gradientes.md` |
 

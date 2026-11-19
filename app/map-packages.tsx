@@ -241,20 +241,20 @@ const styles = StyleSheet.create({
   intro: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   error: {
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   message: {
     fontSize: 15,
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
     marginTop: 4,
   },
   card: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -275,16 +275,16 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   cardDetail: {
     fontSize: 13,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   tag: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   actions: {
     flexDirection: 'row',
@@ -297,19 +297,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#1B4332',
+    borderColor: '#0F4B42',
     backgroundColor: '#FFFFFF',
   },
   actionPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   actionText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   note: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
 });

@@ -216,7 +216,7 @@ export default function SyncScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F7F2',
+    backgroundColor: '#F7F1E8',
   },
   content: {
     padding: 16,
@@ -225,45 +225,45 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   subtitle: {
     fontSize: 15,
     lineHeight: 21,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     padding: 16,
     gap: 6,
   },
   label: {
     fontSize: 13,
-    color: '#5A5A5A',
+    color: '#4E5D59',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   detail: {
     fontSize: 15,
-    color: '#2F2F2F',
+    color: '#2D3733',
   },
   actions: {
     gap: 12,
   },
   message: {
     fontSize: 15,
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   error: {
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   note: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
 });

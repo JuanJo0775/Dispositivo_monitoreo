@@ -88,7 +88,7 @@ export default function DiagnosisScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F7F2',
+    backgroundColor: '#F7F1E8',
   },
   content: {
     padding: 16,
@@ -97,22 +97,22 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     padding: 16,
     gap: 6,
   },
   empty: {
     fontSize: 16,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   error: {
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
 });

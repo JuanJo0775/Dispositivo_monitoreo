@@ -34,10 +34,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   value: {
     fontSize: 16,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
 });

@@ -210,26 +210,26 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 16,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   statusValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   note: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   error: {
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     padding: 16,
     gap: 6,
   },
@@ -237,29 +237,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   empty: {
     fontSize: 15,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   date: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   value: {
     fontSize: 16,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   diagnosisClass: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   explanation: {
     fontSize: 15,
     lineHeight: 22,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
 });

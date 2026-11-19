@@ -23,7 +23,7 @@ export const CLASS_COLORS: Record<AptitudeClass, string> = {
 };
 
 /** Celda sin ninguna medición válida: no se colorea por clase. */
-export const NO_DATA_COLOR = '#EDEAE0';
+export const NO_DATA_COLOR = '#E9DFD2';
 
 /** Celda con mediciones que no permiten dar una clase. */
 export const INCONCLUSIVE_COLOR = '#CFCBC0';

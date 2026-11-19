@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     padding: 16,
     gap: 20,
   },
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   classRow: {
     flexDirection: 'row',
@@ -327,34 +327,34 @@ const styles = StyleSheet.create({
   classLabel: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   classCode: {
     fontSize: 14,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   none: {
     fontSize: 16,
-    color: '#8A3B12',
+    color: '#8D321D',
     fontWeight: '600',
   },
   note: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   factorName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   factorValue: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   variableRow: {
     borderTopWidth: 1,
-    borderTopColor: '#EEF1EA',
+    borderTopColor: '#E3EFEA',
     paddingTop: 10,
     gap: 4,
   },
@@ -367,23 +367,23 @@ const styles = StyleSheet.create({
   variableName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   variableRole: {
     fontSize: 13,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   variableValue: {
     fontSize: 18,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   variableBand: {
     fontSize: 14,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   variableNote: {
     fontSize: 13,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   alertRow: {
     gap: 2,
@@ -391,28 +391,28 @@ const styles = StyleSheet.create({
   alertSeverity: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   alertSeverityInfo: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   alertMessage: {
     fontSize: 15,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   evidenceLabel: {
     fontSize: 13,
-    color: '#5A5A5A',
+    color: '#4E5D59',
     marginTop: 6,
   },
   evidenceValue: {
     fontSize: 16,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   evidenceItem: {
     fontSize: 14,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
 });

@@ -152,7 +152,7 @@ export default function SettingsScreen() {
             onValueChange={(value) => {
               void handleTrialMode(value);
             }}
-            trackColor={{ false: '#C9D3C4', true: '#1B4332' }}
+            trackColor={{ false: '#D8CDBC', true: '#0F4B42' }}
             thumbColor="#FFFFFF"
           />
         </View>
@@ -225,7 +225,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F7F2',
+    backgroundColor: '#F7F1E8',
   },
   content: {
     padding: 16,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     padding: 16,
     gap: 6,
   },
@@ -243,16 +243,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   label: {
     fontSize: 16,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   value: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   switchRow: {
     flexDirection: 'row',
@@ -269,28 +269,28 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   confirmBox: {
     gap: 10,
     padding: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E3C3B4',
-    backgroundColor: '#FFF6F1',
+    borderColor: '#D9B7A4',
+    backgroundColor: '#FDF3EA',
   },
   confirmTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   message: {
     fontSize: 15,
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   error: {
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   actions: {
     gap: 12,

@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 16,
-    color: '#4A4A4A',
+    color: '#4E5D59',
     textAlign: 'center',
   },
   row: {
@@ -146,10 +146,10 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 8,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
   },
   rowPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   rowHeader: {
     flexDirection: 'row',
@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
   },
   trial: {
     fontSize: 13,
-    color: '#3F3F3F',
+    color: '#4E5D59',
     fontWeight: '600',
     borderWidth: 1,
-    borderColor: '#C9D3C4',
+    borderColor: '#D8CDBC',
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -175,15 +175,15 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   statusValid: {
     fontSize: 13,
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   statusWarning: {
     fontSize: 13,
-    color: '#8A3B12',
+    color: '#8D321D',
     fontWeight: '600',
   },
   values: {
@@ -196,11 +196,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   value: {
     fontSize: 17,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   plotRow: {
     flexDirection: 'row',
@@ -208,13 +208,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
     borderTopWidth: 1,
-    borderTopColor: '#EEF1EC',
+    borderTopColor: '#E3EFEA',
     paddingTop: 8,
   },
   plot: {
     flexShrink: 1,
     fontSize: 14,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   assign: {
     minHeight: 44,
@@ -222,14 +222,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#1B4332',
+    borderColor: '#0F4B42',
   },
   assignPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   assignText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
 });

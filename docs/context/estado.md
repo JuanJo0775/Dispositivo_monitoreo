@@ -35,6 +35,8 @@ diagnostica, documenta y exporta. La meta es terminar el producto durante 2027.
 - Importación de paquetes validada por firma `PMTiles`, tamaño y espacio libre.
 - Historial con lote por medición y asignación cuando llegó sin lote.
 - Borrado de todos los datos personales desde Ajustes, en una transacción.
+- Sistema de diseño: paleta cálida, tema en `src/ui/theme.ts` y componentes reutilizables
+  (`Card`, `ActionCard`, `Badge`, `SectionHeader`). Ver `docs/design/sistema-de-diseno.md`.
 
 ## Verificación
 

@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   items: {
     flexDirection: 'row',
@@ -129,6 +129,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
 });

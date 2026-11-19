@@ -109,7 +109,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   if (services === null) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#1B4332" />
+        <ActivityIndicator size="large" color="#0F4B42" />
         <Text style={styles.loading}>Preparando la base local…</Text>
       </View>
     );
@@ -125,21 +125,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
     padding: 24,
-    backgroundColor: '#F7F7F2',
+    backgroundColor: '#F7F1E8',
   },
   loading: {
     fontSize: 16,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   errorTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#8A3B12',
+    color: '#8D321D',
     textAlign: 'center',
   },
   errorDetail: {
     fontSize: 15,
-    color: '#3F3F3F',
+    color: '#4E5D59',
     textAlign: 'center',
   },
 });

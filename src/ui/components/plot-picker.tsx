@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 15,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   row: {
     minHeight: 48,
@@ -88,19 +88,19 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     backgroundColor: '#FFFFFF',
   },
   rowSelected: {
     borderWidth: 2,
-    borderColor: '#1B4332',
+    borderColor: '#0F4B42',
   },
   rowPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   name: {
     fontSize: 16,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   text: {
     flexShrink: 1,
@@ -108,15 +108,15 @@ const styles = StyleSheet.create({
   },
   farm: {
     fontSize: 13,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   nameSelected: {
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   tag: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
 });

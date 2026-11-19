@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   actions: {
     paddingHorizontal: 16,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     fontSize: 15,
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   assignPanel: {
     marginHorizontal: 16,
@@ -233,18 +233,18 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     backgroundColor: '#FFFFFF',
   },
   assignTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   assignDetail: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#3F3F3F',
+    color: '#4E5D59',
   },
   assignPicker: {
     maxHeight: 260,
@@ -253,6 +253,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
 });

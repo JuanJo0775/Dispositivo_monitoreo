@@ -504,21 +504,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
   },
   plotName: {
     fontSize: 19,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   headerLine: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   headerNote: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   mapBlock: {
     gap: 8,
@@ -527,19 +527,19 @@ const styles = StyleSheet.create({
     minHeight: 260,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#EDEAE0',
+    backgroundColor: '#E9DFD2',
   },
   notice: {
     gap: 2,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: '#F2F0E9',
+    backgroundColor: '#F3ECE2',
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
   },
   noticeText: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   mapFooter: {
     flexDirection: 'row',
@@ -553,26 +553,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#1B4332',
+    borderColor: '#0F4B42',
     backgroundColor: '#FFFFFF',
   },
   zoomPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   zoomText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   attribution: {
     flexShrink: 1,
     fontSize: 12,
-    color: '#5A5A5A',
+    color: '#4E5D59',
     textAlign: 'right',
   },
   summary: {
     fontSize: 15,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   section: {
     gap: 6,
@@ -581,11 +581,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   sectionEmpty: {
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   alertRow: {
     flexDirection: 'row',
@@ -594,37 +594,37 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
   },
   alertPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   alertCount: {
     minWidth: 20,
     fontSize: 14,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   alertMessage: {
     flexShrink: 1,
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   note: {
     padding: 16,
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   warning: {
     padding: 12,
     fontSize: 14,
-    color: '#8A3B12',
-    backgroundColor: '#FDF1E6',
+    color: '#8D321D',
+    backgroundColor: '#FBEDE0',
     borderRadius: 10,
   },
   error: {
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
   linkButton: {
     minHeight: 44,
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   empty: {
     flex: 1,
@@ -645,12 +645,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
     textAlign: 'center',
   },
   emptyDetail: {
     fontSize: 15,
-    color: '#4A4A4A',
+    color: '#4E5D59',
     textAlign: 'center',
   },
 });

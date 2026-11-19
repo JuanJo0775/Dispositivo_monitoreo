@@ -1,72 +1,121 @@
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { APP_NAME } from '@/shared/app-info';
 import { PrimaryButton } from '@/ui/components/primary-button';
+import { ActionCard } from '@/ui/components/ui/action-card';
+import { Card } from '@/ui/components/ui/card';
+import { SectionHeader } from '@/ui/components/ui/section-header';
+import { colors, palette, radius, spacing, typography } from '@/ui/theme';
 
+/**
+ * Inicio: qué puede hacer la app, sin menús escondidos.
+ *
+ * Primero la acción del día (conectar el bastón), después las cuatro tareas
+ * frecuentes en tarjetas grandes y, al final, la promesa del producto: todo
+ * funciona sin internet.
+ */
 export default function HomeScreen() {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{APP_NAME}</Text>
-      <Text style={styles.subtitle}>
-        Registra el suelo, guarda cada captura y consúltala sin internet.
-      </Text>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <View style={styles.hero}>
+        <Text style={styles.kicker}>{APP_NAME.toUpperCase()}</Text>
+        <Text style={styles.heroTitle}>El suelo de tu lote, medido y documentado</Text>
+        <Text style={styles.heroText}>
+          Cada medición queda guardada en el teléfono con su hora y su posición. Sin cuentas, sin
+          señal y sin depender de un servidor.
+        </Text>
+      </View>
 
-      <View style={styles.actions}>
-        <PrimaryButton label="Conectar bastón" onPress={() => router.push('/connect')} />
-        <PrimaryButton label="Medir" variant="secondary" onPress={() => router.push('/measure')} />
-        <PrimaryButton
-          label="Historial"
-          variant="secondary"
+      <PrimaryButton label="Conectar bastón" onPress={() => router.push('/connect')} />
+
+      <SectionHeader
+        title="Tareas frecuentes"
+        detail="Todo lo que ya está en el teléfono, también en campo."
+      />
+
+      <View style={styles.grid}>
+        <ActionCard
+          title="Medir"
+          detail="Toma una lectura y guárdala con su contexto."
+          accent="accent"
+          onPress={() => router.push('/measure')}
+        />
+        <ActionCard
+          title="Historial"
+          detail="Revisa capturas, diagnósticos y el lote de cada una."
+          accent="wine"
           onPress={() => router.push('/history')}
         />
-        <PrimaryButton
-          label="Mapa del lote"
-          variant="secondary"
+        <ActionCard
+          title="Mapa del lote"
+          detail="Malla, celdas y puntos sobre el mapa incluido."
+          accent="terracotta"
           onPress={() => router.push('/map')}
         />
-        <PrimaryButton
-          label="Sincronizar microSD"
-          variant="secondary"
+        <ActionCard
+          title="Sincronizar microSD"
+          detail="Trae del bastón lo capturado sin conexión."
+          accent="primary"
           onPress={() => router.push('/sync')}
         />
       </View>
 
-      <Text style={styles.note}>
-        Todo funciona sin internet: el bastón guarda cada medición y la app la conserva en el
-        teléfono. El mapa se arma con las coordenadas del GPS del bastón.
-      </Text>
-    </View>
+      <Card muted accent="primary">
+        <Text style={styles.noteTitle}>Funciona sin internet</Text>
+        <Text style={styles.note}>
+          El bastón guarda cada medición y la app la conserva en el teléfono. El mapa se arma con
+          las coordenadas del GPS del bastón y el paquete de mapas viaja dentro de la app.
+        </Text>
+      </Card>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    gap: 16,
+    backgroundColor: colors.background,
   },
-  title: {
-    fontSize: 26,
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
+    gap: spacing.lg,
+  },
+  hero: {
+    gap: spacing.sm,
+    padding: spacing.xl,
+    paddingBottom: spacing.xl + spacing.xs,
+    borderRadius: radius.xl,
+    backgroundColor: palette.forest950,
+  },
+  kicker: {
+    fontSize: 12,
+    lineHeight: 16,
     fontWeight: '700',
-    color: '#1B4332',
+    letterSpacing: 1.4,
+    color: palette.forest300,
   },
-  subtitle: {
-    fontSize: 16,
-    lineHeight: 22,
-    color: '#3F3F3F',
+  heroTitle: {
+    ...typography.display,
+    color: colors.textOnDark,
   },
-  actions: {
-    gap: 12,
-    marginTop: 8,
+  heroText: {
+    ...typography.subtitle,
+    color: colors.textOnDarkMuted,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  noteTitle: {
+    ...typography.label,
+    color: colors.primary,
   },
   note: {
-    marginTop: 'auto',
-    marginBottom: 24,
-    fontSize: 13,
-    color: '#5A5A5A',
+    ...typography.caption,
   },
 });

@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     padding: 16,
     gap: 12,
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontSize: 19,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   plots: {
     gap: 8,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     gap: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
     paddingRight: 12,
   },
   plotMain: {
@@ -222,15 +222,15 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   pressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   plotName: {
     fontSize: 16,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   plotDetail: {
     fontSize: 13,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   link: {
     minHeight: 48,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   empty: {
     flex: 1,
@@ -253,28 +253,28 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
+    color: '#0F4B42',
     textAlign: 'center',
   },
   emptyDetail: {
     fontSize: 15,
-    color: '#4A4A4A',
+    color: '#4E5D59',
     textAlign: 'center',
   },
   emptyPlots: {
     fontSize: 15,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   note: {
     paddingHorizontal: 16,
     paddingTop: 12,
     fontSize: 14,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   error: {
     paddingHorizontal: 16,
     paddingTop: 8,
     fontSize: 15,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
 });

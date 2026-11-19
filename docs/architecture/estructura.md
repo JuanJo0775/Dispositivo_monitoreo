@@ -115,12 +115,14 @@ src/
       describe-plot-space.ts      Malla, celdas, puntos, conteos y alertas.
       ensure-plot-diagnoses.ts    Completa diagnósticos antes de dibujar.
       manage-map-packages.ts      Importar, activar y borrar paquetes.
+      prepare-base-map.ts         Deja el mapa incluido como archivo y arma su URI.
 
   ports/                          Interfaces de salida.
     stick-gateway.ts
     ble-transport.ts              Puerto de transporte BLE. (corte 2)
     clock.ts
     random-bytes.ts               Bytes aleatorios para el cifrado. (corte 2)
+    base-map.ts                   Paquete de mapa incluido que viaja con la app. (corte 3)
     map-package-files.ts          Disco de los paquetes de mapa. (corte 3)
     stores/
       capture-store.ts
@@ -153,12 +155,14 @@ src/
     files/
       csv-share.ts
     maps/                         (corte 3)
-      pmtiles-archive-store.ts    URI local del paquete incluido y del importado.
+      expo-base-map.ts            Extrae el paquete incluido con expo-asset.
       map-style.ts                Estilo MapLibre con las dos fuentes vectoriales.
       expo-map-package-files.ts   Copia, espacio libre y borrado de paquetes.
 
   ui/                             Componentes, hooks, proveedores y tiendas.
     labels.ts                     Etiquetas de clases, variables y roles.
+    theme.ts                      Paleta, tipografía, espacios y radios.
+    components/ui/                Tarjeta, distintivo, encabezado de sección y tarjeta de acción.
     components/
       history-list.tsx            Lista de mediciones; muestra el lote.
       primary-button.tsx

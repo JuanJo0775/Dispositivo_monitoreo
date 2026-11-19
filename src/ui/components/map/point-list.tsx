@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 15,
-    color: '#4A4A4A',
+    color: '#4E5D59',
   },
   row: {
     gap: 2,
@@ -117,10 +117,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DCE3DA',
+    borderColor: '#E1D6C7',
   },
   rowPressed: {
-    backgroundColor: '#EEF3EC',
+    backgroundColor: '#E3EFEA',
   },
   header: {
     flexDirection: 'row',
@@ -131,24 +131,24 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1B4332',
+    color: '#0F4B42',
   },
   state: {
     flexShrink: 1,
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
     textAlign: 'right',
   },
   coordinates: {
     fontSize: 14,
-    color: '#1F1F1F',
+    color: '#2D3733',
   },
   quality: {
     fontSize: 13,
-    color: '#5A5A5A',
+    color: '#4E5D59',
   },
   alert: {
     fontSize: 13,
-    color: '#8A3B12',
+    color: '#8D321D',
   },
 });
