@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   statusValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   note: {
     fontSize: 14,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   value: {
     fontSize: 16,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   diagnosisClass: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   explanation: {
     fontSize: 15,

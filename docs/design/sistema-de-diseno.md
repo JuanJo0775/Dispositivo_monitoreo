@@ -1,12 +1,33 @@
 # Sistema de diseño
 
 La app tiene que leerse al sol, con guantes y con prisa. El sistema busca eso: fondos cálidos, verde
-profundo para lo principal y acentos de vino y terracota para lo que pide atención.
+profundo para lo principal y acentos de verde campo, vino y terracota para lo que pide atención.
+
+## Marca
+
+La marca del producto es **Agrovia**: una «A» que es a la vez montaña y surco, con el wordmark en una
+sans geométrica de remates redondeados. Todo el material de marca vive en
+`F:\uni\Z- Semillero baston\identidad de marca` y se copia al repositorio ya procesado:
+
+| Archivo | Versión | Cuándo |
+| --- | --- | --- |
+| `assets/brand/agrovia-logo-color.png` | A color sobre transparente (la principal) | Fondos claros |
+| `assets/brand/agrovia-logo-blanco.png` | Blanca sobre transparente | Fondos verde profundo (el hero del inicio) |
+| `assets/brand/agrovia-simbolo-color.png` | Solo la «A» a color | Icono, splash, marcas de agua |
+| `assets/brand/agrovia-simbolo-monocromo.png` | Solo la «A» en blanco | Icono monocromo de Android |
+
+`scripts/brand/build-brand-assets.ps1` recorta los originales, quita el fondo y compone
+`assets/icon.png`, el icono adaptativo y el del splash. Si la marca cambia, se reemplazan los
+originales y se vuelve a correr; no se redibuja a mano.
+
+Los colores salen del original a color: verde profundo `#015439` y verde campo `#2D963B`. El crema de
+la marca es `#F9FAF5`; el fondo de las pantallas es un beige cálido distinto a propósito, para que las
+tarjetas blancas no se confundan con el papel.
 
 ## De dónde sale la paleta
 
-De la guía de marca que el equipo tomó de Cofinet: verdes de montaña, vinos y terracotas del café y
-beiges de pradera. No se copiaron los componentes ni la lógica de esa app; se tomó la paleta y el
+De la identidad de Agrovia (verdes) y de la guía de marca que el equipo tomó de Cofinet (vinos,
+terracotas y beiges de pradera). No se copiaron los componentes ni la lógica de esa app; se tomó el
 criterio de agrupar la información en tarjetas.
 
 La traducción a tokens vive en `src/ui/theme.ts`. Ninguna pantalla nueva debe escribir un hex: pide
@@ -25,9 +46,9 @@ La traducción a tokens vive en `src/ui/theme.ts`. Ninguna pantalla nueva debe e
 | `colors.text` | `#2D3733` | Texto principal |
 | `colors.textMuted` | `#4E5D59` | Texto de apoyo |
 | `colors.textSoft` | `#6B7671` | Pie de tarjeta, notas |
-| `colors.primary` | `#0F4B42` | Acción principal, encabezado de la app |
-| `colors.primarySoft` | `#E3EFEA` | Presionado y fondos de énfasis suave |
-| `colors.accent` | `#258278` | Enlaces, «Abrir», datos activos |
+| `colors.primary` | `#015439` | Acción principal, encabezado de la app |
+| `colors.primarySoft` | `#E2F0E3` | Presionado y fondos de énfasis suave |
+| `colors.accent` | `#2D963B` | Enlaces, «Abrir», datos activos |
 | `colors.wine` | `#671741` | Secciones de historial y contexto |
 | `colors.terracotta` | `#8D321D` | Advertencias y acciones destructivas suaves |
 | `colors.danger` | `#601E18` | Borrar datos y errores |

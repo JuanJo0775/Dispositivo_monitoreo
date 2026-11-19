@@ -249,12 +249,12 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 15,
-    color: '#0F4B42',
+    color: '#015439',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
     marginTop: 4,
   },
   card: {
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   tag: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   actions: {
     flexDirection: 'row',
@@ -297,16 +297,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#0F4B42',
+    borderColor: '#015439',
     backgroundColor: '#FFFFFF',
   },
   actionPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   actionText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   note: {
     fontSize: 14,

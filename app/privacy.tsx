@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   intro: {
     fontSize: 16,

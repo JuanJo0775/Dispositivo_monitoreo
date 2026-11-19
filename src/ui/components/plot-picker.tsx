@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
   },
   rowSelected: {
     borderWidth: 2,
-    borderColor: '#0F4B42',
+    borderColor: '#015439',
   },
   rowPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   name: {
     fontSize: 16,
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
   },
   nameSelected: {
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   tag: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
 });

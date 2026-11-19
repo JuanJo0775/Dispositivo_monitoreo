@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     fontSize: 15,
-    color: '#0F4B42',
+    color: '#015439',
   },
   assignPanel: {
     marginHorizontal: 16,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   assignTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   assignDetail: {
     fontSize: 14,

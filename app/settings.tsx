@@ -152,7 +152,7 @@ export default function SettingsScreen() {
             onValueChange={(value) => {
               void handleTrialMode(value);
             }}
-            trackColor={{ false: '#D8CDBC', true: '#0F4B42' }}
+            trackColor={{ false: '#D8CDBC', true: '#015439' }}
             thumbColor="#FFFFFF"
           />
         </View>
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 17,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   switchRow: {
     flexDirection: 'row',
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 15,
-    color: '#0F4B42',
+    color: '#015439',
   },
   error: {
     fontSize: 15,

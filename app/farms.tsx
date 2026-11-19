@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontSize: 19,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   plots: {
     gap: 8,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   pressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   plotName: {
     fontSize: 16,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   empty: {
     flex: 1,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
     textAlign: 'center',
   },
   emptyDetail: {

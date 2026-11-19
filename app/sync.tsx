@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   subtitle: {
     fontSize: 15,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 15,
-    color: '#0F4B42',
+    color: '#015439',
   },
   error: {
     fontSize: 15,

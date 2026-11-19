@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { APP_NAME } from '@/shared/app-info';
 import { PrimaryButton } from '@/ui/components/primary-button';
 import { ActionCard } from '@/ui/components/ui/action-card';
 import { Card } from '@/ui/components/ui/card';
@@ -21,7 +20,13 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <View style={styles.hero}>
-        <Text style={styles.kicker}>{APP_NAME.toUpperCase()}</Text>
+        <Image
+          accessibilityLabel="Agrovia"
+          accessibilityRole="image"
+          source={require('../assets/brand/agrovia-logo-blanco.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <Text style={styles.heroTitle}>El suelo de tu lote, medido y documentado</Text>
         <Text style={styles.heroText}>
           Cada medición queda guardada en el teléfono con su hora y su posición. Sin cuentas, sin
@@ -91,12 +96,10 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     backgroundColor: palette.forest950,
   },
-  kicker: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '700',
-    letterSpacing: 1.4,
-    color: palette.forest300,
+  logo: {
+    width: 168,
+    height: 42,
+    marginBottom: spacing.sm,
   },
   heroTitle: {
     ...typography.display,

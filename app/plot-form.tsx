@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   subtitle: {
     fontSize: 15,
@@ -486,8 +486,8 @@ const styles = StyleSheet.create({
   },
   opcionActiva: {
     borderWidth: 2,
-    borderColor: '#0F4B42',
-    backgroundColor: '#E3EFEA',
+    borderColor: '#015439',
+    backgroundColor: '#E2F0E3',
   },
   presionado: {
     opacity: 0.85,
@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   },
   opcionTextoActiva: {
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   elegido: {
     fontSize: 13,

@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   classLabel: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   classCode: {
     fontSize: 14,
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   factorName: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   factorValue: {
     fontSize: 20,
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   },
   variableRow: {
     borderTopWidth: 1,
-    borderTopColor: '#E3EFEA',
+    borderTopColor: '#E2F0E3',
     paddingTop: 10,
     gap: 4,
   },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   variableName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   variableRole: {
     fontSize: 13,

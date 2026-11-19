@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Monitoreo de suelo",
+    "name": "Agrovia",
     "slug": "dispositivomonitoreo",
     "owner": "juanjo_38",
     "version": "0.1.0",
@@ -20,9 +20,8 @@
     "android": {
       "package": "com.semillero.monitoreosuelo",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F9FAF5",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
@@ -33,12 +32,19 @@
       "expo-sharing",
       "@maplibre/maplibre-react-native",
       [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": false,
+          "neverForLocation": true
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#E6F4FE"
+          "backgroundColor": "#F9FAF5"
         }
       ],
       "expo-asset"

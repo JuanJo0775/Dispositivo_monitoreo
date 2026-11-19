@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     borderColor: '#E1D6C7',
   },
   rowPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   rowHeader: {
     flexDirection: 'row',
@@ -175,11 +175,11 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   statusValid: {
     fontSize: 13,
-    color: '#0F4B42',
+    color: '#015439',
   },
   statusWarning: {
     fontSize: 13,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E3EFEA',
+    borderTopColor: '#E2F0E3',
     paddingTop: 8,
   },
   plot: {
@@ -222,14 +222,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#0F4B42',
+    borderColor: '#015439',
   },
   assignPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   assignText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
 });

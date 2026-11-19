@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   subtitle: {
     fontSize: 14,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   closeText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   area: {
     fontSize: 14,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
     marginTop: 4,
   },
   summaryRow: {
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#EEF0EA',
   },
   measurementPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   measurementTime: {
     fontSize: 14,

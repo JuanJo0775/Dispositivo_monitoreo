@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     borderColor: '#E1D6C7',
   },
   rowPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   header: {
     flexDirection: 'row',
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   time: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   state: {
     flexShrink: 1,

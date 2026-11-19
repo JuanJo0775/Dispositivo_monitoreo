@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   plotName: {
     fontSize: 19,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   headerLine: {
     fontSize: 14,
@@ -553,16 +553,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#0F4B42',
+    borderColor: '#015439',
     backgroundColor: '#FFFFFF',
   },
   zoomPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   zoomText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   attribution: {
     flexShrink: 1,
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   sectionEmpty: {
     fontSize: 14,
@@ -597,13 +597,13 @@ const styles = StyleSheet.create({
     borderColor: '#E1D6C7',
   },
   alertPressed: {
-    backgroundColor: '#E3EFEA',
+    backgroundColor: '#E2F0E3',
   },
   alertCount: {
     minWidth: 20,
     fontSize: 14,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   alertMessage: {
     flexShrink: 1,
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   empty: {
     flex: 1,
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
     textAlign: 'center',
   },
   emptyDetail: {

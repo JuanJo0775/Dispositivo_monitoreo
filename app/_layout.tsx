@@ -16,7 +16,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'Monitoreo de suelo' }} />
+        <Stack.Screen name="index" options={{ title: 'Agrovia' }} />
         <Stack.Screen name="connect" options={{ title: 'Conectar' }} />
         <Stack.Screen name="sync" options={{ title: 'Sincronizar' }} />
         <Stack.Screen name="measure" options={{ title: 'Medir' }} />

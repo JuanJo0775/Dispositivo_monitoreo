@@ -125,11 +125,11 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0F4B42',
+    color: '#015439',
   },
   hint: {
     fontSize: 15,
-    color: '#0F4B42',
+    color: '#015439',
   },
   empty: {
     fontSize: 15,

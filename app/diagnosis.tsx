@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F4B42',
+    color: '#015439',
   },
   card: {
     backgroundColor: '#FFFFFF',
