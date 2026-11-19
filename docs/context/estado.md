@@ -47,11 +47,11 @@ diagnostica, documenta y exporta. La meta es terminar el producto durante 2027.
 
 ## Lo que todavía no está verificado
 
-- **APK en un teléfono real**: el APK `preview` `da367f3f` se compiló desde `main` (`e261b56`) y se
-  instaló. El pincho de mapa mostró que `pmtiles://asset://` no dibuja: el archivo viajaba
-  comprimido dentro del APK. El mapa incluido ahora se extrae a un archivo real con `expo-asset` y se
-  abre con `pmtiles://file://…`; falta confirmarlo en el próximo APK, que exige rebuild porque suma
-  `expo-asset` y `expo-updates`.
+- **APK en un teléfono real**: el primer APK `preview` (`da367f3f`, `e261b56`) mostró que
+  `pmtiles://asset://` no dibuja: el archivo viajaba comprimido dentro del APK. El de ahora
+  (`50474068`, `2596039`) ya trae el mapa extraído a un archivo real con `expo-asset`, la marca
+  Agrovia, el BLE real y `expo-updates`; falta instalarlo y confirmar mapa, conexión y recepción de
+  una actualización.
 - **Bastón físico**: el BLE real ya está cableado (`BlePlxTransport` + `BleStickGateway`, permisos de
   Android y pantalla de escaneo), pero falta probarlo con el bastón del semillero. El firmware todavía
   tiene que implementar los UUID del contrato y el intercambio de sal del emparejamiento; hasta
@@ -72,10 +72,42 @@ diagnostica, documenta y exporta. La meta es terminar el producto durante 2027.
 3. Completar el correo de contacto del aviso de privacidad antes de publicar.
 4. Terminar el sistema de diseño: componentes reutilizables aplicados a todas las pantallas.
 
+## Conectar el bastón
+
+1. Encender el bastón y dejarlo cerca del teléfono.
+2. En la app: «Conectar» → «Buscar bastones». Android pide permiso de Bluetooth la primera vez; sin
+   ese permiso el escaneo no devuelve nada.
+3. La lista muestra **todos** los aparatos que hay cerca. Los que anuncian el servicio del contrato
+   llevan la insignia «Del contrato»; los demás aparecen como «Otro aparato» para que se vea qué hay
+   en el ambiente cuando el bastón no está.
+4. Tocar el bastón de la lista conecta con ese identificador. Si el servicio no aparece al descubrir,
+   la app lo dice: el problema está en el firmware, no en el teléfono.
+5. «Emparejar» pide el PIN de seis dígitos. Hoy falla con un mensaje honesto («Falta la sal de
+   emparejamiento») porque el firmware todavía no implementa ese intercambio; **conectar y descubrir
+   no dependen de eso**.
+
+El bastón de prueba está al final de la pantalla, detrás de un toque explícito. Sus capturas quedan
+marcadas como simuladas y no sirven como dato de campo.
+
 ## Compilar (EAS)
 
 La release se compila desde `main`. El corte 3 ya está integrado: el PR #5 se fusionó en
 `2df470f`. El APK se compila en la nube; no hace falta Android SDK ni JDK local.
+
+**Lo normal es no compilar.** Un build solo hace falta cuando cambia algo nativo: SDK, permisos,
+librerías con código nativo, icono, splash o versión. Todo lo demás (pantallas, estilos, assets, el
+`.pmtiles`) viaja por EAS Update sin gastar cuota. El plan gratuito da unas 15 compilaciones Android
+al mes.
+
+Compilar a mano desde GitHub:
+
+```powershell
+gh workflow run eas-build.yml -f profile=preview
+gh run list --workflow=eas-build.yml
+```
+
+O en la web: Actions → «Compilar APK» → Run workflow. El flujo corre `npm run check`, compila con
+EAS, espera y deja el APK enlazado en el run.
 
 En la web de EAS, para este repositorio:
 
