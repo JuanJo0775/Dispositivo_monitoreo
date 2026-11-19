@@ -1,0 +1,59 @@
+# Compila la app en la nube (EAS Build) y deja el APK descargable.
+#
+# Cuándo hace falta: solo cuando cambia algo **nativo** — SDK, permisos,
+# librerías con código nativo, icono, splash o versión. Los cambios de
+# JavaScript, estilos y assets viajan por EAS Update
+# (`.github/workflows/eas-update.yml`) sin gastar compilación.
+#
+# La cuota gratuita es de 15 compilaciones Android al mes: no se dispara solo.
+# Se lanza a mano desde Actions → «Compilar APK» → Run workflow.
+name: Compilar APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Perfil de EAS Build
+        type: choice
+        options:
+          - preview
+          - production
+        default: preview
+
+concurrency:
+  group: eas-build-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  compilar:
+    name: Compilar y esperar el APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      PERFIL: ${{ inputs.profile }}
+    steps:
+      - name: Traer el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Formato, lint, tipos y pruebas
+        run: npm run check
+
+      - name: Compilar
+        run: |
+          npx eas-cli@latest build \
+            --profile "$PERFIL" \
+            --platform android \
+            --non-interactive

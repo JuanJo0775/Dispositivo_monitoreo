@@ -18,6 +18,16 @@ function configuracion(overrides: Partial<SessionConfig> = {}): SessionConfig {
 }
 
 describe('SimulatedStickGateway', () => {
+  it('el escaneo devuelve el bastón de prueba como compatible', async () => {
+    const gateway = new SimulatedStickGateway({ deviceId: 'stick-01' });
+
+    const encontrados = await gateway.scan();
+
+    expect(encontrados).toHaveLength(1);
+    expect(encontrados[0]?.deviceId).toBe('stick-01');
+    expect(encontrados[0]?.compatible).toBe(true);
+  });
+
   it('emite una captura con secuencia creciente al pedirla', async () => {
     const gateway = new SimulatedStickGateway({ deviceId: 'stick-01' });
     const seen: number[] = [];

@@ -78,7 +78,12 @@ export function makeFakeBleTransport(device: SimulatedStickDevice): BleTransport
       }
 
       const results: BleScanResult[] = [
-        { deviceId: device.deviceId, name: device.name, rssi: device.rssi },
+        {
+          deviceId: device.deviceId,
+          name: device.name,
+          rssi: device.rssi,
+          advertisesOwnService: true,
+        },
       ];
 
       connectionState = 'idle';

@@ -75,6 +75,7 @@ function gatewayFalso(antesDeEscribir?: () => void): GatewayFalso {
   });
 
   const gateway: StickGateway = {
+    scan: async () => [],
     connect: async () => undefined,
     disconnect: async () => undefined,
     status: () => ESTADO_CONECTADO,

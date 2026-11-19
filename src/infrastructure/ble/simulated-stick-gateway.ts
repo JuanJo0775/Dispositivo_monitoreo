@@ -1,7 +1,7 @@
 import type { CapturePayload, RawCapture } from '@/domain/capture/types';
 import { flagsFromBits, type StickRecord } from '@/domain/protocol/record-codec';
 import type { SessionConfig } from '@/domain/session/types';
-import type { StickGateway, StickStatus, Unsubscribe } from '@/ports/stick-gateway';
+import type { StickCandidate, StickGateway, StickStatus, Unsubscribe } from '@/ports/stick-gateway';
 import {
   SimulatedStickDevice,
   type StickSensors,
@@ -66,6 +66,27 @@ export class SimulatedStickGateway implements StickGateway {
   /** Bastón simulado sobre el que está construido el gateway. */
   simulatedDevice(): SimulatedStickDevice {
     return this.device;
+  }
+
+  /**
+   * El bastón de prueba siempre está a la vista.
+   *
+   * Sirve para probar la app sin hardware; la interfaz lo marca como tal y
+   * toda captura que sale de acá viaja con la bandera de dato simulado.
+   */
+  async scan(): Promise<readonly StickCandidate[]> {
+    if (!this.device.isVisible()) {
+      return [];
+    }
+
+    return [
+      {
+        deviceId: this.device.deviceId,
+        name: this.device.name,
+        rssi: this.device.rssi,
+        compatible: true,
+      },
+    ];
   }
 
   async connect(deviceId: string): Promise<void> {

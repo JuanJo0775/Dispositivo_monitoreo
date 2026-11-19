@@ -19,6 +19,7 @@ import {
 import type {
   BleCharacteristic,
   BleConnectionState,
+  BleScanOptions,
   BleScanResult,
   BleTransport,
 } from '@/ports/ble-transport';
@@ -128,14 +129,15 @@ export class BlePlxTransport implements BleTransport {
     this.manager = createManager(options.library);
   }
 
-  /** Escanea los dispositivos que anuncian el servicio propio del bastón. */
-  async scan(options: { timeoutMs: number }): Promise<BleScanResult[]> {
+  /** Escanea los dispositivos cercanos; por defecto, los del servicio propio. */
+  async scan(options: BleScanOptions): Promise<BleScanResult[]> {
+    const onlyOwnService = options.onlyOwnService ?? true;
     const found = new Map<string, BleScanResult>();
     this.setState('scanning');
 
     try {
       await this.manager.startDeviceScan(
-        [BLE_SERVICE_UUID],
+        onlyOwnService ? [BLE_SERVICE_UUID] : null,
         { allowDuplicates: false },
         (error, device) => {
           if (error !== null) {
@@ -145,7 +147,7 @@ export class BlePlxTransport implements BleTransport {
           if (device === null) {
             return;
           }
-          const result = toScanResult(device);
+          const result = toScanResult(device, onlyOwnService);
           if (result === null) {
             return;
           }
@@ -389,8 +391,10 @@ function loadLibrary(): BlePlxLibrary {
 }
 
 /** Traduce un dispositivo escaneado al resultado del puerto. */
-function toScanResult(device: BlePlxScannedDevice): BleScanResult | null {
-  if (!advertisesOwnService(device)) {
+function toScanResult(device: BlePlxScannedDevice, onlyOwnService: boolean): BleScanResult | null {
+  const compatible = advertisesOwnService(device);
+
+  if (onlyOwnService && !compatible) {
     return null;
   }
 
@@ -398,6 +402,7 @@ function toScanResult(device: BlePlxScannedDevice): BleScanResult | null {
     deviceId: device.id,
     name: device.name ?? device.localName ?? null,
     rssi: device.rssi ?? 0,
+    advertisesOwnService: compatible,
   };
 }
 

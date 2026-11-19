@@ -55,12 +55,33 @@ export interface StickStatus {
 export type Unsubscribe = () => void;
 
 /**
+ * Bastón encontrado por Bluetooth, antes de conectar.
+ *
+ * `compatible` dice si anuncia el servicio del contrato. Un aparato que no lo
+ * anuncia se puede listar y hasta intentar conectar, pero la app avisa: no es
+ * un bastón con el que sepa hablar.
+ */
+export interface StickCandidate {
+  readonly deviceId: string;
+  readonly name: string | null;
+  readonly rssi: number;
+  readonly compatible: boolean;
+}
+
+/**
  * Puerto de salida hacia el bastón.
  *
  * La app real lo implementa con BLE; el desarrollo y las pruebas, con un
  * simulador. Ninguna capa de dominio o aplicación conoce BLE.
  */
 export interface StickGateway {
+  /**
+   * Busca bastones cerca, sin conectarse.
+   *
+   * Devuelve también los aparatos que no anuncian el servicio del contrato:
+   * en campo, saber que el bastón no aparece es la mitad del diagnóstico.
+   */
+  scan(): Promise<readonly StickCandidate[]>;
   connect(deviceId: string): Promise<void>;
   disconnect(): Promise<void>;
   status(): StickStatus;

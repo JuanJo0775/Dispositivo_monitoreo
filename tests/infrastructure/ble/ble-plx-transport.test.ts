@@ -289,8 +289,23 @@ describe('BlePlxTransport', () => {
       deviceId: 'AA:BB:CC:DD:EE:FF',
       name: 'Bastón',
       rssi: -55,
+      advertisesOwnService: true,
     });
     expect(manager.scanFilter).toEqual([BLE_SERVICE_UUID]);
+  });
+
+  it('con el escaneo abierto lista también los aparatos ajenos y los marca', async () => {
+    manager.scanResults.push(
+      new FakeScannedDevice('AA:BB:CC:DD:EE:FF', 'Bastón', -55, [BLE_SERVICE_UUID]),
+      new FakeScannedDevice('11:22:33:44:55:66', 'Audífonos', -80, ['servicio-ajeno']),
+    );
+
+    const results = await transport.scan({ timeoutMs: 5, onlyOwnService: false });
+    const ajeno = results.find((result) => result.deviceId === '11:22:33:44:55:66');
+
+    expect(manager.scanFilter).toBeNull();
+    expect(results).toHaveLength(2);
+    expect(ajeno?.advertisesOwnService).toBe(false);
   });
 
   it('el escaneo se cancela al cumplirse el tiempo', async () => {

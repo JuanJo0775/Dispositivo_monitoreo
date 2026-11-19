@@ -36,6 +36,7 @@ import type { SessionConfig } from '@/domain/session/types';
 import type { BleTransport } from '@/ports/ble-transport';
 import type { RandomBytes } from '@/ports/random-bytes';
 import type {
+  StickCandidate,
   StickGateway,
   StickGatewayState,
   StickStatus,
@@ -256,6 +257,29 @@ export class BleStickGateway implements StickGateway, StickSync {
   // ------------------------------------------------------------- conexión
 
   /**
+   * Busca bastones cerca, sin conectar.
+   *
+   * Abre el escaneo a todos los aparatos: la pantalla de conexión necesita
+   * mostrar qué hay alrededor para poder decir «el bastón no está emitiendo»
+   * en vez de quedarse en un «no se encontró» sin explicación.
+   */
+  async scan(): Promise<readonly StickCandidate[]> {
+    const results = await this.transport.scan({
+      timeoutMs: this.options.scanTimeoutMs,
+      onlyOwnService: false,
+    });
+
+    return results
+      .map((result) => ({
+        deviceId: result.deviceId,
+        name: result.name,
+        rssi: result.rssi,
+        compatible: result.advertisesOwnService,
+      }))
+      .sort((one, other) => other.rssi - one.rssi);
+  }
+
+  /**
    * Conecta con el bastón: escanea, conecta, descubre las características y
    * lee el estado.
    *
@@ -268,7 +292,10 @@ export class BleStickGateway implements StickGateway, StickSync {
 
     try {
       this.setState('scanning');
-      const results = await this.transport.scan({ timeoutMs: this.options.scanTimeoutMs });
+      const results = await this.transport.scan({
+        timeoutMs: this.options.scanTimeoutMs,
+        onlyOwnService: false,
+      });
 
       if (!results.some((result) => result.deviceId === deviceId)) {
         throw new Error(`No se encontró el bastón ${deviceId} en el escaneo.`);

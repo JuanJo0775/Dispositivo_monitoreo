@@ -364,4 +364,30 @@ describe('BleStickGateway', () => {
     await expect(gateway.writeConfig(configuracion())).rejects.toThrow(/emparejado/i);
     expect(gateway.state()).toBe('ready');
   });
+
+  it('el escaneo devuelve el bastón con su identificador antes de conectar', async () => {
+    const device = new SimulatedStickDevice({ deviceId: 'stick-01' });
+    const gateway = gatewayDe(makeFakeBleTransport(device));
+
+    const encontrados = await gateway.scan();
+
+    expect(encontrados).toHaveLength(1);
+    expect(encontrados[0]?.deviceId).toBe('stick-01');
+    expect(encontrados[0]?.compatible).toBe(true);
+  });
+
+  it('conecta con el aparato aunque el escaneo no lo marque como compatible', async () => {
+    const device = new SimulatedStickDevice({ deviceId: 'stick-01' });
+    const transport = makeFakeBleTransport(device);
+    const gateway = gatewayDe({
+      ...transport,
+      async scan() {
+        return [{ deviceId: 'stick-01', name: 'Bastón', rssi: -60, advertisesOwnService: false }];
+      },
+    });
+
+    await gateway.connect('stick-01');
+
+    expect(gateway.state()).toBe('ready');
+  });
 });

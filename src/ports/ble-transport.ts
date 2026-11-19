@@ -14,6 +14,25 @@ export interface BleScanResult {
   readonly deviceId: BleDeviceId;
   readonly name: string | null;
   readonly rssi: number;
+  /**
+   * Si el dispositivo anuncia el servicio propio del bastón.
+   *
+   * Un bastón del contrato lo anuncia; cualquier otro aparato —audífonos, un
+   * televisor— aparece en un escaneo abierto y se marca aquí para que la
+   * interfaz lo diga antes de intentar conectarse.
+   */
+  readonly advertisesOwnService: boolean;
+}
+
+/** Opciones del escaneo. */
+export interface BleScanOptions {
+  readonly timeoutMs: number;
+  /**
+   * Si es `true` (lo normal), se piden al sistema solo los dispositivos que
+   * anuncian el servicio propio. La pantalla de conexión abre el escaneo para
+   * mostrar qué hay cerca y poder explicar por qué no aparece el bastón.
+   */
+  readonly onlyOwnService?: boolean;
 }
 
 /** Característica descubierta, con sus propiedades. */
@@ -40,8 +59,8 @@ export interface BleTransportEvents {
 
 /** Transporte BLE: todo lo que la app necesita del Bluetooth. */
 export interface BleTransport extends BleTransportEvents {
-  /** Escanea dispositivos que anuncian el servicio propio. */
-  scan(options: { timeoutMs: number }): Promise<BleScanResult[]>;
+  /** Escanea dispositivos; por defecto, solo los que anuncian el servicio propio. */
+  scan(options: BleScanOptions): Promise<BleScanResult[]>;
   /** Conecta con un dispositivo. */
   connect(deviceId: BleDeviceId): Promise<void>;
   /** Cierra la conexión. */
