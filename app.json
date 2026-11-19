@@ -4,6 +4,7 @@
     "slug": "dispositivomonitoreo",
     "owner": "juanjo_38",
     "version": "0.1.0",
+    "platforms": ["android"],
     "orientation": "portrait",
     "scheme": "monitoreosuelo",
     "icon": "./assets/icon.png",
