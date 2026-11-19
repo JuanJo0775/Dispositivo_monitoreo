@@ -1,12 +1,8 @@
 import { BASE_SOURCE_ID, DETAIL_SOURCE_ID, buildMapStyle } from '@/infrastructure/maps/map-style';
-import {
-  BASE_ARCHIVE_NAME,
-  assetArchiveUri,
-  fileArchiveUri,
-} from '@/infrastructure/maps/pmtiles-archive-store';
+import { BASE_ARCHIVE_NAME, pmtilesFileUri } from '@/shared/pmtiles-uri';
 import type { StyleSpecification } from '@maplibre/maplibre-react-native';
 
-const BASE_URI = 'pmtiles://asset://base.pmtiles';
+const BASE_URI = 'pmtiles://file:///data/user/0/app/files/maps/base.pmtiles';
 const DETAIL_URI = 'pmtiles://file:///data/user/0/app/files/maps/pkg-1.pmtiles';
 
 /** Capas del estilo, ya tipadas para poder mirar `source`. */
@@ -28,7 +24,7 @@ describe('buildMapStyle', () => {
   it('no contiene ninguna URL http: el mapa es offline', () => {
     const serializado = JSON.stringify(
       buildMapStyle({
-        base: 'pmtiles://asset://base.pmtiles',
+        base: BASE_URI,
         detalle: 'pmtiles://file:///data/x.pmtiles',
       }),
     );
@@ -90,16 +86,15 @@ describe('buildMapStyle', () => {
     expect(capas(style).some((capa) => capa.type === 'symbol')).toBe(false);
   });
 
-  it('arma la URI del paquete empaquetado en el APK', () => {
+  it('el paquete base que viaja con la app se llama base.pmtiles', () => {
     expect(BASE_ARCHIVE_NAME).toBe('base.pmtiles');
-    expect(assetArchiveUri(BASE_ARCHIVE_NAME)).toBe('pmtiles://asset://base.pmtiles');
   });
 
   it('arma la URI del archivo en el almacenamiento de la app, sin duplicar file://', () => {
-    expect(fileArchiveUri('/data/user/0/x/base.pmtiles')).toBe(
+    expect(pmtilesFileUri('/data/user/0/x/base.pmtiles')).toBe(
       'pmtiles://file:///data/user/0/x/base.pmtiles',
     );
-    expect(fileArchiveUri('file:///data/user/0/x/base.pmtiles')).toBe(
+    expect(pmtilesFileUri('file:///data/user/0/x/base.pmtiles')).toBe(
       'pmtiles://file:///data/user/0/x/base.pmtiles',
     );
   });

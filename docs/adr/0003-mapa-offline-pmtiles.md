@@ -43,8 +43,11 @@ en la nube con EAS Build, que es gratuito para este uso.
    a zoom 0–6, ~1,2 MB, versionado) siempre está; el paquete **detallado** que la persona importa se
    dibuja encima. Sin paquete detallado el mapa igual abre, con menos detalle.
 4. La app **no descarga nada**: el paquete detallado lo elige la persona desde el selector de
-   archivos del sistema, se copia al almacenamiento privado y se abre con
-   `pmtiles://file://…`. El incluido se abre con `pmtiles://asset://…`.
+   archivos del sistema, se copia al almacenamiento privado y se abre con `pmtiles://file://…`. El
+   incluido viaja como recurso de Metro dentro del APK y, la primera vez que se abre el mapa, se
+   extrae a los documentos de la app con `expo-asset`; también se abre con `pmtiles://file://…`. La
+   variante `pmtiles://asset://…` **no sirve** para un `.pmtiles`: el archivo queda comprimido dentro
+   del APK y el motor no puede leerlo por rangos.
 5. Los paquetes se generan con `scripts/map/extract-pmtiles.mjs` a partir de un build diario de
    Protomaps; el binario oficial de `pmtiles` se descarga a `scripts/map/.bin/` (ignorado por git) y
    no se instala en el sistema. La caja y el zoom se validan **antes** de pedir un byte al servidor.
@@ -73,9 +76,11 @@ en la nube con EAS Build, que es gratuito para este uso.
   importe en su teléfono (no viajan en el APK).
 - Los datos del mapa incluido quedan congelados a la fecha del build de Protomaps; para
   actualizarlos se regenera `base.pmtiles` con el script y se commitea.
-- La lectura del archivo empaquetado con `pmtiles://asset://` está pendiente de confirmar en un
-  teléfono real (pincho de la tarea 0). Si no funciona, la app copia el paquete incluido al
-  almacenamiento privado la primera vez y usa `file://`; el resto no cambia.
+- La lectura del archivo empaquetado con `pmtiles://asset://` **no funciona** en Android: el
+  paquete queda como entrada comprimida del APK y MapLibre no lo puede leer por posiciones (el
+  pincho de la tarea 0 dibujó un rectángulo negro). Por eso el incluido se extrae a un archivo real
+  con `expo-asset` antes de abrirlo. `expo-asset` y `expo-updates` exigen un build nativo nuevo; de
+  ahí en adelante el JavaScript y los assets se actualizan con EAS Update sin recompilar.
 - Si el paquete no abre —archivo dañado, URI que el motor no resuelve o módulo nativo que falla— la
   pantalla cae a un croquis con celdas y puntos y lo avisa. El mapa nunca deja el área en blanco.
 - Un paquete importado se valida por su firma `PMTiles`, no por la extensión del nombre.

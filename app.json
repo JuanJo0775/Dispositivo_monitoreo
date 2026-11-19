@@ -8,6 +8,14 @@
     "scheme": "monitoreosuelo",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/84fc947c-6e0e-4ce9-9483-7d5d8fd9ee25",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
     "android": {
       "package": "com.semillero.monitoreosuelo",
       "adaptiveIcon": {
@@ -23,7 +31,6 @@
       "expo-sqlite",
       "expo-sharing",
       "@maplibre/maplibre-react-native",
-      "./plugins/with-map-assets",
       [
         "expo-splash-screen",
         {
@@ -32,7 +39,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#E6F4FE"
         }
-      ]
+      ],
+      "expo-asset"
     ],
     "web": {
       "favicon": "./assets/favicon.png"

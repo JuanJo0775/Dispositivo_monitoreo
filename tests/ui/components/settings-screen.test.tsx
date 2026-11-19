@@ -5,6 +5,7 @@ import type { AppServices } from '@/ui/providers/app-context';
 import { AppContext } from '@/ui/providers/app-context';
 
 import SettingsScreen from '../../../app/settings';
+import { fakeBaseMap } from '../../helpers/base-map';
 import rawSet from '../../../assets/thresholds/2026.11-v1.json';
 import { makeInMemorySettingsStore } from '../../helpers/in-memory-diagnosis-stores';
 import { makeInMemoryMapPackageFiles } from '../../helpers/in-memory-map-package-files';
@@ -45,6 +46,7 @@ function makeServices() {
     gateway: {} as unknown as AppServices['gateway'],
     sync: {} as unknown as AppServices['sync'],
     mapFiles: files.files,
+    baseMap: fakeBaseMap,
     deviceId: 'stick-01',
     thresholds,
   };

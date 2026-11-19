@@ -6,16 +6,13 @@ import { listFarms, listPlots } from '@/application/farm/list-farms';
 import { describePlotSpace, type PlotSpace } from '@/application/map/describe-plot-space';
 import { ensurePlotDiagnoses } from '@/application/map/ensure-plot-diagnoses';
 import { getActiveMapPackage } from '@/application/map/manage-map-packages';
+import { prepareBaseMap } from '@/application/map/prepare-base-map';
 import type { AptitudeClass } from '@/domain/diagnosis/types';
 import type { Plot } from '@/domain/farm/types';
 import { MAX_CELLS } from '@/domain/geo/grid';
-import {
-  assetArchiveUri,
-  BASE_ARCHIVE_NAME,
-  fileArchiveUri,
-} from '@/infrastructure/maps/pmtiles-archive-store';
 import type { MapPackage } from '@/ports/stores/map-package-store';
 import { formatArea } from '@/shared/format';
+import { pmtilesFileUri } from '@/shared/pmtiles-uri';
 import { CellSheet } from '@/ui/components/map/cell-sheet';
 import { FallbackMap } from '@/ui/components/map/fallback-map';
 import { MapErrorBoundary } from '@/ui/components/map/map-error-boundary';
@@ -33,6 +30,10 @@ const AVISO_DIAGNOSTICOS =
 const AVISO_TESELAS =
   'El mapa no pudo abrir el paquete de teselas. Se muestra el croquis con las celdas y los puntos medidos.';
 
+/** Texto cuando el mapa incluido no se pudo preparar en el teléfono. */
+const AVISO_MAPA_INCLUIDO =
+  'No se pudo preparar el mapa incluido en este teléfono. El croquis y los datos del lote siguen disponibles.';
+
 /**
  * Pantalla del lote: encabezado, mapa, resumen, leyenda, alertas y puntos.
  *
@@ -46,7 +47,7 @@ const AVISO_TESELAS =
  * midió, no el contorno del lote.
  */
 export default function MapScreen() {
-  const { stores, thresholds } = useApp();
+  const { stores, thresholds, baseMap } = useApp();
   const router = useRouter();
   const params = useLocalSearchParams<{ plotId?: string }>();
   const plotParam = typeof params.plotId === 'string' ? params.plotId : null;
@@ -55,6 +56,7 @@ export default function MapScreen() {
   const [farmNames, setFarmNames] = useState<Record<string, string>>({});
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
   const [space, setSpace] = useState<PlotSpace | null>(null);
+  const [baseUri, setBaseUri] = useState<string | null>(null);
   const [detailUri, setDetailUri] = useState<string | null>(null);
   const [selectedCellId, setSelectedCellId] = useState<string | null>(null);
   const [mapKey, setMapKey] = useState(0);
@@ -123,6 +125,7 @@ export default function MapScreen() {
       setWarning(null);
       setSelectedCellId(null);
       setTilesFailed(false);
+      setBaseUri(null);
 
       try {
         let aviso: string | null = null;
@@ -152,11 +155,13 @@ export default function MapScreen() {
           diagnoses: stores.diagnoses,
         });
         const paquete = await paqueteActivo();
+        const base = await prepararBaseMapa();
 
         if (!cancelled) {
           setSpace(descrito);
-          setDetailUri(paquete === null ? null : fileArchiveUri(paquete.path));
-          setWarning(aviso);
+          setBaseUri(base);
+          setDetailUri(paquete === null ? null : pmtilesFileUri(paquete.path));
+          setWarning(aviso ?? (base === null ? AVISO_MAPA_INCLUIDO : null));
           setError(null);
         }
       } catch (loadError) {
@@ -181,12 +186,24 @@ export default function MapScreen() {
       return id === null ? null : stores.mapPackages.get(id);
     }
 
+    /**
+     * El mapa incluido es opcional: si no se puede preparar, el lote abre con
+     * el croquis. Nunca se deja el área en blanco (diseño §11.4).
+     */
+    async function prepararBaseMapa(): Promise<string | null> {
+      try {
+        return await prepareBaseMap(baseMap);
+      } catch {
+        return null;
+      }
+    }
+
     void load();
 
     return () => {
       cancelled = true;
     };
-  }, [selectedPlotId, stores, thresholds]);
+  }, [selectedPlotId, stores, thresholds, baseMap]);
 
   const clases = useMemo<readonly AptitudeClass[]>(() => {
     if (space === null) {
@@ -271,8 +288,9 @@ export default function MapScreen() {
     space !== null && space.grid !== null && space.grid.adjusted
       ? `Malla ajustada a celdas de ${formatArea(space.grid.cellAreaHa)} para no pasar de ${MAX_CELLS} celdas.`
       : null;
-  // El paquete base va empaquetado con la app; el detallado se importa aparte.
-  const baseUri: string | null = assetArchiveUri(BASE_ARCHIVE_NAME);
+  // El paquete base se abre como archivo real; el detallado se importa aparte
+  // y también se abre desde el almacenamiento de la app.
+  const sinTeselas = !loadingSpace && baseUri === null && detailUri === null;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -331,7 +349,7 @@ export default function MapScreen() {
             ) : null}
 
             <View style={styles.mapFrame}>
-              {tilesFailed ? (
+              {tilesFailed || sinTeselas ? (
                 <FallbackMap
                   space={space}
                   onSelectCell={setSelectedCellId}

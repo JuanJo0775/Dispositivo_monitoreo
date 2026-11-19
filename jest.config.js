@@ -2,6 +2,9 @@ module.exports = {
   preset: 'jest-expo',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    // Metro convierte un `.pmtiles` en el número del recurso; en Jest lo
+    // reemplazamos por un doble para no depender del empaquetado nativo.
+    '\\.pmtiles$': '<rootDir>/tests/helpers/pmtiles-asset-stub.ts',
   },
   testMatch: ['<rootDir>/tests/**/*.test.ts', '<rootDir>/tests/**/*.test.tsx'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],

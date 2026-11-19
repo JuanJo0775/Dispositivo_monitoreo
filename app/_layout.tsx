@@ -29,7 +29,6 @@ export default function RootLayout() {
         <Stack.Screen name="diagnosis" options={{ title: 'Diagnóstico' }} />
         <Stack.Screen name="settings" options={{ title: 'Ajustes' }} />
         <Stack.Screen name="privacy" options={{ title: 'Aviso de privacidad' }} />
-        <Stack.Screen name="map-spike" options={{ title: 'Pincho de mapa' }} />
       </Stack>
     </AppProvider>
   );

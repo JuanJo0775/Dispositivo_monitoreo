@@ -39,12 +39,7 @@ expo-env.d.ts
 # Metro
 .metro-health-check*
 
-# fixture del pincho de mapa: pesa 23,5 MB y no entra al repositorio
-# (`.easignore` lo vuelve a incluir para que el build de EAS lo lleve al APK)
-assets/maps/prueba.pmtiles
-
-# herramientas de construcción y paquetes de zonas: no viajan en el APK
-scripts/map/.bin/
+# Metro
 assets/maps/detalle.pmtiles
 assets/maps/quindio.pmtiles
 
@@ -85,8 +80,3 @@ coverage/
 
 # bocetos del compañero visual (locales)
 .superpowers/
-
-# EAS Build sube el proyecto con estas reglas en lugar de las de .gitignore.
-# El archivo de prueba del pincho de mapa no se versiona, pero el APK lo necesita:
-# se incluye a mano para que llegue al build.
-!assets/maps/prueba.pmtiles

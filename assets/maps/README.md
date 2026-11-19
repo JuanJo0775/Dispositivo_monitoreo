@@ -49,18 +49,6 @@ Límites que la app comprueba al importar:
 - debe caber en el espacio libre del teléfono;
 - no puede superar 200 MB (`MAX_MAP_PACKAGE_BYTES`).
 
-## `prueba.pmtiles` (temporal, pincho del corte 3)
-
-- **Qué es:** imágenes de los Alpes centrales en formato PMTiles v3 (23,5 MB), bajadas de
-  `https://demotiles.maplibre.org/pmtiles/raster/imagery.pmtiles`.
-- **Para qué sirve:** es el archivo de prueba del pincho (tarea 0 del corte 3). La pantalla
-  `app/map-spike.tsx` lo abre de dos maneras: como `pmtiles://asset://prueba.pmtiles` (empaquetado
-  en el APK) y como `pmtiles://file://<ruta>` (copiado al almacenamiento privado de la app).
-- **No se versiona:** pesa 23,5 MB y es un archivo de prueba. Está en `.gitignore`, y `.easignore`
-  lo vuelve a incluir para que el build de EAS lo lleve al APK.
-- **Cobertura:** longitud 9 a 15, latitud 46 a 49, zoom 0 a 11, teselas PNG.
-- Se borra cuando la persona confirme cuál de las dos URI dibuja en el teléfono.
-
 ## Atribución
 
 Las teselas son del basemap de Protomaps, hechas a partir de OpenStreetMap (© OpenStreetMap

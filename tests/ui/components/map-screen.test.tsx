@@ -102,6 +102,11 @@ function makeServices() {
     gateway: {} as unknown as AppServices['gateway'],
     sync: {} as unknown as AppServices['sync'],
     mapFiles: {} as unknown as AppServices['mapFiles'],
+    baseMap: {
+      async ensureLocalFile() {
+        return '/documentos/maps/base.pmtiles';
+      },
+    },
     deviceId: 'stick-01',
     thresholds,
   };
@@ -159,6 +164,25 @@ describe('pantalla de mapa', () => {
         '1 celda: 1 con dato, 0 sin dato, 0 no concluyente · 1 punto · 0 sin posición',
       ),
     ).toBeTruthy();
+  });
+
+  it('abre el mapa incluido desde un archivo real del teléfono', async () => {
+    const { services, stores } = makeServices();
+
+    await stores.measurements.insert(makeMeasurement({}, { id: 'm-1', sessionId: 'session-1' }));
+
+    await render(
+      <AppContext.Provider value={{ services, error: null }}>
+        <MapScreen />
+      </AppContext.Provider>,
+    );
+
+    await waitFor(() => expect(mockMapProps).not.toBeNull());
+
+    const style = mockMapProps?.mapStyle as
+      { sources?: Record<string, { url?: string }> } | undefined;
+
+    expect(style?.sources?.base?.url).toBe('pmtiles://file:///documentos/maps/base.pmtiles');
   });
 
   it('resume celdas, puntos y puntos sin posición', async () => {

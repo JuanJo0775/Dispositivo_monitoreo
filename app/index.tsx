@@ -32,17 +32,11 @@ export default function HomeScreen() {
           variant="secondary"
           onPress={() => router.push('/sync')}
         />
-        <PrimaryButton
-          label="Prueba de mapa en teléfono"
-          variant="secondary"
-          onPress={() => router.push('/map-spike')}
-        />
       </View>
 
       <Text style={styles.note}>
         Todo funciona sin internet: el bastón guarda cada medición y la app la conserva en el
-        teléfono. El mapa se arma con las coordenadas del GPS del bastón. El botón de prueba
-        comprueba el paquete de mapa en el teléfono y se retira cuando esa prueba quede registrada.
+        teléfono. El mapa se arma con las coordenadas del GPS del bastón.
       </Text>
     </View>
   );

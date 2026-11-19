@@ -8,6 +8,7 @@ import type { MapPackage } from '@/ports/stores/map-package-store';
 import type { ThresholdSet } from '@/domain/diagnosis/threshold-set';
 
 import MapPackagesScreen from '../../../app/map-packages';
+import { fakeBaseMap } from '../../helpers/base-map';
 import { makeInMemorySettingsStore } from '../../helpers/in-memory-diagnosis-stores';
 import {
   makeInMemoryMapPackageFiles,
@@ -67,6 +68,7 @@ function makeServices(
     gateway: {} as unknown as AppServices['gateway'],
     sync: {} as unknown as AppServices['sync'],
     mapFiles: disk.files,
+    baseMap: fakeBaseMap,
     deviceId: 'stick-01',
     thresholds: {} as unknown as ThresholdSet,
   };

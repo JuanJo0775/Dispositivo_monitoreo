@@ -10,9 +10,9 @@ import {
   listMapPackages,
   setActiveMapPackage,
 } from '@/application/map/manage-map-packages';
-import { BASE_ARCHIVE_NAME } from '@/infrastructure/maps/pmtiles-archive-store';
 import type { MapPackage } from '@/ports/stores/map-package-store';
 import { formatBytes } from '@/shared/format';
+import { BASE_ARCHIVE_NAME } from '@/shared/pmtiles-uri';
 import { PrimaryButton } from '@/ui/components/primary-button';
 import { useApp } from '@/ui/providers/app-context';
 

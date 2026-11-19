@@ -41,7 +41,6 @@ app/                              Rutas de expo-router. Una pantalla por archivo
   diagnosis.tsx                   Resultado del diagnóstico. (corte 1)
   map.tsx                         Mapa del lote: malla, celdas y puntos. (corte 3)
   map-packages.tsx                Paquetes de mapa offline. (corte 3)
-  map-spike.tsx                   Pincho temporal del mapa; se borra al confirmar en teléfono.
   settings.tsx                    Ajustes mínimos. (corte 1)
   privacy.tsx                     Aviso de privacidad. (corte 1)
 

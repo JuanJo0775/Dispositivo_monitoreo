@@ -45,8 +45,11 @@ diagnostica, documenta y exporta. La meta es terminar el producto durante 2027.
 
 ## Lo que todavía no está verificado
 
-- **APK en un teléfono real**: el build de EAS nunca se ha ejecutado desde esta rama. Falta confirmar
-  que MapLibre abre el paquete incluido y si la URI `asset://` funciona o hay que copiar a `file://`.
+- **APK en un teléfono real**: el APK `preview` `da367f3f` se compiló desde `main` (`e261b56`) y se
+  instaló. El pincho de mapa mostró que `pmtiles://asset://` no dibuja: el archivo viajaba
+  comprimido dentro del APK. El mapa incluido ahora se extrae a un archivo real con `expo-asset` y se
+  abre con `pmtiles://file://…`; falta confirmarlo en el próximo APK, que exige rebuild porque suma
+  `expo-asset` y `expo-updates`.
 - **Bastón físico**: el BLE, la sincronización y el GPS real se probaron con el bastón simulado.
 - **Campo**: capturar, sincronizar, importar CSV y revisar un lote con mediciones reales.
 - **Agronomía**: las pruebas demuestran que el motor aplica el set `2026.11-v1` de forma consistente;
@@ -58,13 +61,12 @@ diagnostica, documenta y exporta. La meta es terminar el producto durante 2027.
 
 ## Pendientes inmediatos
 
-1. Generar el keystore de Android en la página de credenciales de EAS; sin él el build falla.
-2. Compilar e instalar el APK `preview` desde `main` y probar el mapa en el teléfono.
-3. Reportar cuál URI dibuja (`asset://` o `file://`), registrar el resultado y retirar el pincho
-   temporal (`app/map-spike.tsx`, su ruta y `assets/maps/prueba.pmtiles`) antes de cualquier build de
-   producción.
-4. Revisar los umbrales con criterio agronómico antes de llamar «v1.0» al producto.
-5. Completar el correo de contacto del aviso de privacidad antes de publicar.
+1. Publicar el APK `preview` con el mapa incluido corregido y confirmar en el teléfono que dibuja.
+2. Crear el token de Expo y guardarlo como secreto `EXPO_TOKEN` del repositorio para que el flujo de
+   GitHub publique actualizaciones (`.github/workflows/eas-update.yml`).
+3. Revisar los umbrales con criterio agronómico antes de llamar «v1.0» al producto.
+4. Completar el correo de contacto del aviso de privacidad antes de publicar.
+5. Terminar el sistema de diseño: paleta y componentes reutilizables aplicados a todas las pantallas.
 
 ## Compilar (EAS)
 

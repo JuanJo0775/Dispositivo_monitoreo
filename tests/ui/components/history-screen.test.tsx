@@ -6,6 +6,7 @@ import { AppContext } from '@/ui/providers/app-context';
 
 import HistoryScreen from '../../../app/history';
 import rawSet from '../../../assets/thresholds/2026.11-v1.json';
+import { fakeBaseMap } from '../../helpers/base-map';
 import { makePlot } from '../../helpers/farm-fixtures';
 import {
   makeInMemoryDiagnosisStore,
@@ -80,6 +81,7 @@ function makeServices() {
     gateway: {} as unknown as AppServices['gateway'],
     sync: {} as unknown as AppServices['sync'],
     mapFiles: {} as unknown as AppServices['mapFiles'],
+    baseMap: fakeBaseMap,
     deviceId: 'stick-01',
     thresholds,
   };
